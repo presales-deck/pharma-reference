@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pharma Regulatory Authorities — Plain Language Reference</title>
+<meta name="description" content="A plain-language guide to FDA, EMA, WHO, and ICH — who they are, what they look for, and the key rules governing pharmaceutical manufacturing and AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f2ed;
+  --surface: #ffffff;
+  --surface2: #f0ede8;
+  --border: rgba(0,0,0,0.09);
+  --border-strong: rgba(0,0,0,0.15);
+  --text: #1a1714;
+  --text-muted: #5c5650;
+  --text-dim: #9a948e;
+  --fda: #b05c00;
+  --fda-bg: #fff4e8;
+  --fda-border: #f0c080;
+  --ema: #005fa3;
+  --ema-bg: #e8f2fc;
+  --ema-border: #9bcbef;
+  --who: #1a7a4a;
+  --who-bg: #e8f6ee;
+  --who-border: #90d4ae;
+  --ich: #6030b0;
+  --ich-bg: #f0ebfa;
+  --ich-border: #c4a8e8;
+  --display: 'Fraunces', serif;
+  --sans: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.header-inner {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
+.logo strong { color: var(--fda); font-weight: 500; }
+
+nav { display: flex; gap: 0; }
+
+nav a {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  transition: background 0.15s, color 0.15s;
+}
+
+nav a:hover { background: var(--surface2); color: var(--text); }
+
+/* ── HERO ── */
+.hero {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 80px 32px 64px;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-eyebrow::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-strong);
+  max-width: 60px;
+}
+
+.hero h1 {
+  font-family: var(--display);
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 900;
+  line-height: 1.06;
+  color: var(--text);
+  margin-bottom: 24px;
+  max-width: 700px;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--fda);
+}
+
+.hero-lead {
+  font-size: 17px;
+  color: var(--text-muted);
+  max-width: 600px;
+  line-height: 1.75;
+  margin-bottom: 48px;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.stat-item {}
+.stat-num {
+  font-family: var(--display);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+.stat-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* ── TOC ── */
+.toc-bar {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 56px;
+  z-index: 90;
+  overflow-x: auto;
+}
+
+.toc-inner {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  gap: 0;
+}
+
+.toc-link {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 10px 16px;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  letter-spacing: 0.04em;
+}
+
+.toc-link:hover { color: var(--text); border-color: var(--fda); }
+
+/* ── MAIN ── */
+.main {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 32px 80px;
+}
+
+/* ── SECTION HEADER ── */
+.section-head {
+  padding: 64px 0 36px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+}
+
+.section-head:first-child { border-top: none; }
+
+.section-num {
+  font-family: var(--display);
+  font-size: 48px;
+  font-weight: 900;
+  color: var(--border-strong);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.section-meta {}
+.section-label-small {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.section-title {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.section-intro {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: 680px;
+  margin-bottom: 32px;
+}
+
+/* ── AUTHORITY CARDS ── */
+.auth-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.auth-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+
+.auth-card-top {
+  padding: 28px 28px 0;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+}
+
+.auth-badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+  letter-spacing: 0.06em;
+}
+
+.auth-badge.fda { background: var(--fda-bg); color: var(--fda); border: 1px solid var(--fda-border); }
+.auth-badge.ema { background: var(--ema-bg); color: var(--ema); border: 1px solid var(--ema-border); }
+.auth-badge.who { background: var(--who-bg); color: var(--who); border: 1px solid var(--who-border); }
+.auth-badge.ich { background: var(--ich-bg); color: var(--ich); border: 1px solid var(--ich-border); }
+
+.auth-abbr {
+  font-family: var(--display);
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.auth-abbr.fda { color: var(--fda); }
+.auth-abbr.ema { color: var(--ema); }
+.auth-abbr.who { color: var(--who); }
+.auth-abbr.ich { color: var(--ich); }
+
+.auth-fullname {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+
+.auth-summary {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.auth-card-bottom {
+  padding: 20px 28px 24px;
+  background: var(--surface2);
+}
+
+.checks-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.check-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.check-list li {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  padding-left: 20px;
+  position: relative;
+}
+
+.check-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dot-color);
+}
+
+.auth-card.fda .check-list li::before { --dot-color: var(--fda); }
+.auth-card.ema .check-list li::before { --dot-color: var(--ema); }
+.auth-card.who .check-list li::before { --dot-color: var(--who); }
+.auth-card.ich .check-list li::before { --dot-color: var(--ich); }
+
+/* authority detail prose */
+.auth-detail {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 16px;
+}
+
+.auth-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.auth-detail-abbr {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 900;
+}
+.auth-detail-abbr.fda { color: var(--fda); }
+.auth-detail-abbr.ema { color: var(--ema); }
+.auth-detail-abbr.who { color: var(--who); }
+.auth-detail-abbr.ich { color: var(--ich); }
+
+.auth-detail-meta { flex: 1; }
+.auth-detail-name { font-size: 15px; font-weight: 500; color: var(--text); }
+.auth-detail-region { font-size: 13px; color: var(--text-dim); }
+
+.auth-detail-body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+.detail-block-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.detail-block p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+.detail-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-list li {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  padding-left: 18px;
+  position: relative;
+}
+
+.detail-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--text-dim);
+  font-size: 11px;
+  top: 1px;
+}
+
+/* analogy box */
+.analogy {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 16px;
+}
+
+.analogy-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.analogy p {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.65;
+  font-style: italic;
+}
+
+/* ── CITATIONS ── */
+.cite-group { margin-bottom: 40px; }
+
+.cite-group-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.cite-group-pill {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.cite-group-pill.fda { background: var(--fda-bg); color: var(--fda); border: 1px solid var(--fda-border); }
+.cite-group-pill.ema { background: var(--ema-bg); color: var(--ema); border: 1px solid var(--ema-border); }
+.cite-group-pill.who { background: var(--who-bg); color: var(--who); border: 1px solid var(--who-border); }
+.cite-group-pill.ich { background: var(--ich-bg); color: var(--ich); border: 1px solid var(--ich-border); }
+.cite-group-pill.joint { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border-strong); }
+
+.cite-group-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.cite-cards { display: flex; flex-direction: column; gap: 8px; }
+
+.cite-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 22px;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 20px;
+  align-items: start;
+  transition: border-color 0.15s;
+}
+
+.cite-card:hover { border-color: var(--border-strong); }
+
+.cite-id-block {}
+.cite-id {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.cite-year {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.cite-content {}
+.cite-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.cite-plain {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.cite-importance {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--surface2);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
+/* ── 7 STEPS ── */
+.steps-list { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+
+.step {
+  display: grid;
+  grid-template-columns: 64px 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  transition: background 0.15s;
+}
+
+.step:last-child { border-bottom: none; }
+.step:hover { background: var(--surface2); }
+
+.step-num-col {
+  background: var(--surface2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--fda);
+  opacity: 0.5;
+  padding: 24px 0;
+}
+
+.step-body { padding: 22px 24px; border-right: 1px solid var(--border); }
+.step-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+.step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+.step-plain {
+  padding: 22px 24px;
+  background: var(--fda-bg);
+}
+
+.step-plain-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--fda);
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  opacity: 0.7;
+}
+
+.step-plain p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* ── RISK TABLE ── */
+.risk-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+
+.risk-table { width: 100%; border-collapse: collapse; }
+
+.risk-table th {
+  background: var(--surface2);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 400;
+}
+
+.risk-table td {
+  padding: 16px 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.55;
+}
+
+.risk-table tr:last-child td { border-bottom: none; }
+.risk-table tr:hover td { background: var(--surface2); }
+.risk-table td strong { color: var(--text); font-weight: 500; }
+
+.risk-badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.risk-badge.high { background: #fff0f0; color: #c0302a; border: 1px solid #f0b0a8; }
+.risk-badge.medium { background: var(--fda-bg); color: var(--fda); border: 1px solid var(--fda-border); }
+.risk-badge.low { background: var(--who-bg); color: var(--who); border: 1px solid var(--who-border); }
+
+/* ── CALLOUT ── */
+.callout {
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--fda);
+  border-radius: 0 12px 12px 0;
+  background: var(--surface);
+  padding: 22px 26px;
+  margin: 32px 0;
+}
+
+.callout-type {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--fda);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.callout p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+.callout p strong { color: var(--text); font-weight: 500; }
+
+/* ── FOOTER ── */
+.site-footer {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding: 40px 32px;
+}
+
+.footer-inner {
+  max-width: 1060px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.footer-note {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.footer-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.footer-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  color: var(--text-dim);
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero h1 { animation: fadeUp 0.5s ease both; }
+.hero-lead { animation: fadeUp 0.5s 0.08s ease both; }
+.hero-stats { animation: fadeUp 0.5s 0.16s ease both; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .auth-grid { grid-template-columns: 1fr; }
+  .auth-detail-body { grid-template-columns: 1fr; }
+  .cite-card { grid-template-columns: 1fr; }
+  .step { grid-template-columns: 48px 1fr; }
+  .step-plain { display: none; }
+  nav { display: none; }
+  .hero { padding: 48px 20px 40px; }
+  .main { padding: 0 20px 60px; }
+  .header-inner { padding: 0 20px; }
+  .toc-inner { padding: 0 20px; }
+  .section-head { flex-direction: column; gap: 4px; padding-top: 48px; }
+  .section-num { font-size: 32px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><strong>PHARMA</strong> / Regulatory Reference</div>
+    <nav>
+      <a href="#authorities">Authorities</a>
+      <a href="#citations">Key Rules</a>
+      <a href="#fda-framework">FDA AI Steps</a>
+      <a href="#risk">Risk Guide</a>
+    </nav>
+  </div>
+</header>
+
+<!-- TOC -->
+<div class="toc-bar">
+  <div class="toc-inner">
+    <a href="#authorities" class="toc-link">01 — Who are they?</a>
+    <a href="#authority-detail" class="toc-link">02 — What do they do?</a>
+    <a href="#citations" class="toc-link">03 — Key rules & citations</a>
+    <a href="#fda-framework" class="toc-link">04 — FDA AI framework</a>
+    <a href="#risk" class="toc-link">05 — Risk levels explained</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Plain Language Regulatory Reference — 2025</div>
+  <h1>Who <em>regulates</em> pharma,<br>and what do they want?</h1>
+  <p class="hero-lead">Four major bodies set the rules for how medicines are made, tested, and approved worldwide. This reference explains who they are, what they inspect for, and the specific rules you'll encounter — written for people without a pharma background.</p>
+  <div class="hero-stats">
+    <div class="stat-item"><div class="stat-num">4</div><div class="stat-label">Major authorities</div></div>
+    <div class="stat-item"><div class="stat-num">190+</div><div class="stat-label">Countries covered</div></div>
+    <div class="stat-item"><div class="stat-num">2025</div><div class="stat-label">First FDA AI standard</div></div>
+    <div class="stat-item"><div class="stat-num">7</div><div class="stat-label">Steps to AI credibility</div></div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- ── SECTION 1: WHO ARE THEY ── -->
+  <div class="section-head" id="authorities">
+    <div class="section-num">01</div>
+    <div class="section-meta">
+      <div class="section-label-small">Overview</div>
+      <div class="section-title">The four regulatory authorities</div>
+    </div>
+  </div>
+
+  <p class="section-intro">Think of these as the government bodies that act as quality gatekeepers for medicines. Before a drug can be sold, one of these authorities must approve it. They also inspect the factories that make drugs — and increasingly, they're setting rules for how AI tools used in those factories must behave.</p>
+
+  <div class="auth-grid">
+    <div class="auth-card fda">
+      <div class="auth-card-top">
+        <div><span class="auth-badge fda">United States</span></div>
+        <div class="auth-abbr fda">FDA</div>
+        <div class="auth-fullname">Food &amp; Drug Administration</div>
+        <p class="auth-summary">The US government agency that controls what medicines, foods, and medical devices can be sold in America. If you want to sell a drug in the US, FDA must approve it — and your factory must be ready to pass their inspection at any time.</p>
+      </div>
+      <div class="auth-card-bottom">
+        <div class="checks-label">What they check for</div>
+        <ul class="check-list">
+          <li>Is the drug safe and does it actually do what the label claims?</li>
+          <li>Is the factory clean, controlled, and producing consistent output?</li>
+          <li>Are all records accurate, complete, and tamper-proof?</li>
+          <li>If AI is used in manufacturing, can you prove it behaves reliably?</li>
+          <li>Is there a qualified human accountable for every critical decision?</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="auth-card ema">
+      <div class="auth-card-top">
+        <div><span class="auth-badge ema">European Union</span></div>
+        <div class="auth-abbr ema">EMA</div>
+        <div class="auth-fullname">European Medicines Agency</div>
+        <p class="auth-summary">The EU's centralised medicine regulator. Getting EMA approval opens the door to selling in all 27 EU member countries at once. EMA also tracks drug safety after medicines reach patients and coordinates recalls when problems emerge.</p>
+      </div>
+      <div class="auth-card-bottom">
+        <div class="checks-label">What they check for</div>
+        <ul class="check-list">
+          <li>Does the clinical trial data genuinely support the drug's claims?</li>
+          <li>Are all computer systems validated, auditable, and secure?</li>
+          <li>Can you explain how any AI system reached its output?</li>
+          <li>Is there a clear human in the loop for AI-assisted decisions?</li>
+          <li>Is post-market safety data being actively monitored?</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="auth-card who">
+      <div class="auth-card-top">
+        <div><span class="auth-badge who">Global / UN</span></div>
+        <div class="auth-abbr who">WHO</div>
+        <div class="auth-fullname">World Health Organization</div>
+        <p class="auth-summary">A United Nations body that sets global health standards. WHO doesn't approve individual drugs — instead, it publishes manufacturing guidelines used as the baseline by 190+ countries that don't have strong local regulators of their own. Critical for global supply chains.</p>
+      </div>
+      <div class="auth-card-bottom">
+        <div class="checks-label">What they check for</div>
+        <ul class="check-list">
+          <li>Do manufacturing practices meet the global GMP baseline?</li>
+          <li>Is data managed with integrity across the entire supply chain?</li>
+          <li>Are prequalified medicines consistently meeting quality standards?</li>
+          <li>Are manufacturers in lower-income markets applying safe practices?</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="auth-card ich">
+      <div class="auth-card-top">
+        <div><span class="auth-badge ich">Multinational</span></div>
+        <div class="auth-abbr ich">ICH</div>
+        <div class="auth-fullname">International Council for Harmonisation</div>
+        <p class="auth-summary">Not a regulator — a standards committee where FDA, EMA, Japan's PMDA, and Health Canada sit together and agree on shared technical rules. The goal: so a drug company doesn't have to run completely separate studies for each country. ICH guidelines are adopted by all member markets.</p>
+      </div>
+      <div class="auth-card-bottom">
+        <div class="checks-label">What they harmonise</div>
+        <ul class="check-list">
+          <li>Q-series: quality and manufacturing standards (Q7–Q14)</li>
+          <li>S-series: safety study requirements (animal testing, toxicology)</li>
+          <li>E-series: clinical trial design and reporting standards</li>
+          <li>M-series: emerging topics — including AI/ML (M14, in progress)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 2: DETAIL ── -->
+  <div class="section-head" id="authority-detail">
+    <div class="section-num">02</div>
+    <div class="section-meta">
+      <div class="section-label-small">Deep Dive</div>
+      <div class="section-title">What each authority actually does</div>
+    </div>
+  </div>
+
+  <p class="section-intro">Beyond the headline role, each authority has a specific scope, enforcement mechanism, and approach to AI. Here's what that looks like in practice.</p>
+
+  <!-- FDA Detail -->
+  <div class="analogy">
+    <div class="analogy-label">Analogy</div>
+    <p>Think of FDA like the building inspector + health department combined for a restaurant chain — except instead of restaurants, it's factories making life-saving drugs. They set the code, do surprise inspections, and can shut you down or issue public warnings if you're not compliant.</p>
+  </div>
+
+  <div class="auth-detail">
+    <div class="auth-detail-header">
+      <div class="auth-detail-abbr fda">FDA</div>
+      <div class="auth-detail-meta">
+        <div class="auth-detail-name">Food &amp; Drug Administration</div>
+        <div class="auth-detail-region">United States — Est. 1906, modernised 1938 &amp; 1962</div>
+      </div>
+    </div>
+    <div class="auth-detail-body">
+      <div class="detail-block">
+        <div class="detail-block-title">Scope &amp; reach</div>
+        <p>FDA covers drugs, biologics (vaccines, gene therapies), medical devices, food, and cosmetics sold in the US. For pharma manufacturing, the key regulations live in Title 21 of the Code of Federal Regulations (21 CFR) — think of this as the legal rulebook. FDA conducts both scheduled and unannounced inspections of manufacturing sites. A failed inspection can result in a Warning Letter (public, damaging) or import alert (blocks your product entering the US).</p>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">How they enforce</div>
+        <ul class="detail-list">
+          <li>Facility inspections — auditors physically walk the floor and review records</li>
+          <li>Form 483 — a list of observations issued during an inspection that need addressing</li>
+          <li>Warning Letters — public documents citing serious violations; can derail a business</li>
+          <li>Import Alerts — block specific products from entering the US market</li>
+          <li>Consent Decrees — court-ordered oversight for serious violators</li>
+          <li>Drug recalls — mandatory or voluntary removal of unsafe products from the market</li>
+        </ul>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">Their stance on AI (2025)</div>
+        <p>In January 2025, FDA published its first structured standard for AI in drug development — a 7-step "credibility assessment" framework. This is not just "test your model." It requires proving, with documented evidence, that an AI system is reliable for a specific task at a defined risk level. FDA also issued its first AI-specific Warning Letter to a manufacturer that used AI to write SOPs and batch records without qualified human review.</p>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">Key regulatory texts</div>
+        <ul class="detail-list">
+          <li>21 CFR Part 210/211 — core GMP rules for drug manufacturing</li>
+          <li>21 CFR Part 11 — electronic records and audit trail requirements</li>
+          <li>FDA AI Credibility Framework (Jan 2025 draft) — the AI rulebook</li>
+          <li>FRAME Initiative — AI as a priority manufacturing technology</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMA Detail -->
+  <div class="analogy">
+    <div class="analogy-label">Analogy</div>
+    <p>Think of EMA like the EU's joint standards board for medicines — similar to how the EU sets unified product standards for electronics or food, EMA sets the standard for drugs so companies don't need 27 separate approvals. They are the scientific evaluators; individual countries' national agencies do the on-the-ground inspections.</p>
+  </div>
+
+  <div class="auth-detail">
+    <div class="auth-detail-header">
+      <div class="auth-detail-abbr ema">EMA</div>
+      <div class="auth-detail-meta">
+        <div class="auth-detail-name">European Medicines Agency</div>
+        <div class="auth-detail-region">European Union — Est. 1995, headquartered in Amsterdam</div>
+      </div>
+    </div>
+    <div class="auth-detail-body">
+      <div class="detail-block">
+        <div class="detail-block-title">Scope &amp; reach</div>
+        <p>EMA provides one centralised approval for the EU's 27 member states (plus EEA countries). It coordinates a network of national agencies (e.g., MHRA in the UK, BfArM in Germany) that conduct actual factory inspections. EMA publishes EU GMP guidelines in a publication called EudraLex, Volume 4. Annexes 11 and 15 are the most relevant to manufacturing AI — covering computerised systems and qualification/validation respectively.</p>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">How they enforce</div>
+        <ul class="detail-list">
+          <li>Centralised procedure — single scientific opinion covers all EU markets</li>
+          <li>GMP inspections — coordinated through national competent authorities</li>
+          <li>EUDRA Vigilance — the EU's pharmacovigilance database for tracking adverse events</li>
+          <li>Non-compliance reports — shared across all EU member states</li>
+          <li>Marketing authorisation suspension — can pull a product EU-wide instantly</li>
+        </ul>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">Their stance on AI</div>
+        <p>EMA published a reflection paper on AI/ML in drug development and co-signed joint guiding principles with FDA in 2024 — an unprecedented level of bilateral regulatory alignment. EMA's emphasis is on explainability (you must be able to explain how the AI reached its conclusion) and human oversight by design, not just human sign-off after the fact.</p>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">Key regulatory texts</div>
+        <ul class="detail-list">
+          <li>EU GMP Annex 11 — computerised systems (the EU's Part 11 equivalent)</li>
+          <li>EU GMP Annex 15 — qualification and validation</li>
+          <li>EudraLex Volume 4 — core EU GMP guidelines</li>
+          <li>EMA AI Reflection Paper — principles for AI in drug development</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHO Detail -->
+  <div class="analogy">
+    <div class="analogy-label">Analogy</div>
+    <p>Think of WHO as the United Nations of medicines standards. It doesn't have enforcement power in individual countries, but it publishes the rulebook that most of the world uses as a starting point — particularly important for manufacturers that supply developing markets or participate in global tenders (e.g., for HIV medications or vaccines).</p>
+  </div>
+
+  <div class="auth-detail">
+    <div class="auth-detail-header">
+      <div class="auth-detail-abbr who">WHO</div>
+      <div class="auth-detail-meta">
+        <div class="auth-detail-name">World Health Organization</div>
+        <div class="auth-detail-region">Global — UN body, headquartered in Geneva, Switzerland</div>
+      </div>
+    </div>
+    <div class="auth-detail-body">
+      <div class="detail-block">
+        <div class="detail-block-title">Scope &amp; reach</div>
+        <p>WHO's GMP guidelines (published in Technical Report Series documents) are the baseline standard for manufacturing quality in markets that lack their own strong regulatory systems. For any manufacturer supplying to UN procurement programs, GAVI, the Global Fund, or governments in Africa, Southeast Asia, or Latin America, WHO prequalification is often the gating requirement — meaning WHO GMP compliance is the ticket to participate.</p>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">How they enforce</div>
+        <ul class="detail-list">
+          <li>Prequalification — WHO audits and certifies manufacturers for global supply programs</li>
+          <li>TRS publications — technical report series that set minimum manufacturing standards</li>
+          <li>Advisory role — provides technical support to national regulators building capacity</li>
+          <li>Public delisting — removing a manufacturer from prequalified status is very damaging for global market access</li>
+        </ul>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">Their stance on AI</div>
+        <p>WHO published an ethics and governance framework for AI in health in 2021, establishing six principles: transparency, explainability, responsibility, inclusiveness, human autonomy, and promotion of wellbeing. While less detailed than FDA's technical framework, these principles are increasingly cited in national AI health policies and procurement requirements worldwide.</p>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">Key regulatory texts</div>
+        <ul class="detail-list">
+          <li>WHO TRS 986 Annex 2 — core GMP standard for pharmaceuticals</li>
+          <li>WHO TRS 1010 Annex 4 — Good Data &amp; Record Management Practices (GDRP)</li>
+          <li>WHO TRS 1019 Annex 3 — GMP for biological products</li>
+          <li>WHO Ethics &amp; Governance of AI for Health (2021)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ICH Detail -->
+  <div class="analogy">
+    <div class="analogy-label">Analogy</div>
+    <p>Think of ICH like ISO standards, but specifically for pharma. Just as ISO 9001 means "quality management system done properly" regardless of which country you're in, an ICH guideline means "here is the agreed global scientific standard for this specific technical requirement." Companies follow ICH because it means their data will be accepted everywhere at once.</p>
+  </div>
+
+  <div class="auth-detail">
+    <div class="auth-detail-header">
+      <div class="auth-detail-abbr ich">ICH</div>
+      <div class="auth-detail-meta">
+        <div class="auth-detail-name">International Council for Harmonisation</div>
+        <div class="auth-detail-region">Multilateral — FDA, EMA, PMDA (Japan), Health Canada, plus observer members</div>
+      </div>
+    </div>
+    <div class="auth-detail-body">
+      <div class="detail-block">
+        <div class="detail-block-title">How it works</div>
+        <p>ICH guidelines are developed through working groups where regulators and industry experts from all member regions collaborate. A guideline goes through four steps — Concept Paper, Draft Guideline, Consultation, and Adoption — before being implemented by each member authority into their own regulations. ICH guidelines don't replace local law; they become embedded in it.</p>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">Most important quality guidelines</div>
+        <ul class="detail-list">
+          <li>Q9(R1): Risk management — how to decide what level of control any given process needs</li>
+          <li>Q10: Pharmaceutical quality system — lifecycle-based quality management</li>
+          <li>Q8(R2): Pharmaceutical development — design space and Quality by Design (QbD)</li>
+          <li>Q12: Post-approval change management — how to modify a product after approval</li>
+          <li>Q14: Analytical procedure development — QbD for lab testing methods</li>
+        </ul>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">Their stance on AI</div>
+        <p>ICH's M14 guideline (in development) will address general principles for AI/ML in drug development. ICH Q9(R1)'s risk framework (updated 2023) is already directly relevant — FDA's AI risk axes (model influence × consequence) map to Q9 risk assessment methodology. Expect the first harmonised AI/ML technical standard from ICH within the next 2–3 years.</p>
+      </div>
+      <div class="detail-block">
+        <div class="detail-block-title">Why ICH matters for AI</div>
+        <p>Because ICH guidelines are adopted by FDA, EMA, and other major markets simultaneously, a company that builds its AI governance around ICH Q9/Q10 principles is essentially building to a standard that will be acceptable to all major regulators at once — reducing the risk of market-by-market compliance gaps.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 3: CITATIONS ── -->
+  <div class="section-head" id="citations">
+    <div class="section-num">03</div>
+    <div class="section-meta">
+      <div class="section-label-small">Rules &amp; Guidances</div>
+      <div class="section-title">Key citations you'll encounter</div>
+    </div>
+  </div>
+
+  <p class="section-intro">When regulators, auditors, or compliance teams talk about "the rules," these are the specific documents they're citing. Here is what each one is in plain language.</p>
+
+  <!-- FDA CFR -->
+  <div class="cite-group">
+    <div class="cite-group-header">
+      <span class="cite-group-pill fda">FDA — US Law</span>
+      <span class="cite-group-name">21 CFR — Code of Federal Regulations, Title 21</span>
+    </div>
+    <div class="cite-cards">
+      <div class="cite-card">
+        <div class="cite-id-block">
+          <div class="cite-id">21 CFR Part 211</div>
+          <div class="cite-year">Always active</div>
+        </div>
+        <div class="cite-content">
+          <div class="cite-title">Current Good Manufacturing Practice — Finished Pharmaceuticals</div>
+          <div class="cite-plain">The main US factory rulebook. It covers everything from how clean rooms must be maintained, to how raw materials are tested, to how finished product records must be written. Section 211.192 is particularly cited in AI contexts — it requires investigation of any batch parameter that is outside specification. An AI system that monitors for these deviations must be documented and validated under Part 211.</div>
+          <span class="cite-importance">Most-cited regulation in US pharma GMP</span>
+        </div>
+      </div>
+      <div class="cite-card">
+        <div class="cite-id-block">
+          <div class="cite-id">21 CFR Part 11</div>
+          <div class="cite-year">Always active</div>
+        </div>
+        <div class="cite-content">
+          <div class="cite-title">Electronic Records &amp; Electronic Signatures</div>
+          <div class="cite-plain">If you use a computer to record anything in a GMP environment, this rule applies. It requires that digital records be tamper-evident (no one can alter them without a trace), time-stamped, and access-controlled so only authorised people can make changes. For AI systems, this means every action the AI takes — every recommendation, every alert, every data input — must be logged in a way that an auditor can reconstruct later without ambiguity.</div>
+          <span class="cite-importance">Foundational for all AI audit trail requirements</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FDA Guidances -->
+  <div class="cite-group">
+    <div class="cite-group-header">
+      <span class="cite-group-pill fda">FDA — Guidance Documents</span>
+      <span class="cite-group-name">Non-binding guidance that establishes expectations in practice</span>
+    </div>
+    <div class="cite-cards">
+      <div class="cite-card">
+        <div class="cite-id-block">
+          <div class="cite-id">FDA AI Credibility Framework</div>
+          <div class="cite-year">Jan 2025 — Draft</div>
+        </div>
+        <div class="cite-content">
+          <div class="cite-title">Artificial Intelligence in Drug &amp; Biologic Development — Credibility Assessment</div>
+          <div class="cite-plain">FDA's first structured standard specifically for AI. It establishes a 7-step process that any AI model used in drug development must satisfy. "Credibility" here means a structured body of evidence proving the model does what it claims, in the specific context where it's deployed, at a documented risk level. It covers the full drug lifecycle — not just manufacturing. See Section 04 for the full step-by-step breakdown.</div>
+          <span class="cite-importance">The foundational AI regulatory document for pharma</span>
+        </div>
+      </div>
+      <div class="cite-card">
+        <div class="cite-id-block">
+          <div class="cite-id">FRAME Initiative</div>
+          <div class="cite-year">2024</div>
+        </div>
+        <div class="cite-content">
+          <div class="cite-title">Frameworks for Regulatory AI in Manufacturing Excellence</div>
+          <div class="cite-plain">FDA's internal program that formally names AI as one of four priority manufacturing technologies. FRAME signals that FDA is actively building regulatory infrastructure for AI in manufacturing — not just responding to what industry is doing, but proactively creating the frameworks and expertise to regulate it. Companies that engage with FRAME early get clearer regulatory pathways.</div>
+          <span class="cite-importance">Signals FDA's strategic priority on manufacturing AI</span>
+        </div>
+      </div>
+      <div class="cite-card">
+        <div class="cite-id-block">
+          <div class="cite-id">FDA Warning Letter<br>(AI — 2025)</div>
+          <div class="cite-year">First issued 2025</div>
+        </div>
+        <div class="cite-content">
+          <div class="cite-title">FDA's First AI-Specific Enforcement Action</div>
+          <div class="cite-plain">FDA issued a Warning Letter to a manufacturer that used AI to generate SOPs (standard operating procedures) and batch production records without qualified human review. The violation wasn't that they used AI — it was that no qualified person verified the AI's output before it was used to govern actual production. The lesson: AI can draft or flag, but a qualified human must review and approve anything used in GMP decision-making.</div>
+          <span class="cite-importance">Sets enforcement precedent for AI without human oversight</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMA -->
+  <div class="cite-group">
+    <div class="cite-group-header">
+      <span class="cite-group-pill ema">EMA / EU GMP</span>
+      <span class="cite-group-name">European regulations and guidelines</span>
+    </div>
+    <div class="cite-cards">
+      <div class="cite-card">
+        <div class="cite-id-block">
+          <div class="cite-id">EU GMP Annex 11</div>
+          <div class="cite-year">Active</div>
+        </div>
+        <div class="cite-content">
+          <div class="cite-title">Computerised Systems</div>
+          <div class="cite-plain">The EU equivalent of FDA's Part 11, but broader. It covers everything about using computer systems in GMP: how they must be validated before use, how data must be protected, how audit trails must work, and how changes to the system must be controlled. Any AI or software tool used in EU pharma manufacturing must comply with Annex 11. Regulators will ask: "Is this system validated? Can you prove it does what you say it does? What happens if it fails?"</div>
+          <span class="cite-importance">Mandatory for any computerised system in EU GMP</span>
+        </div>
+      </div>
+      <div class="cite-card">
+        <div class="cite-id-block">
+          <div class="cite-id">EMA AI Reflection Paper</div>
+          <div class="cite-year">Active</div>
+        </div>
+        <div class="cite-content">
+          <div class="cite-title">Considerations on the Use of AI/ML in Drug Development</div>
+          <div class="cite-plain">EMA's position document on AI, particularly focused on the need for explainability — you must be able to explain why an AI reached its conclusion, not just that it did. EMA also emphasises bias assessment (was the model trained on data that represents real-world diversity?) and lifecycle monitoring (you must keep checking the model's performance after deployment, not just at validation).</div>
+          <span class="cite-importance">Defines EMA's explainability and bias expectations</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ICH -->
+  <div class="cite-group">
+    <div class="cite-group-header">
+      <span class="cite-group-pill ich">ICH — Harmonised Standards</span>
+      <span class="cite-group-name">Adopted by FDA, EMA, PMDA, Health Canada simultaneously</span>
+    </div>
+    <div class="cite-cards">
+      <div class="cite-card">
+        <div class="cite-id-block">
+          <div class="cite-id">ICH Q9(R1)</div>
+          <div class="cite-year">Revised 2023</div>
+        </div>
+        <div class="cite-content">
+          <div class="cite-title">Quality Risk Management</div>
+          <div class="cite-plain">The shared international playbook for deciding how much control and testing a given manufacturing process or system needs. The core idea: not everything needs the same level of scrutiny — what matters is how likely something is to go wrong and how bad it would be if it did. FDA's AI risk framework maps directly onto Q9 logic: an AI system that autonomously approves drug batches carries higher consequence than one that flags deviations for human review, and therefore needs more rigorous validation.</div>
+          <span class="cite-importance">Foundation for all risk-based decisions in pharma</span>
+        </div>
+      </div>
+      <div class="cite-card">
+        <div class="cite-id-block">
+          <div class="cite-id">ICH Q10</div>
+          <div class="cite-year">Active</div>
+        </div>
+        <div class="cite-content">
+          <div class="cite-title">Pharmaceutical Quality System</div>
+          <div class="cite-plain">Describes how a modern pharmaceutical company should manage quality across a product's entire lifecycle — from development through to discontinuation. Quality isn't just a testing function; it's a system of processes, controls, and continuous improvement. AI systems are expected to support this lifecycle model, not replace its oversight structure. A well-designed AI tool should generate evidence that slots into this system, not create a parallel quality process outside of it.</div>
+          <span class="cite-importance">Defines lifecycle quality management expectations</span>
+        </div>
+      </div>
+      <div class="cite-card">
+        <div class="cite-id-block">
+          <div class="cite-id">ICH Q12</div>
+          <div class="cite-year">Active</div>
+        </div>
+        <div class="cite-content">
+          <div class="cite-title">Technical &amp; Regulatory Considerations for Product Lifecycle Management</div>
+          <div class="cite-plain">Governs how you make changes to a drug or its manufacturing process after it's already been approved. This is relevant to AI because an AI-driven manufacturing optimisation might change how a product is made — and any such change must be categorised and potentially reported to regulators. Q12 provides a framework for which changes need full regulatory approval, which need notification, and which can be made internally without telling regulators.</div>
+          <span class="cite-importance">Required reading for AI-driven process optimisation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Joint -->
+  <div class="cite-group">
+    <div class="cite-group-header">
+      <span class="cite-group-pill joint">FDA + EMA — Joint</span>
+      <span class="cite-group-name">Bilateral convergence</span>
+    </div>
+    <div class="cite-cards">
+      <div class="cite-card">
+        <div class="cite-id-block">
+          <div class="cite-id">FDA-EMA Joint AI Principles</div>
+          <div class="cite-year">2024</div>
+        </div>
+        <div class="cite-content">
+          <div class="cite-title">Joint Guiding Principles for AI Across the Medicines Lifecycle</div>
+          <div class="cite-plain">An unprecedented document where the US and EU regulators agreed on shared principles for AI in medicines. They converge on: transparency (the AI's purpose and training must be documented), human oversight (humans must remain accountable for decisions), risk-based approach (more scrutiny for higher-stakes AI), and lifecycle monitoring (ongoing performance tracking after deployment). This bilateral alignment means that building to FDA's AI standard will mostly satisfy EMA's expectations, and vice versa — significantly reducing the compliance burden for global companies.</div>
+          <span class="cite-importance">First-ever US-EU regulatory alignment on pharma AI</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 4: FDA 7 STEPS ── -->
+  <div class="section-head" id="fda-framework">
+    <div class="section-num">04</div>
+    <div class="section-meta">
+      <div class="section-label-small">FDA — AI Credibility Framework</div>
+      <div class="section-title">The 7-step process, explained plainly</div>
+    </div>
+  </div>
+
+  <p class="section-intro">FDA's January 2025 framework defines how any AI model used in drug development must prove it's trustworthy. It's not a checkbox. It's a sequential process — each step builds on the last — and the depth of evidence required scales with how risky the AI's role is.</p>
+
+  <div class="callout">
+    <div class="callout-type">Key Principle</div>
+    <p>FDA doesn't ask <strong>"does the AI work?"</strong> It asks: <strong>"Can you prove this AI is credible for this specific task, at this risk level, with this data, in this environment?"</strong> The answer depends entirely on how the system was architected — not just how accurate its predictions are.</p>
+  </div>
+
+  <div class="steps-list">
+    <div class="step">
+      <div class="step-num-col">1</div>
+      <div class="step-body">
+        <div class="step-name">Define the question of interest</div>
+        <div class="step-desc">FDA requires a precise, specific statement of what the AI model is actually deciding or predicting — not a vague capability claim. Not "we use AI for quality." Instead: something like "this model identifies out-of-specification batch parameters that may indicate a manufacturing deviation requiring investigation under 21 CFR 211.192." The specificity forces the team to think clearly about what the AI is and isn't responsible for.</div>
+      </div>
+      <div class="step-plain">
+        <div class="step-plain-label">Plain language</div>
+        <p>What exact question is this AI answering? Write it out precisely. If it's too vague to write down clearly, the system isn't ready for regulatory use.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num-col">2</div>
+      <div class="step-body">
+        <div class="step-name">Define the context of use (COU)</div>
+        <div class="step-desc">A comprehensive statement covering what data goes into the model, what comes out, how the output is used in practice, who sees it, what decisions it influences, and what human oversight exists. The COU defines the boundary between what the AI does and where the human takes over. FDA expects this document to be precise enough that an auditor could understand exactly where AI influence begins and ends in your process.</div>
+      </div>
+      <div class="step-plain">
+        <div class="step-plain-label">Plain language</div>
+        <p>Write a clear description of the AI's inputs, outputs, and the exact point where a human takes over. Where does the AI end and the person begin?</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num-col">3</div>
+      <div class="step-body">
+        <div class="step-name">Assess model risk</div>
+        <div class="step-desc">FDA evaluates risk on two axes: (1) model influence — how directly does the AI output drive a decision, with no human second-guessing it? And (2) decision consequence — how bad is it if the AI is wrong? High on either axis means more validation evidence is required. An AI that makes recommendations that a human then reviews and approves is fundamentally lower-risk than one that autonomously approves batches. The regulatory incentive is clear: build AI that supports human experts, not AI that replaces them.</div>
+      </div>
+      <div class="step-plain">
+        <div class="step-plain-label">Plain language</div>
+        <p>Two questions: How much does the AI drive the decision on its own? And what's the worst-case outcome if it's wrong? Higher risk = more proof needed.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num-col">4</div>
+      <div class="step-body">
+        <div class="step-name">Develop a credibility assessment plan</div>
+        <div class="step-desc">Before testing or deploying the model, you must write a plan covering: how the model was built and trained, what data quality standards apply, how you will validate it (what tests, on what datasets, measuring what metrics), how you will detect and mitigate bias, and how you will monitor it over its deployed lifetime. The plan's depth and rigor must match the risk level determined in Step 3. FDA recommends early engagement for high-risk applications — come talk to them before you build.</div>
+      </div>
+      <div class="step-plain">
+        <div class="step-plain-label">Plain language</div>
+        <p>Write down exactly how you'll test and maintain this AI before you deploy it. The riskier the AI, the more detailed this plan needs to be.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num-col">5</div>
+      <div class="step-body">
+        <div class="step-name">Execute the plan</div>
+        <div class="step-desc">Run the validation tests using independent datasets the model has never seen. Calculate performance metrics. Conduct robustness checks — does the model behave consistently when data is slightly noisy or unusual? Document everything reproducibly, including all data used, how it was processed, and any deviations from the plan. This is where 21 CFR Part 11 compliance intersects with AI credibility: the audit trail for the AI's validation must meet the same standards as records for any other GMP process.</div>
+      </div>
+      <div class="step-plain">
+        <div class="step-plain-label">Plain language</div>
+        <p>Actually run the tests. Keep a full, auditable record of everything — what data you used, what the results were, and anything that didn't go as planned.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num-col">6</div>
+      <div class="step-body">
+        <div class="step-name">Document results</div>
+        <div class="step-desc">FDA requires a formal Credibility Assessment Report — a self-contained document that can sit in front of an FDA inspector and tell the whole story without any additional explanation. It must include: performance results with confidence intervals, all deviations from the original plan and why they happened, honest limitations of the model (what it can't do or where it's less reliable), and all supporting technical materials. This is not an internal slide deck. It must stand alone as a regulatory document.</div>
+      </div>
+      <div class="step-plain">
+        <div class="step-plain-label">Plain language</div>
+        <p>Write a formal report that tells the whole story: results, deviations from plan, and limitations. Write it as if an auditor who knows nothing about your system will read it cold.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num-col">7</div>
+      <div class="step-body">
+        <div class="step-name">Determine model adequacy</div>
+        <div class="step-desc">The final step evaluates whether the total body of evidence establishes sufficient credibility for the intended use. If gaps exist, FDA offers five remedial paths: reduce the AI's role (lower its influence over decisions), increase validation rigour (more testing), add risk controls (human checkpoints, alerts, safeguards), modify the modelling approach, or re-scope the context of use. Critically, FDA frames this as iterative — the framework is designed to help manufacturers get to credibility, not to block AI adoption. But the path is shorter when AI systems are built with these steps in mind from day one.</div>
+      </div>
+      <div class="step-plain">
+        <div class="step-plain-label">Plain language</div>
+        <p>Based on all the evidence, is this AI trustworthy enough for the job? If not, there are five ways to fix it — reduce what the AI does, add more testing, add human safeguards, change the approach, or narrow the scope.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 5: RISK ── -->
+  <div class="section-head" id="risk">
+    <div class="section-num">05</div>
+    <div class="section-meta">
+      <div class="section-label-small">Risk Classification</div>
+      <div class="section-title">Understanding AI risk levels</div>
+    </div>
+  </div>
+
+  <p class="section-intro">Not all AI in pharma carries the same risk. The regulatory burden — how much validation evidence you need — scales directly with the risk level. Here's how to think about where different AI systems land.</p>
+
+  <div class="risk-table-wrap">
+    <table class="risk-table">
+      <thead>
+        <tr>
+          <th>Risk tier</th>
+          <th>What it looks like</th>
+          <th>Model influence</th>
+          <th>Decision consequence</th>
+          <th>Validation burden</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="risk-badge high">High</span></td>
+          <td><strong>Autonomous black-box.</strong> AI makes or heavily drives a GMP decision with limited explainability. Humans are involved procedurally (signing off) but not substantively reviewing the reasoning.</td>
+          <td>High — AI output largely determines outcome</td>
+          <td>Serious — error could result in patient harm, recall, or regulatory action</td>
+          <td>Extensive. Full model validation, independent datasets, bias assessment, explainability evidence, and ongoing monitoring required. Early FDA engagement recommended.</td>
+        </tr>
+        <tr>
+          <td><span class="risk-badge medium">Medium</span></td>
+          <td><strong>AI investigates, human decides.</strong> AI agents gather data, surface patterns, and prepare recommendations — but a qualified human reviews the reasoning and makes the final quality decision. This is the architecture FDA's framework implicitly favours.</td>
+          <td>Medium — AI shapes the options but human exercises judgment</td>
+          <td>Moderate — human review catches errors before they propagate</td>
+          <td>Proportionate. Model validation, documented performance metrics, audit trail for both AI reasoning and human decisions. More achievable at scale.</td>
+        </tr>
+        <tr>
+          <td><span class="risk-badge low">Low</span></td>
+          <td><strong>Assistive or informational.</strong> AI surfaces information, generates reports, or flags items for human attention — but the human is fully in the decision loop and the AI output is one of many inputs, not the determining factor.</td>
+          <td>Low — AI is a tool, not a decision-maker</td>
+          <td>Low to moderate — human is making the judgment, not the AI</td>
+          <td>Relatively light. Software validation, basic performance documentation, and audit trail for AI outputs. Manageable with standard QMS infrastructure.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <div class="callout-type">The Architecture Insight</div>
+    <p>The regulatory incentive built into FDA's framework is clear: <strong>build AI that augments qualified professionals, not AI that replaces them.</strong> An agentic system where AI investigates, reasons, and prepares evidence — while a human reviewer makes the final quality call — is architecturally a medium-risk system. An autonomous black-box that makes the same decision is high-risk and requires far more validation to justify. Same outcome, very different compliance burden.</p>
+  </div>
+
+  <div class="callout" style="border-left-color: var(--ema);">
+    <div class="callout-type" style="color: var(--ema);">Why this matters right now — 2025</div>
+    <p>75% of pharmaceutical companies have made AI a strategic priority as of 2025, but only 29% report seeing actual results on the manufacturing floor. <strong>The gap is not the AI models themselves — it's the architecture underneath them.</strong> Most manufacturing AI deployments were designed to demonstrate a capability, not to satisfy a structured evidentiary standard. FDA's framework makes that gap regulatory, not just operational. Companies that treat this framework as a design requirement — not a post-deployment checklist — will validate faster, scale with less friction, and face fewer surprises at inspection.</p>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-note">
+      Pharma Regulatory Reference — compiled from public regulatory sources.<br>
+      For informational purposes. Not legal or regulatory advice.<br>
+      Sources: FDA.gov, EMA.europa.eu, WHO.int, ICH.org — as of 2025.
+    </div>
+    <div class="footer-tags">
+      <span class="footer-tag">FDA</span>
+      <span class="footer-tag">EMA</span>
+      <span class="footer-tag">WHO</span>
+      <span class="footer-tag">ICH</span>
+      <span class="footer-tag">GMP</span>
+      <span class="footer-tag">AI Credibility</span>
+      <span class="footer-tag">21 CFR Part 11</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
