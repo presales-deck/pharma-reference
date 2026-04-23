@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMP Documentation Reference — Plain Language Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f2ed;--surface:#fff;--surface2:#f0ede8;--surface3:#ebe7e1;
+  --border:rgba(0,0,0,.08);--border-strong:rgba(0,0,0,.14);
+  --text:#1a1714;--muted:#5c5650;--dim:#9a948e;
+  --accent:#006a5a;--accent-bg:#e6f4f1;--accent-bd:#9dd4c8;
+  --tab-dark:#1a3c35;
+  --orange:#b85c00;--orange-bg:#fff3e6;--orange-bd:#f0b880;
+  --blue:#005fa3;--blue-bg:#e8f2fc;--blue-bd:#9bcbef;
+  --purple:#6030b0;--purple-bg:#f0ebfa;--purple-bd:#c4a8e8;
+  --red:#a02020;--red-bg:#fdf0f0;--red-bd:#e8a8a8;
+  --gold:#7a5c00;--gold-bg:#fdf8e6;--gold-bd:#e0cc80;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200}
+.hdr-in{max-width:1060px;margin:0 auto;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'DM Mono',monospace;font-size:12px;color:var(--dim);letter-spacing:.06em}
+.logo strong{color:var(--accent);font-weight:500}
+nav{display:flex}
+nav a{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:6px 14px;border-radius:20px;letter-spacing:.04em;transition:background .15s,color .15s}
+nav a:hover{background:var(--surface2);color:var(--text)}
+
+.toc{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:56px;z-index:190;overflow-x:auto}
+.toc-in{max-width:1060px;margin:0 auto;padding:0 32px;display:flex}
+.toc a{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);text-decoration:none;padding:10px 16px;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;letter-spacing:.04em}
+.toc a:hover{color:var(--text);border-color:var(--accent)}
+
+.hero{max-width:1060px;margin:0 auto;padding:80px 32px 64px}
+.eyebrow{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.eyebrow::after{content:'';flex:1;height:1px;background:var(--border-strong);max-width:60px}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(36px,5vw,64px);font-weight:900;line-height:1.06;margin-bottom:24px;max-width:720px}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero-lead{font-size:17px;color:var(--muted);max-width:620px;line-height:1.75;margin-bottom:48px}
+.stats{display:flex;gap:40px;flex-wrap:wrap}
+.stat-n{font-family:'Fraunces',serif;font-size:36px;font-weight:700;line-height:1}
+.stat-l{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);margin-top:4px}
+
+.main{max-width:1060px;margin:0 auto;padding:0 32px 80px}
+
+.sh{padding:64px 0 32px;border-top:1px solid var(--border);display:flex;align-items:baseline;gap:20px}
+.sh-n{font-family:'Fraunces',serif;font-size:48px;font-weight:900;color:var(--border-strong);line-height:1;flex-shrink:0}
+.sh-sm{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.sh-title{font-family:'Fraunces',serif;font-size:28px;font-weight:700;line-height:1.2}
+.s-intro{font-size:15px;color:var(--muted);line-height:1.7;max-width:700px;margin-bottom:32px}
+
+/* CALLOUTS */
+.co{border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;background:var(--surface);padding:20px 24px;margin:28px 0}
+.co.or{border-left-color:var(--orange)} .co.re{border-left-color:var(--red)} .co.bl{border-left-color:var(--blue)} .co.pu{border-left-color:var(--purple)} .co.go{border-left-color:var(--gold)}
+.co-t{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
+.co.or .co-t{color:var(--orange)} .co.re .co-t{color:var(--red)} .co.bl .co-t{color:var(--blue)} .co.pu .co-t{color:var(--purple)} .co.go .co-t{color:var(--gold)}
+.co p{font-size:14px;color:var(--muted);line-height:1.7}
+.co p strong{color:var(--text);font-weight:500}
+
+/* DOC LANDSCAPE GRID */
+.doc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--border);border-radius:16px;overflow:hidden;margin-bottom:48px}
+.doc-card{background:var(--surface);padding:24px;transition:background .15s;cursor:default}
+.doc-card:hover{background:var(--surface2)}
+.dc-icon{font-size:24px;margin-bottom:10px}
+.dc-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px}
+.dc-alias{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);margin-bottom:8px}
+.dc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+.dc-tag{display:inline-block;margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;padding:2px 9px;border-radius:20px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-bd)}
+.dc-tag.or{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd)}
+.dc-tag.re{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
+.dc-tag.bl{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd)}
+.dc-tag.pu{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-bd)}
+.dc-tag.go{background:var(--gold-bg);color:var(--gold);border-color:var(--gold-bd)}
+
+/* TABS */
+.tc{margin-bottom:48px}
+.tb{display:flex;gap:2px;background:var(--border);border-radius:12px 12px 0 0;overflow:hidden;flex-wrap:wrap}
+.tb-btn{background:var(--surface2);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--muted);padding:12px 18px;transition:all .15s;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.tb-btn:hover{background:var(--surface);color:var(--text)}
+.tb-btn.active{background:var(--tab-dark);color:#fff}
+.t-icon{font-size:14px}
+.t-pane{display:none;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:36px}
+.t-pane.active{display:block}
+.t-intro{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:28px;max-width:700px}
+
+/* FIELD TABLE */
+.ft-wrap{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:20px 0}
+.ft-head{background:var(--surface2);padding:11px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.ft-title{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.ft-badge{font-family:'DM Mono',monospace;font-size:10px;padding:2px 9px;border-radius:20px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-bd)}
+.ft-badge.or{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd)}
+.ft-badge.re{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
+.ft{width:100%;border-collapse:collapse}
+.ft th{background:var(--surface3);font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:11px 16px;border-bottom:1px solid var(--border);font-weight:400}
+.ft td{padding:12px 16px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55}
+.ft tr:last-child td{border-bottom:none}
+.ft tr:hover td{background:var(--surface2)}
+.ft td strong{color:var(--text);font-weight:500}
+.ft td .req{font-family:'DM Mono',monospace;font-size:10px;padding:1px 7px;border-radius:20px}
+.req.m{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
+.req.r{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-bd)}
+.req.o{background:var(--surface2);color:var(--dim);border:1px solid var(--border-strong)}
+
+/* STEP LIST */
+.sl{display:flex;flex-direction:column;gap:2px;margin:20px 0}
+.sr{display:grid;grid-template-columns:52px 1fr 190px;background:var(--surface2);border:1px solid var(--border);overflow:hidden;transition:background .15s}
+.sr:first-child{border-radius:10px 10px 0 0} .sr:last-child{border-radius:0 0 10px 10px} .sr:not(:last-child){border-bottom:none}
+.sr:hover{background:var(--accent-bg)}
+.sr-n{background:var(--surface);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:20px;font-weight:900;color:var(--accent);opacity:.4;padding:18px 0}
+.sr-b{padding:16px 20px;border-right:1px solid var(--border)}
+.sr-name{font-size:14px;font-weight:500;margin-bottom:4px}
+.sr-d{font-size:13px;color:var(--muted);line-height:1.6}
+.sr-s{padding:16px;background:var(--surface)}
+.sr-sl{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.sr-sv{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* DEFICIENCY LIST */
+.def-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+.def-item{background:var(--red-bg);border:1px solid var(--red-bd);border-radius:10px;padding:14px 16px}
+.def-item.or{background:var(--orange-bg);border-color:var(--orange-bd)}
+.def-item.go{background:var(--gold-bg);border-color:var(--gold-bd)}
+.def-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.def-item.or .def-label{color:var(--orange)}
+.def-item.go .def-label{color:var(--gold)}
+.def-text{font-size:13px;color:var(--muted);line-height:1.55}
+
+/* PHASE CARDS (investigation) */
+.ph-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--border);border-radius:14px;overflow:hidden;margin:20px 0 32px}
+.ph-card{background:var(--surface);padding:22px}
+.ph-num{font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:var(--border-strong);line-height:1;margin-bottom:8px}
+.ph-name{font-size:13px;font-weight:500;margin-bottom:8px}
+.ph-items{list-style:none;display:flex;flex-direction:column;gap:5px}
+.ph-items li{font-size:12px;color:var(--muted);padding-left:14px;position:relative;line-height:1.55}
+.ph-items li::before{content:'→';position:absolute;left:0;color:var(--dim);font-size:10px;top:3px}
+
+/* ROOT CAUSE TABLE */
+.rc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.rc-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.rc-method{font-size:14px;font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.rc-badge{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:20px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-bd)}
+.rc-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+.rc-when{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);padding-top:10px;border-top:1px solid var(--border)}
+
+/* RETENTION TABLE */
+.ret-wrap{border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:32px}
+.ret-t{width:100%;border-collapse:collapse}
+.ret-t th{background:var(--surface2);font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:13px 18px;border-bottom:1px solid var(--border);font-weight:400}
+.ret-t td{padding:13px 18px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5}
+.ret-t tr:last-child td{border-bottom:none}
+.ret-t tr:hover td{background:var(--surface2)}
+.ret-t td strong{color:var(--text);font-weight:500}
+
+/* ALCOA GRID */
+.alcoa{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:var(--border);border-radius:14px;overflow:hidden;margin:20px 0}
+.alcoa-card{background:var(--surface);padding:20px 16px;text-align:center}
+.alcoa-letter{font-family:'Fraunces',serif;font-size:42px;font-weight:900;color:var(--accent);line-height:1;margin-bottom:6px}
+.alcoa-name{font-size:13px;font-weight:500;margin-bottom:6px}
+.alcoa-desc{font-size:11px;color:var(--muted);line-height:1.5}
+.alcoa-plus{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:var(--border);border-radius:14px;overflow:hidden;margin:2px 0 20px}
+.alcoa-plus .alcoa-card{background:var(--accent-bg)}
+.alcoa-plus .alcoa-letter{color:var(--tab-dark);font-size:28px}
+
+/* INSPECT TABLE */
+.insp-wrap{border:1px solid var(--border);border-radius:16px;overflow:hidden;margin:20px 0}
+.insp-t{width:100%;border-collapse:collapse}
+.insp-t th{background:var(--surface2);font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:12px 16px;border-bottom:1px solid var(--border);font-weight:400}
+.insp-t td{padding:12px 16px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border);vertical-align:top;line-height:1.5}
+.insp-t tr:last-child td{border-bottom:none}
+.insp-t tr:hover td{background:var(--surface2)}
+.insp-t td strong{color:var(--text);font-weight:500}
+.flag{font-family:'DM Mono',monospace;font-size:10px;padding:1px 7px;border-radius:20px;background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
+
+/* FLOWCHART */
+.fc-title{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+.flow{display:flex;align-items:stretch;background:var(--border);border-radius:12px;overflow:hidden;overflow-x:auto;margin:16px 0 28px}
+.fn{flex:1;min-width:90px;background:var(--surface);padding:14px 8px;text-align:center;border-right:1px solid var(--border)}
+.fn:last-child{border-right:none}
+.fn.hl{background:var(--accent-bg)}
+.fn.hl .fn-l{color:var(--accent)}
+.fn.warn{background:var(--orange-bg)}
+.fn.warn .fn-l{color:var(--orange)}
+.fn.crit{background:var(--red-bg)}
+.fn.crit .fn-l{color:var(--red)}
+.fn-i{font-size:16px;margin-bottom:4px}
+.fn-l{font-size:11px;font-weight:500;line-height:1.3;margin-bottom:2px}
+.fn-s{font-size:10px;color:var(--dim);line-height:1.4;font-family:'DM Mono',monospace}
+.fa{display:flex;align-items:center;justify-content:center;background:var(--surface2);padding:0 3px;font-size:11px;color:var(--dim);border-right:1px solid var(--border);flex-shrink:0}
+
+/* COMMON DEFICIENCY BOX */
+.crit-box{background:var(--red-bg);border:1px solid var(--red-bd);border-radius:12px;padding:20px 24px;margin:20px 0}
+.crit-box-t{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+.crit-items{display:flex;flex-direction:column;gap:8px}
+.crit-item{display:flex;gap:12px;align-items:flex-start}
+.crit-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--red);opacity:.6;flex-shrink:0;padding-top:1px}
+.crit-text{font-size:13px;color:var(--muted);line-height:1.6}
+.crit-text strong{color:var(--text);font-weight:500}
+
+/* FOOTER */
+.ftr{border-top:1px solid var(--border);background:var(--surface);padding:40px 32px;margin-top:40px}
+.ftr-in{max-width:1060px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.ftr-note{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);line-height:1.6}
+.ftr-tags{display:flex;gap:8px;flex-wrap:wrap}
+.ftr-tag{font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border:1px solid var(--border-strong);border-radius:20px;color:var(--dim)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.hero h1{animation:fadeUp .5s ease both}
+.hero-lead{animation:fadeUp .5s .08s ease both}
+.stats{animation:fadeUp .5s .16s ease both}
+
+@media(max-width:768px){
+  nav{display:none} .hero{padding:48px 20px 40px} .main{padding:0 20px 60px}
+  .hdr-in,.toc-in{padding:0 20px}
+  .doc-grid{grid-template-columns:1fr 1fr}
+  .ph-grid{grid-template-columns:1fr 1fr}
+  .alcoa,.alcoa-plus{grid-template-columns:repeat(3,1fr)}
+  .sr{grid-template-columns:42px 1fr} .sr-s{display:none}
+  .def-list{grid-template-columns:1fr} .rc-grid{grid-template-columns:1fr}
+  .sh{flex-direction:column;gap:4px;padding-top:48px} .sh-n{font-size:32px}
+  .ftr-in{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <div class="logo"><strong>PHARMA</strong> / GMP Documentation</div>
+    <nav>
+      <a href="#landscape">Overview</a>
+      <a href="#anatomy">Anatomy</a>
+      <a href="#investigations">Investigations</a>
+      <a href="#data-integrity">Data Integrity</a>
+      <a href="#retention">Retention</a>
+      <a href="manufacturing.html">← Manufacturing</a>
+      <a href="index.html">← Regulatory</a>
+    </nav>
+  </div>
+</header>
+
+<div class="toc">
+  <div class="toc-in">
+    <a href="#landscape">01 — Document landscape</a>
+    <a href="#anatomy">02 — Document anatomy</a>
+    <a href="#investigations">03 — Investigations deep dive</a>
+    <a href="#data-integrity">04 — Data integrity & ALCOA+</a>
+    <a href="#retention">05 — Retention requirements</a>
+    <a href="#inspection">06 — Inspection readiness</a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="eyebrow">Plain Language GMP Documentation Reference — 2025</div>
+  <h1>The paper trail that<br><em>keeps patients safe</em></h1>
+  <p class="hero-lead">GMP documentation is not bureaucracy for its own sake. Every record, every log entry, every investigation report exists for one reason: if a patient is harmed, or a batch is recalled, or a regulator walks in — you can prove exactly what was made, how it was made, who made it, and what was done when something went wrong. This is the documentation that makes that possible.</p>
+  <div class="stats">
+    <div><div class="stat-n">12</div><div class="stat-l">Core document types</div></div>
+    <div><div class="stat-n">4</div><div class="stat-l">Investigation phases</div></div>
+    <div><div class="stat-n">ALCOA+</div><div class="stat-l">Data integrity standard</div></div>
+    <div><div class="stat-n">21 CFR 211</div><div class="stat-l">Governing regulation</div></div>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- ═══ SECTION 1: LANDSCAPE ═══ -->
+<div class="sh" id="landscape">
+  <div class="sh-n">01</div>
+  <div><div class="sh-sm">Document Landscape</div><div class="sh-title">The 12 core GMP documents</div></div>
+</div>
+<p class="s-intro">GMP manufacturing generates a specific set of documents — each with a defined purpose, required content, and regulatory basis. No document is optional. A missing or incomplete record is treated by regulators as equivalent to the activity not having occurred. "If it isn't documented, it didn't happen" is the most foundational GMP principle.</p>
+
+<div class="doc-grid">
+  <div class="doc-card"><div class="dc-icon">📋</div><div class="dc-name">Batch Manufacturing Record</div><div class="dc-alias">BMR / Batch Record / BR</div><div class="dc-desc">The complete lifecycle record for a single batch — every step taken, every measurement made, every person involved, every deviation noted. The most important document in pharma manufacturing.</div><div class="dc-tag re">Most Critical</div></div>
+  <div class="doc-card"><div class="dc-icon">📜</div><div class="dc-name">Master Batch Record</div><div class="dc-alias">MBR / Master Formula</div><div class="dc-desc">The approved recipe — the template for the BMR. Defines ingredients, quantities, equipment, process steps, and in-process specifications for every batch of a product. Fixed until formally changed through change control.</div><div class="dc-tag go">Master Document</div></div>
+  <div class="doc-card"><div class="dc-icon">📖</div><div class="dc-name">Standard Operating Procedure</div><div class="dc-alias">SOP / Procedure</div><div class="dc-desc">The controlled, approved instruction for performing a specific task — cleaning, calibration, sample collection, equipment operation, investigations. Every GMP activity has a governing SOP.</div><div class="dc-tag">Foundation</div></div>
+  <div class="doc-card"><div class="dc-icon">📓</div><div class="dc-name">Equipment & Area Logbooks</div><div class="dc-alias">Logbook / Usage Log</div><div class="dc-desc">The chronological record of every use, cleaning, maintenance, and calibration event for a piece of equipment or area. Proves the equipment was in a qualified state when used for the batch.</div><div class="dc-tag bl">Chronological Record</div></div>
+  <div class="doc-card"><div class="dc-icon">⚠️</div><div class="dc-name">Deviation Report</div><div class="dc-alias">Deviation / Event Report / Non-Conformance</div><div class="dc-desc">Documents any unplanned departure from an approved procedure or specification during manufacturing or testing. Every deviation must be assessed for impact on batch quality and product safety.</div><div class="dc-tag or">Event Record</div></div>
+  <div class="doc-card"><div class="dc-icon">🔍</div><div class="dc-name">OOS / OOT Investigation Report</div><div class="dc-alias">OOS Report / Lab Investigation</div><div class="dc-desc">Documents the formal two-phase investigation triggered when any test result falls outside specification (OOS) or outside trend limits (OOT). One of the most scrutinised documents during inspections.</div><div class="dc-tag re">High Scrutiny</div></div>
+  <div class="doc-card"><div class="dc-icon">🔧</div><div class="dc-name">CAPA Record</div><div class="dc-alias">CAPA / Corrective-Preventive Action</div><div class="dc-desc">Documents the corrective action (fix the specific problem) and preventive action (prevent recurrence) following deviations, OOS events, complaints, or audit findings. Must demonstrate effectiveness.</div><div class="dc-tag or">Improvement Record</div></div>
+  <div class="doc-card"><div class="dc-icon">🔄</div><div class="dc-name">Change Control Record</div><div class="dc-alias">Change Control / Change Request</div><div class="dc-desc">Documents every planned change to a process, equipment, material, procedure, or facility — with impact assessment, approval workflow, and implementation verification. Mandatory for any deviation from the validated state.</div><div class="dc-tag pu">Change Management</div></div>
+  <div class="doc-card"><div class="dc-icon">🏷️</div><div class="dc-name">Material Specification</div><div class="dc-alias">Spec / Quality Standard</div><div class="dc-desc">Defines the approved quality parameters for each raw material, excipient, packaging component, and finished product. Every QC test has a pass/fail specification. Nothing is released without meeting its specification.</div><div class="dc-tag go">Quality Standard</div></div>
+  <div class="doc-card"><div class="dc-icon">✅</div><div class="dc-name">Validation Protocol & Report</div><div class="dc-alias">VAL / IQ / OQ / PQ</div><div class="dc-desc">Defines the requirements (protocol) and documents the evidence (report) that a process, equipment, cleaning procedure, or test method consistently performs as intended. The foundation for GMP compliance claims.</div><div class="dc-tag bl">Evidence Package</div></div>
+  <div class="doc-card"><div class="dc-icon">🌡️</div><div class="dc-name">Environmental Monitoring Records</div><div class="dc-alias">EM Records / Environmental Data</div><div class="dc-desc">The ongoing record of airborne particle counts and viable microorganism data in classified manufacturing areas. Trend analysis against alert and action limits is mandatory. Critical for sterile product manufacturing.</div><div class="dc-tag">Ongoing Monitoring</div></div>
+  <div class="doc-card"><div class="dc-icon">📊</div><div class="dc-name">Annual Product Quality Review</div><div class="dc-alias">APQR / PQR / Annual Review</div><div class="dc-desc">The annual compilation and analysis of all quality data for a product — batches produced, OOS/OOT events, deviations, complaints, stability, CAPA status, change controls. Assesses whether the process remains in control.</div><div class="dc-tag go">Annual Review</div></div>
+</div>
+
+<div class="co or">
+  <div class="co-t">The cardinal GMP rule on documentation</div>
+  <p>If it isn't written down, it didn't happen. If it was written down incorrectly, it's a falsification. If it was written down but then corrected improperly, it's a data integrity violation. <strong>There is no such thing as an informal GMP record.</strong> Every entry in a GMP document — including a correction of a single digit — is a permanent, auditable part of the quality record and may be reviewed by a regulator years after the batch has left the facility.</p>
+</div>
+
+<!-- ═══ SECTION 2: ANATOMY (TABS) ═══ -->
+<div class="sh" id="anatomy">
+  <div class="sh-n">02</div>
+  <div><div class="sh-sm">Document Anatomy</div><div class="sh-title">What each document must contain</div></div>
+</div>
+<p class="s-intro">Each GMP document type has required content defined by regulation and industry guidance. Regulators know exactly what they expect to see in each document type. A missing section, an incomplete field, or an unsigned approval is a finding. Understanding what each document must contain — and why — is fundamental to both writing them and reviewing them during investigations.</p>
+
+<div class="tc">
+<div class="tb">
+  <button class="tb-btn active" onclick="showTab('bmr',this)"><span class="t-icon">📋</span>BMR</button>
+  <button class="tb-btn" onclick="showTab('sop',this)"><span class="t-icon">📖</span>SOPs</button>
+  <button class="tb-btn" onclick="showTab('logbook',this)"><span class="t-icon">📓</span>Logbooks</button>
+  <button class="tb-btn" onclick="showTab('deviation',this)"><span class="t-icon">⚠️</span>Deviations</button>
+  <button class="tb-btn" onclick="showTab('oos',this)"><span class="t-icon">🔍</span>OOS / OOT</button>
+  <button class="tb-btn" onclick="showTab('capa',this)"><span class="t-icon">🔧</span>CAPA</button>
+  <button class="tb-btn" onclick="showTab('change',this)"><span class="t-icon">🔄</span>Change Control</button>
+  <button class="tb-btn" onclick="showTab('val',this)"><span class="t-icon">✅</span>Validation</button>
+</div>
+
+<!-- BMR -->
+<div id="tab-bmr" class="t-pane active">
+<p class="t-intro">The Batch Manufacturing Record is the most important document in pharmaceutical manufacturing. It is the executed, batch-specific record showing that a batch was produced according to the Master Batch Record. A BMR is opened for each batch when it is started and closed only after QA review and batch release. It travels with the batch from start to finish.</p>
+
+<div class="co re"><div class="co-t">Master BMR vs Completed BMR — know the difference</div><p><strong>Master Batch Record (MBR):</strong> The approved template — the recipe. Contains the product name, code, formula, equipment, step-by-step instructions, and blank fields for data entry. Controlled document — it cannot be changed without formal change control and re-approval. <strong>Completed Batch Record (BMR):</strong> The MBR with all data filled in for a specific batch. Contains actual batch number, actual materials used, actual measured values, operator signatures, and a record of any deviations. The MBR is the plan; the BMR is the proof.</p></div>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Required sections — 21 CFR 211.188 / ICH Q7</div><div class="ft-badge re">Mandatory</div></div>
+  <table class="ft">
+    <thead><tr><th>Section</th><th>What it contains</th><th>Regulatory basis</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Batch header</strong></td><td>Product name and code, batch number, manufacturing date(s), batch size, theoretical yield. Identifies the batch uniquely — every subsequent record references this batch number</td><td><span class="req m">Must</span> 21 CFR 211.188(a)</td></tr>
+      <tr><td><strong>Materials dispensed</strong></td><td>Each raw material: name, item code, lot number, quantity dispensed, date dispensed, dispensing operator and independent check operator signatures. Two-person verification is mandatory for every material dispensed</td><td><span class="req m">Must</span> 21 CFR 211.188(b)(1)</td></tr>
+      <tr><td><strong>Processing steps</strong></td><td>Each manufacturing step described in the MBR, with: actual parameters recorded (times, temperatures, speeds, volumes), equipment used (ID number), operator signature at each step, date and time of each step</td><td><span class="req m">Must</span> 21 CFR 211.188(b)(4)</td></tr>
+      <tr><td><strong>In-process controls</strong></td><td>All in-process check results (tablet weights, blend samples, pH measurements, temperatures) with time, result, operator initials, and pass/fail against specification. Out-of-spec in-process results must be followed by a documented investigation even if the final batch passes release testing</td><td><span class="req m">Must</span> 21 CFR 211.188(b)(5)</td></tr>
+      <tr><td><strong>Yield calculations</strong></td><td>Theoretical yield (calculated from input materials), actual yield, and percentage yield at each critical stage and at batch completion. Yield significantly outside the expected range is a deviation requiring investigation — it may indicate unreported loss, contamination, or theft</td><td><span class="req m">Must</span> 21 CFR 211.188(b)(7)</td></tr>
+      <tr><td><strong>Deviation section</strong></td><td>Every departure from the approved process — whether discovered in the moment or retrospectively — must be documented here with description, time of occurrence, immediate action taken, and cross-reference to the formal Deviation Report number. Leaving this section blank when deviations occurred is falsification</td><td><span class="req m">Must</span> 21 CFR 211.192</td></tr>
+      <tr><td><strong>Equipment identification</strong></td><td>For every piece of equipment used: equipment ID, equipment logbook reference, and a record confirming the equipment was clean and in a qualified state at time of use. Equipment used in an unqualified or uncleaned state invalidates the batch record</td><td><span class="req m">Must</span> 21 CFR 211.188(b)(2)</td></tr>
+      <tr><td><strong>Operator & QA signatures</strong></td><td>Each production step signed by the operator who performed it and an independent checker. Final QA review signature certifying the record is complete, accurate, and no unresolved issues exist. QA signature is the last step before batch disposition</td><td><span class="req m">Must</span> 21 CFR 211.192</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="crit-box">
+  <div class="crit-box-t">Most common BMR deficiencies — what inspectors find</div>
+  <div class="crit-items">
+    <div class="crit-item"><div class="crit-num">01</div><div class="crit-text"><strong>Retroactive entries without justification.</strong> Recording a step after it was performed without documenting why it wasn't recorded contemporaneously. The correction itself is not the violation; the absence of explanation is.</div></div>
+    <div class="crit-item"><div class="crit-num">02</div><div class="crit-text"><strong>Corrections made incorrectly.</strong> A single line through the error with the correction, date, and initials is the only accepted method. White-out, scribbling out, overwriting, or using correction fluid is a data integrity violation — it destroys the original entry.</div></div>
+    <div class="crit-item"><div class="crit-num">03</div><div class="crit-text"><strong>Blank fields without explanation.</strong> Every field in a BMR must be filled in. If a step was not performed (e.g. coating step for an uncoated tablet), the field must read "N/A — not applicable to this product" with initials. A blank field means the step was either skipped or not recorded — both are violations.</div></div>
+    <div class="crit-item"><div class="crit-num">04</div><div class="crit-text"><strong>Deviations not cross-referenced.</strong> If a deviation occurred and a Deviation Report was raised, the BMR must explicitly reference the Deviation Report number. A standalone Deviation Report with no mention in the BMR is an incomplete quality trail.</div></div>
+    <div class="crit-item"><div class="crit-num">05</div><div class="crit-text"><strong>Calculated yields not verified.</strong> Yield calculations must be independently verified — the person who calculated should not be the same person who checks. Yield outside the expected range that was not investigated is among the most serious BMR findings.</div></div>
+  </div>
+</div>
+</div>
+
+<!-- SOP -->
+<div id="tab-sop" class="t-pane">
+<p class="t-intro">Standard Operating Procedures are the controlled instructions for performing every GMP task. They are not guidelines or suggestions — they are the approved method. Performing a GMP task in a way that deviates from the governing SOP — even if the deviation was an improvement — is a GMP violation. The SOP must be followed as written, or formally changed first through change control.</p>
+
+<div class="fc-title">SOP lifecycle — every SOP follows this mandatory path</div>
+<div class="flow">
+  <div class="fn"><div class="fn-i">✏️</div><div class="fn-l">Draft</div><div class="fn-s">Author writes; SME review</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">✅</div><div class="fn-l">Review & Approve</div><div class="fn-s">QA approval mandatory; dept head sign-off</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🎓</div><div class="fn-l">Training</div><div class="fn-s">All users trained; records signed</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">📌</div><div class="fn-l">Effective</div><div class="fn-s">Issued; effective date set</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">⏰</div><div class="fn-l">Periodic Review</div><div class="fn-s">Typically every 2–3 years</div></div>
+  <div class="fa">→</div>
+  <div class="fn warn"><div class="fn-i">🔄</div><div class="fn-l">Revise or Retire</div><div class="fn-s">New version through same cycle; old version archived</div></div>
+</div>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Required SOP sections</div><div class="ft-badge">Standard Structure</div></div>
+  <table class="ft">
+    <thead><tr><th>Section</th><th>What it must contain</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Header block</strong></td><td>Document number, title, version number, effective date, department, author, reviewer names, QA approval signature and date</td><td>Identifies the controlled document uniquely. Version number ensures operators are using the current approved version — not an outdated revision</td></tr>
+      <tr><td><strong>Purpose / Scope</strong></td><td>What this SOP covers; what it does not cover; which products, equipment, or areas it applies to</td><td>Prevents scope creep — operators must know whether this SOP applies to their specific situation</td></tr>
+      <tr><td><strong>Responsibilities</strong></td><td>Who performs the procedure; who reviews the output; who approves exceptions; which department owns the SOP</td><td>Clear accountability. During investigations, responsibility sections are used to identify who should have known about a process requirement</td></tr>
+      <tr><td><strong>Definitions & abbreviations</strong></td><td>All technical terms, acronyms, and regulatory citations used in the SOP defined unambiguously</td><td>Eliminates interpretation variance. Ambiguous procedures are cited in inspection findings as inadequate instructions</td></tr>
+      <tr><td><strong>Procedure steps</strong></td><td>Numbered, sequential instructions in imperative form. Safety precautions, critical parameters, and acceptance criteria embedded at the relevant step. No ambiguity permitted — each step must have exactly one interpretation</td><td>The core of the SOP. Steps must be clear enough that a trained person new to the role can follow them without asking for guidance</td></tr>
+      <tr><td><strong>Revision history</strong></td><td>All previous versions, dates, authors, and a brief description of what changed in each revision</td><td>Critical for investigations — reveals what the procedure said at the time a historical event occurred. Archived versions must be retrievable</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="def-list">
+  <div class="def-item or"><div class="def-label">Common deficiency — Training gap</div><div class="def-text">SOP was revised but some operators were trained only on the old version. Using the correct procedure but documented as trained on version 3 when version 5 is current = training deviation. Training must be completed before the new SOP is effective for that operator.</div></div>
+  <div class="def-item or"><div class="def-label">Common deficiency — Revision not triggered</div><div class="def-text">The actual practice in the facility differs from what the SOP says — but no change control was initiated. Regulators view this as either the SOP being wrong, or the practice being wrong. Either way it is a violation. Common cause: informal "improvements" made on the floor without paperwork.</div></div>
+  <div class="def-item go"><div class="def-label">Inspection tip — SOP version control</div><div class="def-text">Inspectors will ask operators to show them the SOP they're working from and check whether it matches the current approved version in the document management system. Unsupported paper copies of outdated SOPs found at workstations are a common and easily avoided finding.</div></div>
+  <div class="def-item go"><div class="def-label">Inspection tip — SOP vs actual practice</div><div class="def-text">Inspectors observe operations and cross-check against the governing SOP in real time. If the operator performs step 4 before step 3 (even with good reason), that is a deviation. The SOP must reflect what is actually done — not an idealised version of what should be done.</div></div>
+</div>
+</div>
+
+<!-- LOGBOOKS -->
+<div id="tab-logbook" class="t-pane">
+<p class="t-intro">Equipment and area logbooks are the chronological record of every event for a piece of equipment or classified area. They prove the equipment was clean, calibrated, and in a qualified state when used for a specific batch. During investigations — particularly contamination, cross-contamination, or OOS events — the logbook is the primary source of information about what happened in that area or on that equipment before the problem was detected.</p>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Types of GMP logbooks</div></div>
+  <table class="ft">
+    <thead><tr><th>Logbook type</th><th>What it records</th><th>Key regulatory driver</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Equipment usage logbook</strong></td><td>Every use: date, time, batch number, product, operator, duration. Every cleaning: date, time, cleaning agent used, operator, independent verifier. Status line after each cleaning: "Clean — ready for use." The logbook is the primary proof that the equipment was clean when used for a batch</td><td>21 CFR 211.182 — requires record of each cleaning of equipment used in processing</td></tr>
+      <tr><td><strong>Equipment calibration & maintenance log</strong></td><td>Every preventive maintenance activity, every calibration with result and calibration standard used, every unplanned repair with a description of the fault and corrective action. Equipment cannot be used between its last calibration date and next due date — the logbook proves compliance with calibration schedule</td><td>21 CFR 211.68 — requires calibration records with results and acceptable limits</td></tr>
+      <tr><td><strong>Area / room logbook</strong></td><td>Entry and exit log for controlled manufacturing areas: who entered, time in, time out, purpose. Environmental monitoring alerts. Cleaning records for the area. Temperature/humidity records if area-controlled parameters exist. Used in contamination investigations to identify all personnel present at relevant times</td><td>21 CFR 211.42 — adequate space and control of manufacturing areas</td></tr>
+      <tr><td><strong>Weighing balance logbook</strong></td><td>Daily balance check result (standard weights, acceptance criteria), balance ID and calibration status, any anomalous behaviour (drifting, error codes), cleaning record. An unchecked balance used for dispensing is a direct risk to dose accuracy — the logbook proves the balance was verified before use</td><td>21 CFR 211.68 — laboratory instruments calibrated at suitable intervals</td></tr>
+      <tr><td><strong>Cold store / refrigerator log</strong></td><td>Temperature records (continuous monitoring preferred, manual twice-daily minimum for critical storage), alarm event records, any excursion with assessment and corrective action. Materials stored in a cold store with an undocumented temperature excursion cannot be assumed to remain within specification</td><td>21 CFR 211.142 — warehousing conditions must be controlled and recorded</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Required entries for each equipment use (per FDA expectations)</div><div class="ft-badge">Every Use</div></div>
+  <table class="ft">
+    <thead><tr><th>Entry</th><th>What to record</th><th>Status required</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Pre-use check</strong></td><td>Equipment ID, date and time of check, previous product/batch (from last entry), cleanliness verification result, equipment status label verified (Clean / In Use / Quarantine)</td><td><span class="req m">Must</span></td></tr>
+      <tr><td><strong>Use entry</strong></td><td>Start date and time, batch number, product name, step being performed (e.g. "Wet granulation — Batch 24001"), operator name and initials</td><td><span class="req m">Must</span></td></tr>
+      <tr><td><strong>Post-use entry</strong></td><td>End time, any anomaly during use (equipment malfunction, unexpected behaviour), cleaned by (name, date, time), cleaning verified by (independent second person), new status: "Cleaned — ready for use" or "Quarantine — awaiting investigation"</td><td><span class="req m">Must</span></td></tr>
+      <tr><td><strong>Cross-reference</strong></td><td>Reference to the BMR page or batch record entry that corresponds to this use. Creates a bidirectional link: BMR references logbook; logbook references BMR. During investigations, this link is essential</td><td><span class="req r">Recommended</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="co bl">
+  <div class="co-t">Logbooks in investigations — why they matter</div>
+  <p>During a contamination or OOS investigation, the equipment logbook is typically the first document reviewed. It answers: <strong>What was made on this equipment before the affected batch? Was it cleaned in between? Who cleaned it? Was the clean verified?</strong> A logbook with a gap in cleaning records, or a product changeover without documented cleaning verification, immediately becomes the primary hypothesis for the investigation. Logbook entries that are backdated, imprecise, or missing are treated as potential evidence of undisclosed process failures.</p>
+</div>
+</div>
+
+<!-- DEVIATIONS -->
+<div id="tab-deviation" class="t-pane">
+<p class="t-intro">A deviation is any unplanned departure from an approved SOP, specification, or process parameter. Deviations are not inherently bad — detecting, documenting, and managing them is a sign of a functioning quality system. What regulators penalise is not the presence of deviations, but the absence of them. A facility with no reported deviations is suspect: it implies either that problems are not being detected or that they are being concealed.</p>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Deviation classification — planned vs unplanned</div></div>
+  <table class="ft">
+    <thead><tr><th>Type</th><th>Definition</th><th>Examples</th><th>Process</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Planned deviation</strong></td><td>A known, approved departure from a standard procedure for a specific batch or situation — approved by QA in advance before the batch is started. Also called a "temporary change" or "concession"</td><td>Using an alternative approved excipient supplier for one batch due to supply shortage; using a substitute piece of equipment while the primary is being repaired</td><td>QA pre-approval required; limited to defined batch(es); documented in BMR; formal change control initiated if recurring</td></tr>
+      <tr><td><strong>Unplanned deviation</strong></td><td>An unexpected departure discovered during or after manufacturing that was not approved in advance. This is the most common deviation type and the primary trigger for Deviation Reports</td><td>Blend time exceeded due to equipment fault; temperature excursion during storage; incorrect material weighed; wrong version of SOP used; in-process check outside limits</td><td>Immediate report to supervisor and QA; formal Deviation Report opened within defined timeframe (typically 24–72 hrs)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Deviation severity classification</div></div>
+  <table class="ft">
+    <thead><tr><th>Severity</th><th>Definition</th><th>Typical examples</th><th>Required actions</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Critical</strong></td><td>Departure that has, or could have, a direct and significant impact on patient safety or product sterility. Batch disposition is immediately in question</td><td>Sterility breach in aseptic area; failed filter integrity post-filtration for injectable; contamination discovered in finished product; temperature excursion for a temperature-sensitive sterile product</td><td>Immediate batch quarantine; QA notification within hours; senior management escalation; possible regulatory notification; full investigation with external review</td></tr>
+      <tr><td><strong>Major</strong></td><td>Departure that may impact product quality, safety, or efficacy but does not create an immediate patient safety risk. Batch release is held pending investigation</td><td>In-process check outside specification; equipment used outside calibration interval; SOP not followed for a critical step; identity testing omitted for a raw material</td><td>Batch hold pending investigation; QA-led investigation; root cause analysis required; batch released only after QA assessment of impact</td></tr>
+      <tr><td><strong>Minor</strong></td><td>Departure with no likely impact on product quality, safety, or efficacy. Administrative or documentation error that does not affect the product itself</td><td>Incorrect date format used in logbook entry; SOP revision number mis-recorded in BMR; delayed completion of training record</td><td>Document and investigate briefly; CAPA if recurring; batch typically not held but deviation noted in batch record reviewed by QA</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Deviation Report — required sections</div><div class="ft-badge or">21 CFR 211.192</div></div>
+  <table class="ft">
+    <thead><tr><th>Section</th><th>Content required</th><th>Common failure mode</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Event description</strong></td><td>What happened, when, where (room/equipment), who was involved, what process was being executed. Factual and objective — no conclusions at this stage. Describes the observation, not the cause</td><td>Mixing observation with conclusion: "The blend was over-lubricated because the operator pressed the wrong button" (conclusion before investigation is complete)</td></tr>
+      <tr><td><strong>Immediate actions</strong></td><td>What was done at the time to contain the situation — batch quarantined, equipment shut down, process halted, additional samples taken. Must be documented with timestamps</td><td>Immediate actions taken informally and not documented until later — creating a retrospective record that appears inconsistent with the timeline</td></tr>
+      <tr><td><strong>Impact assessment</strong></td><td>Which batches, products, materials are potentially affected. Assessment of patient safety risk. Assessment of whether other batches need to be quarantined or recalled. This section drives the most immediate regulatory and business consequences</td><td>Impact assessment completed too narrowly — investigating only the batch at hand without checking whether earlier batches with the same equipment or material were also affected</td></tr>
+      <tr><td><strong>Root cause analysis</strong></td><td>Systematic identification of the true underlying cause — not the symptom. See Section 03 for root cause methods in detail</td><td>Stopping at the proximate cause: "The operator pressed the wrong button." The root cause is why that was possible: inadequate training? Poor SOP clarity? No engineering control?</td></tr>
+      <tr><td><strong>CAPA</strong></td><td>Corrective action to fix the specific event; preventive action to stop recurrence. Each action must have an owner, a due date, and a verification method. Open CAPAs without due dates are a common inspection finding</td><td>CAPA defined as "retrain operator" — without addressing why the SOP was ambiguous, why the training was inadequate, or how training effectiveness will be verified</td></tr>
+      <tr><td><strong>Batch disposition</strong></td><td>QA conclusion on whether the batch is released, rejected, reworked, or destroyed — with the specific justification for the decision. This section is signed by QA and becomes part of the permanent batch quality record</td><td>Batch released with deviation listed but no explicit disposition statement — batch disposition must be a documented decision, not an implied one</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- OOS -->
+<div id="tab-oos" class="t-pane">
+<p class="t-intro">An Out-of-Specification (OOS) result is any analytical test result that falls outside the established acceptance criteria in a specification or approved procedure. OOS investigations are among the most scrutinised documents in any FDA inspection — they are subject to specific FDA guidance (2006 OOS Guidance) and must follow a defined two-phase process. Getting them wrong is one of the most common causes of Warning Letters.</p>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">OOS vs OOT — understanding the difference</div></div>
+  <table class="ft">
+    <thead><tr><th></th><th>OOS (Out-of-Specification)</th><th>OOT (Out-of-Trend)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Definition</strong></td><td>Result falls outside the approved specification limit (e.g. assay result of 88% when specification is 90–110%)</td><td>Result is within specification but statistically unusual relative to historical results for this product/batch (e.g. assay consistently at 103% for 20 batches; new result is 94% — still within spec but trending down)</td></tr>
+      <tr><td><strong>Immediate action</strong></td><td>Mandatory formal OOS investigation per FDA 2006 guidance. Batch held; no release until investigation complete</td><td>QA notification; informal investigation to understand the change; may not require formal OOS process unless investigation reveals specification risk</td></tr>
+      <tr><td><strong>Who determines?</strong></td><td>QC analyst reports immediately to QC supervisor upon observing a result outside specification limits</td><td>Typically identified by QC through statistical process control (SPC) charts, trend analysis in stability data, or APQR review</td></tr>
+      <tr><td><strong>Regulatory basis</strong></td><td>FDA OOS Guidance (2006), ICH Q10 Quality System. Specific two-phase investigation mandated</td><td>ICH Q10 product quality monitoring. No specific two-phase mandate but must be documented and investigated</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="co re"><div class="co-t">What you cannot do when you get an OOS result</div><p>You cannot: average the OOS result with retests to get an "average" that passes. You cannot perform unlimited retests until you get a passing result. You cannot discard the original OOS result without documented assignable cause. You cannot release the batch while the investigation is open. <strong>Every one of these actions has resulted in FDA Warning Letters and consent decrees.</strong> The 2006 FDA OOS Guidance is explicit: a passing retest result does not invalidate an original failing result — it must be explained.</p></div>
+
+<div class="sl">
+  <div class="sr"><div class="sr-n">1</div><div class="sr-b"><div class="sr-name">Phase 1A — Initial laboratory assessment</div><div class="sr-d">The analyst reviews their work immediately upon observing an OOS result. Check: Was the correct sample used? Correct method? Correct reagents/standards in date? Correct calculation? Instrument functioning correctly? This check is performed by the analyst and reviewed by the QC supervisor. It must be documented in real time — not reconstructed later. If a clear, documented assignable cause is found (e.g. expired reagent used), Phase 1A is complete. The result is invalidated with documented cause and a retest is performed.</div></div><div class="sr-s"><div class="sr-sl">Timeframe</div><div class="sr-sv">Immediately upon OOS detection. Supervisor notified same day. Documentation started immediately — not reconstructed later</div></div></div>
+  <div class="sr"><div class="sr-n">2</div><div class="sr-b"><div class="sr-name">Phase 1B — Additional laboratory investigation</div><div class="sr-d">If Phase 1A finds no clear assignable cause, Phase 1B expands the laboratory investigation. A new sample preparation from the same retained sample is tested, following a written, pre-approved retest protocol approved by QC supervisor or QA. Retesting must follow a defined protocol specifying how many retests, by how many analysts, with what acceptance criteria. Retesting cannot be open-ended. If additional retests all pass, with a documented explanation for the original failure, Phase 1 may close. If any retest fails, Phase 2 is triggered.</div></div><div class="sr-s"><div class="sr-sl">Critical requirement</div><div class="sr-sv">Retest protocol must be pre-approved by QA before retesting begins. Ad hoc retesting without a protocol is itself a violation</div></div></div>
+  <div class="sr"><div class="sr-n">3</div><div class="sr-b"><div class="sr-name">Phase 2A — Manufacturing investigation</div><div class="sr-d">If Phase 1 cannot find a laboratory cause for the OOS result, Phase 2 begins — a full investigation of the manufacturing process that produced the sample. Review the BMR for the affected batch: were all steps followed? Any deviations? Correct materials used? Equipment clean and calibrated? Environmental conditions normal? Review operator training records. Review raw material CoAs. The investigation must assess whether the OOS result reflects a true product quality problem rather than a testing error.</div></div><div class="sr-s"><div class="sr-sl">Documents reviewed</div><div class="sr-sv">BMR, equipment logbooks, raw material CoAs, operator training records, environmental monitoring data, stability data for the product</div></div></div>
+  <div class="sr"><div class="sr-n">4</div><div class="sr-b"><div class="sr-name">Phase 2B — Extended investigation & reserve samples</div><div class="sr-d">Testing of reserve/retained samples from the batch, possibly using an alternative validated method. If a different laboratory tests the retained sample and also gets an OOS result, the OOS is confirmed as a true product failure. If the reserve sample passes, a discrepancy investigation is required to explain the conflicting results. The Phase 2 investigation must include an assessment of all potentially affected batches — not just the batch in question. Other batches from the same campaign or using the same materials must be assessed.</div></div><div class="sr-s"><div class="sr-sl">Scope requirement</div><div class="sr-sv">All batches within the scope of the potential root cause must be assessed — the investigation cannot be limited to only the triggering batch</div></div></div>
+  <div class="sr"><div class="sr-n">5</div><div class="sr-b"><div class="sr-name">Final assessment, disposition & CAPA</div><div class="sr-d">QA writes a final assessment: root cause conclusion, all evidence reviewed, batches assessed, disposition of the affected batch, CAPA initiated. If the OOS is confirmed as a true product failure, the batch is rejected. If invalidated by a documented laboratory assignable cause, the batch may potentially be released — with full justification. If root cause is inconclusive, the batch must be rejected. An inconclusive OOS investigation does not permit batch release.</div></div><div class="sr-s"><div class="sr-sl">Disposition rule</div><div class="sr-sv">Inconclusive OOS = batch rejection. Root cause must be established to release. Cannot release on "passing average" or hope</div></div></div>
+</div>
+</div>
+
+<!-- CAPA -->
+<div id="tab-capa" class="t-pane">
+<p class="t-intro">CAPA — Corrective and Preventive Action — is the backbone of continuous improvement in a GMP quality system. Every deviation, OOS, complaint, audit finding, or trend should generate a CAPA if a root cause has been identified. A CAPA without a root cause is just an action item. A CAPA that addresses only the symptom — not the cause — will see the same problem recur, which is one of the most common inspection findings.</p>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Corrective vs preventive — understanding the difference</div></div>
+  <table class="ft">
+    <thead><tr><th></th><th>Corrective Action (CA)</th><th>Preventive Action (PA)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>What it addresses</strong></td><td>The specific existing problem that occurred — fixing what went wrong for this instance, this product, this batch</td><td>The systemic conditions that allowed the problem to exist — changes to prevent the same or similar problems across all products, equipment, or processes</td></tr>
+      <tr><td><strong>Example</strong></td><td>"Revise SOP-0041 to clarify the blend time specification for wet granulation batches using high-shear mixer HM-02"</td><td>"Review all blend time specifications across all wet granulation SOPs in the facility; update any that lack explicit time limits; retrain all production operators"</td></tr>
+      <tr><td><strong>Scope</strong></td><td>Typically narrow — addresses the specific deviation or failure</td><td>Typically broad — addresses systemic risk across the facility</td></tr>
+      <tr><td><strong>When it's enough alone</strong></td><td>Only for truly isolated, one-time events with clear assignable causes that cannot recur (e.g. equipment since decommissioned)</td><td>Preventive action is most valuable but requires a systemic root cause to be meaningful</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">CAPA record — required elements</div><div class="ft-badge or">21 CFR 820.100 / ICH Q10</div></div>
+  <table class="ft">
+    <thead><tr><th>Element</th><th>What it must contain</th><th>Common failure</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Source document</strong></td><td>Reference to the triggering event: Deviation Report number, OOS number, audit finding reference, complaint number. CAPA cannot exist without a traceable source event</td><td>CAPAs raised without a clear source document — "general improvement" CAPAs that lack urgency and are never completed</td></tr>
+      <tr><td><strong>Root cause statement</strong></td><td>The specific, verified root cause — not the symptom. Must explain why the event occurred, not just what occurred. "Operator error" is never an acceptable root cause — it is a symptom requiring further investigation</td><td>Root cause stated as the proximate event rather than the systemic driver. "Valve was left open" vs "No engineering interlock existed to prevent valve from being left open"</td></tr>
+      <tr><td><strong>Action description</strong></td><td>Specific, measurable actions — not vague commitments. "Retrain all operators" is not acceptable without specifying: which operators, on which SOP, by what date, assessed how, and verified by whom</td><td>Vague actions: "Increase awareness," "Remind staff," "Improve communication." These are unverifiable and are cited in almost every major inspection</td></tr>
+      <tr><td><strong>Owner & due date</strong></td><td>Named individual responsible for each action, and a specific due date. CAPAs without owners or due dates are open indefinitely — this is a systemic finding in CAPA system effectiveness reviews</td><td>Group ownership ("QA department") or no due date. CAPA systems with 30% of items overdue are cited as ineffective quality systems</td></tr>
+      <tr><td><strong>Effectiveness check</strong></td><td>The most frequently missed element. After CAPA implementation, a defined check must verify that the action actually prevented recurrence. The check should use data — recurrence rate, audit results, testing results — not just a statement that "CAPA was implemented"</td><td>CAPA closed upon completion of action, with no follow-up to confirm the action worked. This is the most commonly cited CAPA weakness globally</td></tr>
+      <tr><td><strong>Closure</strong></td><td>QA sign-off that: the action was completed; evidence of completion is attached; effectiveness was verified; no recurrence has been observed within the defined verification period</td><td>CAPAs closed without supporting evidence of completion — checked off as "done" based on a memo from the action owner rather than objective evidence</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- CHANGE CONTROL -->
+<div id="tab-change" class="t-pane">
+<p class="t-intro">Change control is the formal process for evaluating, approving, implementing, and verifying any change to a validated or controlled GMP system. In pharma manufacturing, nothing is changed informally. Even a change that seems trivial — a new brand of cleaning wipes, a different printer for labels — must go through change control because its impact on product quality may not be obvious without a systematic assessment.</p>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">What requires change control — scope is broader than most people assume</div></div>
+  <table class="ft">
+    <thead><tr><th>Category</th><th>Examples triggering change control</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Raw materials & suppliers</strong></td><td>New API supplier, alternative excipient grade, new packaging material supplier, change in material specification, change in supplier's manufacturing site</td></tr>
+      <tr><td><strong>Equipment & facilities</strong></td><td>Equipment replacement or addition, facility modifications (new rooms, HVAC changes), equipment relocation, software updates to process equipment, new calibration method or interval</td></tr>
+      <tr><td><strong>Process & formulation</strong></td><td>Any change to a step in the MBR, change in batch size, change in manufacturing route (e.g. wet granulation to direct compression), change in processing parameters (blend time, compression force, coating conditions)</td></tr>
+      <tr><td><strong>Analytical methods</strong></td><td>New or revised test method, change in instrument, change in reference standard, change in sample preparation procedure</td></tr>
+      <tr><td><strong>Documents</strong></td><td>Major SOP revisions (minor editorial corrections may have a separate minor change process), specification changes, validation protocol changes</td></tr>
+      <tr><td><strong>Regulatory filings</strong></td><td>Any change that may require notification to, or approval by, a regulatory authority before implementation — assessed using ICH Q12 regulatory classification framework</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">ICH Q12 regulatory classification of changes</div><div class="ft-badge pu">ICH Q12 Framework</div></div>
+  <table class="ft">
+    <thead><tr><th>Category</th><th>Definition</th><th>Regulatory action required</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Minor change</strong></td><td>Minimal potential to adversely affect product quality. Low risk, well-understood change type</td><td>Annual reporting to regulatory authority — implemented first, then reported</td></tr>
+      <tr><td><strong>Moderate change</strong></td><td>Moderate potential to affect quality. More significant than minor but data-supported</td><td>Prior notification (30–60 days) to regulatory authority; implementation may begin before approval in some markets</td></tr>
+      <tr><td><strong>Major change</strong></td><td>Significant potential to adversely affect product quality, safety, or efficacy. Substantial change to the approved process or product</td><td>Prior approval required from regulatory authority before implementation. No implementation until approval received. Typical review time 6–18 months</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<!-- VALIDATION -->
+<div id="tab-val" class="t-pane">
+<p class="t-intro">Validation is the documented evidence that a process, equipment, analytical method, or cleaning procedure consistently performs as intended and produces results meeting predetermined acceptance criteria. Before manufacturing a product for patient use, the process must be validated. Before using a test method to make a release decision, it must be validated. Validation is the foundation that GMP compliance rests on.</p>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Validation types and what they prove</div></div>
+  <table class="ft">
+    <thead><tr><th>Validation type</th><th>What it proves</th><th>When required</th></tr></thead>
+    <tbody>
+      <tr><td><strong>IQ — Installation Qualification</strong></td><td>The equipment or system was installed correctly according to the manufacturer's specifications and design intent. Correct connections, correct utilities, correct software version, documentation received</td><td>Every new piece of equipment, system, or facility installation before use in GMP operations</td></tr>
+      <tr><td><strong>OQ — Operational Qualification</strong></td><td>The equipment or system operates correctly across its full operational range — not just at one set point. Demonstrates that when you set a temperature to 40°C, it reaches and holds 40°C; when you set a speed to 100 RPM, it reaches and holds 100 RPM. Challenges upper and lower limits</td><td>After IQ; before process validation</td></tr>
+      <tr><td><strong>PQ — Performance Qualification</strong></td><td>The equipment performs correctly when running actual product under production conditions. Process parameters produce product meeting acceptance criteria consistently across multiple runs. This is where equipment qualification and process validation overlap</td><td>After OQ; using actual (or representative) product and materials</td></tr>
+      <tr><td><strong>PV — Process Validation</strong></td><td>The manufacturing process consistently produces product meeting its quality attributes across multiple batches. FDA's 2011 guidance requires three stages: process design, process qualification, and continued process verification. Minimum three consecutive batches at production scale is common practice, though the number must be statistically justified</td><td>Before commercial manufacture; after any major process change</td></tr>
+      <tr><td><strong>CV — Cleaning Validation</strong></td><td>The cleaning procedure removes product residues and cleaning agents to below defined acceptance limits — preventing carryover to the next product or batch. Critical for shared equipment between different products. Limits set based on maximum safe carryover dose calculations (often HBEL — Health-Based Exposure Limits)</td><td>For any equipment used to manufacture more than one product; whenever equipment or cleaning procedure changes</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="co go"><div class="co-t">When re-validation is required</div><p>Re-qualification or re-validation is triggered by: equipment repair or modification; process change within scope of change control; persistent product quality failures; facility relocation; significant changes in raw material suppliers or grades; regulatory requirement; and periodic re-assessment (typically every 3–5 years per risk-based schedule). <strong>A process that was validated 10 years ago, with multiple equipment replacements and raw material changes since, may no longer be in a validated state</strong> — even if each individual change was documented through change control. A periodic validation review confirms the validated state is maintained.</p></div>
+</div>
+
+</div><!-- end tabs -->
+
+<!-- ═══ SECTION 3: INVESTIGATIONS ═══ -->
+<div class="sh" id="investigations">
+  <div class="sh-n">03</div>
+  <div><div class="sh-sm">Investigations Deep Dive</div><div class="sh-title">How GMP investigations actually work</div></div>
+</div>
+<p class="s-intro">A GMP investigation is a systematic process for identifying why something went wrong, who was affected, and how to prevent it from happening again. This section covers the full investigation framework — from initial detection through root cause analysis to CAPA closure — with the specific documentation requirements at each stage. This is what regulators examine most closely during inspections.</p>
+
+<div class="co re"><div class="co-t">The single most common investigation failure</div><p>Investigators reach a conclusion before completing the investigation — writing the root cause first and then gathering evidence to support it. A proper investigation starts with the observation (what happened?), expands to evidence collection (what do the records show?), generates hypotheses (what could have caused this?), tests those hypotheses against evidence, and only then reaches a root cause conclusion. <strong>A pre-determined conclusion that ignores contradictory evidence is the most serious investigation failure mode — and it is exactly what regulatory investigators are trained to detect.</strong></p></div>
+
+<div class="fc-title">Investigation lifecycle — from event to closure</div>
+<div class="flow">
+  <div class="fn crit"><div class="fn-i">🚨</div><div class="fn-l">Event Detected</div><div class="fn-s">Immediate notification; containment; document preservation</div></div>
+  <div class="fa">→</div>
+  <div class="fn warn"><div class="fn-i">📋</div><div class="fn-l">Deviation / OOS Opened</div><div class="fn-s">Within 24–72 hrs; immediate impact assessed</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🔬</div><div class="fn-l">Phase 1: Lab Investigation</div><div class="fn-s">For OOS: testing error ruled in or out</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🏭</div><div class="fn-l">Phase 2: Mfg Investigation</div><div class="fn-s">BMR, logbooks, training records reviewed</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🧩</div><div class="fn-l">Root Cause Analysis</div><div class="fn-s">5-Why, Fishbone, FMEA — documented method</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🔧</div><div class="fn-l">CAPA Development</div><div class="fn-s">Corrective + preventive actions; owners; due dates</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">📤</div><div class="fn-l">Batch Disposition</div><div class="fn-s">QA signs off on release / reject / rework</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">✅</div><div class="fn-l">CAPA Effectiveness</div><div class="fn-s">Verified with data; investigation closed</div></div>
+</div>
+
+<div class="ph-grid">
+  <div class="ph-card">
+    <div class="ph-num">01</div>
+    <div class="ph-name">Phase 1 — Immediate Response</div>
+    <ul class="ph-items">
+      <li>Stop and contain — halt or quarantine affected materials</li>
+      <li>Notify QA and supervisor immediately</li>
+      <li>Preserve all evidence — do not clean equipment yet</li>
+      <li>Secure raw data, printouts, and all original records</li>
+      <li>Document timeline precisely with timestamps</li>
+      <li>Open Deviation Report or OOS form within required timeframe</li>
+      <li>Identify scope — what batches / materials / areas are potentially affected</li>
+    </ul>
+  </div>
+  <div class="ph-card">
+    <div class="ph-num">02</div>
+    <div class="ph-name">Phase 2 — Impact Assessment</div>
+    <ul class="ph-items">
+      <li>Identify all batches potentially affected by the same cause</li>
+      <li>Quarantine all suspect materials until assessment complete</li>
+      <li>Review historical data — did this happen before at a lower severity?</li>
+      <li>Check distributed batches — is a recall or field safety correction needed?</li>
+      <li>Assess patient safety risk — is there an immediate health hazard?</li>
+      <li>Regulatory notification assessment — does this trigger a report?</li>
+      <li>Document worst-case impact even if ultimately ruled out</li>
+    </ul>
+  </div>
+  <div class="ph-card">
+    <div class="ph-num">03</div>
+    <div class="ph-name">Phase 3 — Root Cause Analysis</div>
+    <ul class="ph-items">
+      <li>Gather all relevant records: BMR, logbooks, training records</li>
+      <li>Interview operators and supervisors present at time of event</li>
+      <li>Apply systematic RCA method — 5-Why, Fishbone, FTA</li>
+      <li>Test each hypothesis against available evidence</li>
+      <li>Verify the root cause: if we fix this, would the event have been prevented?</li>
+      <li>Document the investigational logic — not just the conclusion</li>
+      <li>If root cause cannot be determined, state "inconclusive" — do not fabricate</li>
+    </ul>
+  </div>
+  <div class="ph-card">
+    <div class="ph-num">04</div>
+    <div class="ph-name">Phase 4 — CAPA & Closure</div>
+    <ul class="ph-items">
+      <li>Define CA: fix the specific problem that occurred</li>
+      <li>Define PA: address the systemic condition that permitted it</li>
+      <li>Assign named owner and specific due date to every action</li>
+      <li>Complete batch disposition with written QA justification</li>
+      <li>Set effectiveness check: what data will prove the CAPA worked?</li>
+      <li>Verify CAPA completion with objective evidence</li>
+      <li>QA formal closure with signature</li>
+    </ul>
+  </div>
+</div>
+
+<div class="sh" style="padding-top:48px;padding-bottom:24px;border-top:none">
+  <div></div>
+  <div><div class="sh-sm">Root Cause Analysis Methods</div><div class="sh-title" style="font-size:22px">The RCA toolkit</div></div>
+</div>
+<p class="s-intro" style="margin-top:-20px">Root cause analysis is not a single technique — it is a collection of methods applied depending on the complexity and nature of the event. The chosen method must be documented in the investigation report. "We discussed it" is not a documented RCA method.</p>
+
+<div class="rc-grid">
+  <div class="rc-card">
+    <div class="rc-method">5-Why Analysis <div class="rc-badge">Most Common</div></div>
+    <div class="rc-desc">Ask "why?" five or more times, with each answer becoming the next question. Forces investigators past the proximate cause to the systemic root. Example: <em>Why did the batch fail assay? → The wrong material was dispensed. Why? → Material bins were unlabelled. Why? → Labelling SOP was unclear. Why? → SOP was never reviewed by the operations team. Why? → Review process for new SOPs excluded operations department.</em> The last answer is the root cause — not the first.</div>
+    <div class="rc-when">Best for: straightforward causal chains with a clear sequence of events</div>
+  </div>
+  <div class="rc-card">
+    <div class="rc-method">Fishbone / Ishikawa Diagram</div>
+    <div class="rc-desc">A structured brainstorming tool that organises potential causes into categories — typically the 6 Ms: Man (people), Machine (equipment), Method (process), Material, Measurement (testing), and Mother Nature (environment). Each category is systematically investigated. The fishbone forces the team to consider all possible cause categories rather than focusing only on the most obvious. Output is a visual diagram that becomes part of the investigation report.</div>
+    <div class="rc-when">Best for: complex events with multiple potential contributing causes; team investigations</div>
+  </div>
+  <div class="rc-card">
+    <div class="rc-method">Fault Tree Analysis (FTA)</div>
+    <div class="rc-desc">A top-down, deductive logic tree that maps all possible combinations of failures that could lead to the observed event. Uses AND/OR logic gates: an AND gate means both conditions must exist simultaneously; an OR gate means either condition is sufficient. FTA is most powerful when the investigation needs to prove that a specific cause is necessary (not just possible). Common in validation failure investigations and contamination events.</div>
+    <div class="rc-when">Best for: complex system failures; proving a cause is necessary; sterility failures</div>
+  </div>
+  <div class="rc-card">
+    <div class="rc-method">FMEA — Failure Mode & Effects Analysis</div>
+    <div class="rc-desc">A prospective risk tool used reactively in investigations to understand all failure modes of a process step and which one most likely caused the observed event. For each process step, FMEA identifies: what can go wrong (failure mode), what effect it would have, and what controls exist to prevent or detect it. In an investigation context, FMEA is used to confirm whether the identified root cause is the most probable failure mode given the existing control environment.</div>
+    <div class="rc-when">Best for: systematic review of process steps; confirming root cause probability; risk-based investigations</div>
+  </div>
+</div>
+
+<div class="crit-box">
+  <div class="crit-box-t">Investigation red flags — what inspectors look for</div>
+  <div class="crit-items">
+    <div class="crit-item"><div class="crit-num">01</div><div class="crit-text"><strong>"Operator error" as root cause.</strong> This is almost never an acceptable root cause in a GMP investigation. It explains what happened but not why it was possible. The next question must always be: why were the conditions in place that allowed the operator to make that error? The true root cause is typically the system that permitted the error — unclear SOP, inadequate training, no engineering control, high workload, poor workspace design.</div></div>
+    <div class="crit-item"><div class="crit-num">02</div><div class="crit-text"><strong>Timeline inconsistencies.</strong> If the investigation report states the event was discovered at 14:00 but the deviation was opened at 09:00 the next day, regulators will ask why it took 19 hours. Gaps in the timeline — especially if contemporaneous documentation doesn't match — suggest either delayed reporting or retroactive record-keeping.</div></div>
+    <div class="crit-item"><div class="crit-num">03</div><div class="crit-text"><strong>Scope too narrow.</strong> Investigating only the batch that failed without assessing whether other batches were made under the same conditions, with the same equipment, or from the same material lot. FDA specifically expects the scope to be expanded unless there is a documented reason it cannot be.</div></div>
+    <div class="crit-item"><div class="crit-num">04</div><div class="crit-text"><strong>CAPA without measurable outcome.</strong> CAPAs defined as "retrain" or "remind staff" without specifying what training, assessed how, with what acceptance criteria, and verified when. Unmeasurable CAPAs are inherently ineffective — and regulators know it.</div></div>
+    <div class="crit-item"><div class="crit-num">05</div><div class="crit-text"><strong>Investigation closed before CAPA completion.</strong> The investigation and the CAPA are separate records — the investigation can be closed before CAPA implementation, with the CAPA as a separate open item. But the investigation cannot be closed as "complete" if essential CAPAs are outstanding without a clear rationale and timeline.</div></div>
+    <div class="crit-item"><div class="crit-num">06</div><div class="crit-text"><strong>Recurring events with the same root cause.</strong> If the same root cause appears in multiple investigations over 6–12 months, the CAPA from the first event clearly did not work. Recurring deviations with the same root cause are among the most serious systemic findings — they demonstrate that the quality system is not driving real improvement.</div></div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 4: DATA INTEGRITY ═══ -->
+<div class="sh" id="data-integrity">
+  <div class="sh-n">04</div>
+  <div><div class="sh-sm">Data Integrity & ALCOA+</div><div class="sh-title">The foundation of every GMP record</div></div>
+</div>
+<p class="s-intro">Data integrity is the degree to which data is complete, consistent, accurate, and trustworthy throughout its lifecycle. In GMP, data integrity is not a separate compliance activity — it is the foundation on which every other GMP document rests. A batch record that fails data integrity requirements is not a record at all — it is a liability. Data integrity failures are the leading cause of FDA Warning Letters and consent decrees globally.</p>
+
+<div class="co re"><div class="co-t">Why data integrity failures are the most serious GMP violation</div><p>A microbial contamination event harms a batch. A process deviation harms a product line. A data integrity failure — falsified records, deleted results, backdated entries — harms the entire regulatory system. It means regulators cannot trust any data submitted by that manufacturer, for any product, for any batch. <strong>The consequence is typically facility shutdown, import alerts, and criminal prosecution — not just for the individuals who falsified records, but for quality management who failed to detect it.</strong> Every major consent decree of the past decade has had a data integrity component.</p></div>
+
+<p style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">ALCOA — the five original data integrity principles</p>
+<div class="alcoa">
+  <div class="alcoa-card"><div class="alcoa-letter">A</div><div class="alcoa-name">Attributable</div><div class="alcoa-desc">Every data entry must be traceable to the specific person who made it, and the specific time it was made. Anonymous entries, shared login credentials, and uninitialled corrections violate this principle.</div></div>
+  <div class="alcoa-card"><div class="alcoa-letter">L</div><div class="alcoa-name">Legible</div><div class="alcoa-desc">Data must be readable permanently — not just at the moment of recording. Pencil entries, fading ink, overwritten entries, and paper damaged by moisture or solvents violate this principle.</div></div>
+  <div class="alcoa-card"><div class="alcoa-letter">C</div><div class="alcoa-name">Contemporaneous</div><div class="alcoa-desc">Data must be recorded at the time the activity is performed — not from memory afterward. Recording a temperature 4 hours after the measurement was taken is a contemporaneity violation even if the value was correct.</div></div>
+  <div class="alcoa-card"><div class="alcoa-letter">O</div><div class="alcoa-name">Original</div><div class="alcoa-desc">The first record of the data is the authoritative record. Transcribing data from scratch paper, personal notebooks, or temporary notes to a GMP record creates risk of transcription error and loses the original context.</div></div>
+  <div class="alcoa-card"><div class="alcoa-letter">A</div><div class="alcoa-name">Accurate</div><div class="alcoa-desc">Data must represent what was actually observed, measured, or performed. Rounding results to make them appear more acceptable, selecting which data to record, or recording expected rather than actual values violates this principle.</div></div>
+</div>
+
+<p style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin:2px 0 8px">ALCOA+ — five additional principles (FDA, EMA, MHRA emphasis)</p>
+<div class="alcoa-plus">
+  <div class="alcoa-card"><div class="alcoa-letter">C</div><div class="alcoa-name">Complete</div><div class="alcoa-desc">All data generated during a test or process must be retained — including failing results, aborted runs, and unplanned repeats. Selectively keeping only passing results is the most common data integrity violation in laboratories.</div></div>
+  <div class="alcoa-card"><div class="alcoa-letter">C</div><div class="alcoa-name">Consistent</div><div class="alcoa-desc">Data must be internally consistent — time stamps, sequences, and cross-references must agree. A batch record showing a process ended before it started, or a test result dated before the sample was taken, indicates manipulation.</div></div>
+  <div class="alcoa-card"><div class="alcoa-letter">E</div><div class="alcoa-name">Enduring</div><div class="alcoa-desc">Records must be durable for the full retention period. Paper stored in conditions that cause degradation, digital records stored in formats that become unreadable, or systems without backup strategies violate this principle.</div></div>
+  <div class="alcoa-card"><div class="alcoa-letter">A</div><div class="alcoa-name">Available</div><div class="alcoa-desc">Records must be retrievable throughout their retention period and producible for inspection within a reasonable timeframe (FDA expects records to be available upon request during an inspection — typically within hours).</div></div>
+  <div class="alcoa-card"><div class="alcoa-letter">+</div><div class="alcoa-name">Traceable</div><div class="alcoa-desc">The full audit trail — who accessed data, who modified it, when, and what it said before — must be retained. Electronic systems must generate automatic, unalterable audit trails. Manual audit trails require documented correction procedures.</div></div>
+</div>
+
+<div class="ft-wrap" style="margin-top:24px">
+  <div class="ft-head"><div class="ft-title">Paper vs electronic records — ALCOA+ requirements differ</div></div>
+  <table class="ft">
+    <thead><tr><th>Requirement</th><th>Paper records</th><th>Electronic records (21 CFR Part 11 / EU Annex 11)</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Correction method</strong></td><td>Single line through error; write correct value; date; initial; reason for correction if not obvious. Never use white-out or overwrite the original entry</td><td>System must retain the original value and the change in an automatic audit trail. The operator should not be able to overwrite data without the original value being preserved</td></tr>
+      <tr><td><strong>Contemporaneous entry</strong></td><td>Must record at time of activity. Scratch paper notes cannot substitute — all entries go directly into the GMP record at the moment the activity occurs</td><td>System timestamp must match the time of data generation. System clocks must be synchronised and cannot be changed by users</td></tr>
+      <tr><td><strong>Identity of recorder</strong></td><td>Handwritten initials or signature. Shared signature stamps are not acceptable — each person must sign personally for their own entries</td><td>Individual login credentials — shared passwords are prohibited. Each electronic signature must be unique to one individual and cannot be shared or delegated</td></tr>
+      <tr><td><strong>Audit trail</strong></td><td>The physical record itself is the audit trail — every correction visible; no entries can be removed. Storage conditions must prevent degradation</td><td>Automatic, computer-generated audit trail that captures: who made the entry, when, what the original value was, what the new value is, and why (if entered). Must be readable, not just stored</td></tr>
+      <tr><td><strong>Storage and backup</strong></td><td>Paper stored in conditions that preserve legibility. Duplicate copies or secure archives for critical records. Water and fire protection for original documents</td><td>Validated backup systems with documented recovery testing. Disaster recovery procedures. Data must be restorable to its exact state at any point in time</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="crit-box">
+  <div class="crit-box-t">Data integrity red flags — patterns that indicate systemic problems</div>
+  <div class="crit-items">
+    <div class="crit-item"><div class="crit-num">01</div><div class="crit-text"><strong>Testing into compliance:</strong> performing repeated analyses until a passing result is obtained, then reporting only the passing result. Electronic audit trails in modern HPLC and dissolution equipment make this detectable — regulators review audit trails, not just reported data. The "original" result is always the one that occurred first, regardless of whether subsequent results passed.</div></div>
+    <div class="crit-item"><div class="crit-num">02</div><div class="crit-text"><strong>Shared login credentials:</strong> multiple analysts using the same username and password on laboratory instruments. Completely destroys attributability — it is impossible to determine who generated which result. Violates both ALCOA (Attributable) and 21 CFR Part 11 requirements for individual electronic signatures.</div></div>
+    <div class="crit-item"><div class="crit-num">03</div><div class="crit-text"><strong>Backdating entries:</strong> recording events after the fact with the time and date they should have occurred rather than when the record was actually made. Even if the data itself is accurate, backdating destroys contemporaneity. When discovered — through audit trails, ink dating, or witness accounts — it creates suspicion about all data from that site.</div></div>
+    <div class="crit-item"><div class="crit-num">04</div><div class="crit-text"><strong>Scratch paper culture:</strong> operators recording measurements on loose paper during production, then transcribing into the BMR at the end of the shift. The transcription step creates risk of error and the original scratch paper — the true contemporaneous record — is typically discarded. All data must go directly into the GMP record at the moment of measurement.</div></div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 5: RETENTION ═══ -->
+<div class="sh" id="retention">
+  <div class="sh-n">05</div>
+  <div><div class="sh-sm">Retention Requirements</div><div class="sh-title">How long records must be kept</div></div>
+</div>
+<p class="s-intro">GMP records must be retained for defined minimum periods after batch release, product discontinuation, or expiry date — whichever is later. Destroying records before their retention period expires is a GMP violation. During an investigation or recall — which may occur years after manufacture — the records from the original batch must be retrievable in their original form.</p>
+
+<div class="ret-wrap">
+<table class="ret-t">
+<thead><tr><th>Document type</th><th>Minimum retention period</th><th>Regulatory basis</th><th>Practical notes</th></tr></thead>
+<tbody>
+  <tr><td><strong>Batch Manufacturing Records (BMR)</strong></td><td>1 year after the batch expiry date — or 3 years after the batch was distributed, whichever is longer (US). EU: minimum 5 years from batch release or 1 year past expiry</td><td>21 CFR 211.180(a) / EU GMP Chapter 4</td><td>The most important retention requirement. A batch recalled 18 months post-expiry must have its BMR retrievable. Facilities typically retain BMRs for the life of the product plus 5 years as a conservative standard</td></tr>
+  <tr><td><strong>Master Batch Records (MBR)</strong></td><td>Retained for the life of the product. Superseded versions must also be retained — a regulator investigating a batch made 5 years ago needs to see the MBR version that was current at the time</td><td>21 CFR 211.186 / ICH Q7</td><td>Version history is critical — every superseded version is archived with its effective date range. Document management systems must prevent superseded versions from being confused with current versions</td></tr>
+  <tr><td><strong>Batch Analytical Records (BAR / CoA)</strong></td><td>Same as BMR — 1 year past expiry or 3 years post-distribution. The certificate of analysis for each batch must be retained with the batch record</td><td>21 CFR 211.194 / EU GMP Annex 16</td><td>Original analytical worksheets, raw data, and instrument printouts — not just the final CoA — must be retained. Audit trails from electronic laboratory systems must be included</td></tr>
+  <tr><td><strong>SOPs (all versions)</strong></td><td>Current version: indefinitely (active document). Superseded versions: minimum 5 years from the date they were superseded, or for the life of any batch made under that version</td><td>21 CFR 211.68 / EU GMP Chapter 4</td><td>If a batch was made using SOP version 12, version 12 must be retrievable for the full retention period of that batch — even if the current version is 18. Archive all versions in a controlled, retrievable system</td></tr>
+  <tr><td><strong>Deviation & OOS Investigation Reports</strong></td><td>Linked to the batch record — same retention as BMR. In practice, deviation systems often retain records for 5+ years as they support CAPA trend analysis and APQR compilation</td><td>21 CFR 211.192 / 21 CFR 211.194(e)</td><td>Trending of deviation types and frequencies requires multi-year data. Annual Product Quality Reviews analyse deviation trends across the full review period — older records must remain accessible</td></tr>
+  <tr><td><strong>CAPA Records</strong></td><td>Minimum 3 years after CAPA closure, or linked to the batch records that triggered the CAPA. Effectiveness check data must be retained with the CAPA record</td><td>21 CFR 820.100 / ICH Q10</td><td>During regulatory inspections, open and recently closed CAPAs are reviewed extensively. Closed CAPAs should remain in the system for at least 3 years to support trending and re-inspection</td></tr>
+  <tr><td><strong>Validation Protocols & Reports</strong></td><td>Retained for the life of the process or equipment, plus the retention period of any batch manufactured under that validated state. Process validation data from 10 years ago is relevant if the process is still in use</td><td>21 CFR 211.68 / FDA Process Validation Guidance 2011</td><td>When equipment is decommissioned, its validation package must still be retained for the retention period of the last batch manufactured on it. Do not destroy validation records upon equipment disposal</td></tr>
+  <tr><td><strong>Stability Testing Data</strong></td><td>At minimum until 1 year after the last lot manufactured to the protocol has expired. Ongoing stability data must be retained continuously as it is generated</td><td>21 CFR 211.166 / ICH Q1A</td><td>Stability data is the basis for the product's expiry date and shelf-life claim. If the data is lost, the regulatory basis for the expiry date is lost. Stability data must be retained electronically with complete audit trail</td></tr>
+  <tr><td><strong>Calibration & Maintenance Records</strong></td><td>Minimum 1 year past the calibration interval for each instrument; in practice, retained for the life of the equipment plus the retention period of batches made with it</td><td>21 CFR 211.68 / EU GMP Chapter 3</td><td>If an OOS investigation years later determines the analytical instrument was out of calibration, the calibration records from that time must be retrievable. Instrument replacement does not eliminate the record obligation</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ═══ SECTION 6: INSPECTION ═══ -->
+<div class="sh" id="inspection">
+  <div class="sh-n">06</div>
+  <div><div class="sh-sm">Inspection Readiness</div><div class="sh-title">What regulators look for in each document</div></div>
+</div>
+<p class="s-intro">Regulatory inspectors — FDA, EMA/national competent authorities, MHRA, TGA — are trained to use documents to identify systemic quality problems. They do not read documents looking for administrative errors; they read them looking for evidence of what is actually happening in the facility versus what the documents claim is happening. Understanding their perspective makes inspection preparation meaningful rather than cosmetic.</p>
+
+<div class="insp-wrap">
+<table class="insp-t">
+<thead><tr><th>Document type</th><th>What the inspector is really asking</th><th>Red flags that trigger follow-up</th><th>Key regulation</th></tr></thead>
+<tbody>
+  <tr><td><strong>BMR</strong></td><td>Does this record tell the true story of how this batch was made? Are there gaps, inconsistencies, or implausible timelines? Are all deviations captured?</td><td><span class="flag">All fields consistently perfect</span> No facility has zero deviations; a uniformly flawless BMR suggests problems are not being captured. Also: signatures clustered at end of shift rather than contemporaneous with activities</td><td>21 CFR 211.188, 211.192</td></tr>
+  <tr><td><strong>SOPs</strong></td><td>Does the SOP reflect what actually happens? Are operators trained on the current version? How recent was the last revision — and what triggered it?</td><td><span class="flag">SOPs not revised despite known issues</span> If deviations reference a confusing SOP step but the SOP has never been updated — the facility is not learning. Also: SOPs last revised 10+ years ago in a high-risk area</td><td>21 CFR 211.68, 211.100</td></tr>
+  <tr><td><strong>Logbooks</strong></td><td>Can I verify that the equipment was clean when used for this batch? Are there unexplained gaps? Does the logbook show a different product was last run than the BMR suggests?</td><td><span class="flag">Gaps in cleaning records</span> Any undocumented gap between batches — especially across product types — is a cross-contamination risk that must be explained. Also: entries written in the same handwriting throughout a 6-hour shift</td><td>21 CFR 211.182</td></tr>
+  <tr><td><strong>Deviation reports</strong></td><td>Is the deviation rate realistic? Are similar deviations recurring? Are root causes substantive or superficial? Are CAPAs being implemented?</td><td><span class="flag">Very low deviation rate</span> A large manufacturing facility with fewer than 5 deviations per year likely has a detection or reporting culture problem — not genuinely excellent performance. Regulators know typical industry deviation rates</td><td>21 CFR 211.192</td></tr>
+  <tr><td><strong>OOS investigations</strong></td><td>Was the two-phase process followed? Was Phase 1 completed before Phase 2? Were all potentially affected batches assessed? Is the conclusion supported by evidence?</td><td><span class="flag">OOS always attributed to lab error</span> If 100% of OOS results are invalidated as laboratory errors with no confirmed product failures, the investigation process is suspect. Some OOS results must ultimately be product failures in any honest quality system</td><td>FDA OOS Guidance 2006, 21 CFR 211.192</td></tr>
+  <tr><td><strong>CAPA records</strong></td><td>Are actions specific and measurable? Do they address the root cause or just the symptom? Are they completed on time? Is effectiveness verified?</td><td><span class="flag">High rate of overdue CAPAs</span> More than 20–30% of CAPAs overdue suggests the CAPA system is not being managed as a quality priority. Also: CAPAs closed without evidence of effectiveness verification</td><td>21 CFR 820.100 / ICH Q10</td></tr>
+  <tr><td><strong>Training records</strong></td><td>Is everyone performing GMP tasks trained on the current version of the relevant SOP? Were operators trained before performing the task — or trained retroactively?</td><td><span class="flag">Training dates after batch dates</span> An operator documented as trained on an SOP one week after a batch they performed it for is untrained at time of performance — a GMP violation regardless of outcome</td><td>21 CFR 211.68 / EU GMP Chapter 2</td></tr>
+  <tr><td><strong>APQR / PQR</strong></td><td>Does this document show the facility understands its process performance? Are trends being identified and acted on? Are all required data elements present?</td><td><span class="flag">APQR conclusions inconsistent with data</span> An APQR that concludes "process is in control" when the data section shows multiple OOS events, increased deviation frequency, and stability failures demonstrates that the review is not substantive</td><td>21 CFR 211.180(e) / EU GMP Chapter 1</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="co bl"><div class="co-t">The inspection readiness principle that matters most</div><p>The best inspection readiness strategy is not preparation for inspection — it is maintaining the documentation system correctly at all times. Facilities that "prepare" for inspections by retrospectively reviewing and improving records are creating data integrity risk. The question inspectors ask is not "is this document correct now?" but "was this document correct when it was written?" A document corrected the week before an inspection looks — and may be — falsification. <strong>Inspection readiness is not a sprint before the inspectors arrive. It is a daily operational standard.</strong></p></div>
+
+</main>
+
+<footer class="ftr">
+  <div class="ftr-in">
+    <div class="ftr-note">GMP Documentation Reference — plain-language guide.<br>For informational purposes only. Not regulatory or legal advice.<br>Sources: 21 CFR 211, EU GMP Annex 11, ICH Q7/Q10/Q12, FDA OOS Guidance 2006 — as of 2025.</div>
+    <div class="ftr-tags">
+      <span class="ftr-tag">BMR</span><span class="ftr-tag">SOPs</span><span class="ftr-tag">Deviations</span>
+      <span class="ftr-tag">OOS</span><span class="ftr-tag">CAPA</span><span class="ftr-tag">ALCOA+</span><span class="ftr-tag">21 CFR 211</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.t-pane').forEach(function(el){el.classList.remove('active')});
+  document.querySelectorAll('.tb-btn').forEach(function(el){el.classList.remove('active')});
+  var pane = document.getElementById('tab-' + id);
+  if (pane) pane.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>
