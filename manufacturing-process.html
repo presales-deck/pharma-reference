@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pharma Manufacturing Processes — Plain Language Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f2ed;--surface:#fff;--surface2:#f0ede8;
+  --border:rgba(0,0,0,.09);--border-strong:rgba(0,0,0,.15);
+  --text:#1a1714;--muted:#5c5650;--dim:#9a948e;
+  --accent:#006a5a;--accent-bg:#e6f4f1;--accent-border:#9dd4c8;
+  --tab-dark:#1a3c35;
+  --orange:#b85c00;--orange-bg:#fff3e6;--orange-bd:#f0b880;
+  --blue:#005fa3;--blue-bg:#e8f2fc;--blue-bd:#9bcbef;
+  --purple:#6030b0;--purple-bg:#f0ebfa;--purple-bd:#c4a8e8;
+  --red:#a02020;--red-bg:#fdf0f0;--red-bd:#e8a8a8;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+/* HEADER */
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200}
+.hdr-in{max-width:1060px;margin:0 auto;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'DM Mono',monospace;font-size:12px;color:var(--dim);letter-spacing:.06em}
+.logo strong{color:var(--accent);font-weight:500}
+nav a{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:6px 14px;border-radius:20px;letter-spacing:.04em;transition:background .15s,color .15s}
+nav a:hover{background:var(--surface2);color:var(--text)}
+
+/* TOC */
+.toc{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:56px;z-index:190;overflow-x:auto}
+.toc-in{max-width:1060px;margin:0 auto;padding:0 32px;display:flex}
+.toc a{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);text-decoration:none;padding:10px 16px;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;letter-spacing:.04em}
+.toc a:hover{color:var(--text);border-color:var(--accent)}
+
+/* HERO */
+.hero{max-width:1060px;margin:0 auto;padding:80px 32px 64px}
+.eyebrow{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.eyebrow::after{content:'';flex:1;height:1px;background:var(--border-strong);max-width:60px}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(36px,5vw,64px);font-weight:900;line-height:1.06;margin-bottom:24px;max-width:700px}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero p{font-size:17px;color:var(--muted);max-width:600px;line-height:1.75;margin-bottom:48px}
+.stats{display:flex;gap:40px;flex-wrap:wrap}
+.stat-n{font-family:'Fraunces',serif;font-size:36px;font-weight:700;line-height:1}
+.stat-l{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);margin-top:4px}
+
+/* MAIN */
+.main{max-width:1060px;margin:0 auto;padding:0 32px 80px}
+
+/* SECTION HEAD */
+.sh{padding:64px 0 36px;border-top:1px solid var(--border);display:flex;align-items:baseline;gap:20px}
+.sh-n{font-family:'Fraunces',serif;font-size:48px;font-weight:900;color:var(--border-strong);line-height:1;flex-shrink:0}
+.sh-small{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.sh-title{font-family:'Fraunces',serif;font-size:28px;font-weight:700;line-height:1.2}
+.s-intro{font-size:15px;color:var(--muted);line-height:1.7;max-width:680px;margin-bottom:32px}
+
+/* CALLOUT */
+.co{border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;background:var(--surface);padding:22px 26px;margin:32px 0}
+.co.or{border-left-color:var(--orange)} .co.bl{border-left-color:var(--blue)} .co.re{border-left-color:var(--red)}
+.co-t{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.co.or .co-t{color:var(--orange)} .co.bl .co-t{color:var(--blue)} .co.re .co-t{color:var(--red)}
+.co p{font-size:14px;color:var(--muted);line-height:1.7}
+.co p strong{color:var(--text);font-weight:500}
+
+/* PHASE GRID */
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);border-radius:16px;overflow:hidden;margin-bottom:48px}
+.pc{background:var(--surface);padding:28px;transition:background .15s}
+.pc:hover{background:var(--surface2)}
+.pc-n{font-family:'Fraunces',serif;font-size:40px;font-weight:900;color:var(--border);line-height:1;margin-bottom:8px}
+.pc-name{font-size:15px;font-weight:500;margin-bottom:8px}
+.pc p{font-size:13px;color:var(--muted);line-height:1.6}
+.tag{display:inline-block;margin-top:12px;font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border-radius:20px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+.tag.or{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd)}
+.tag.re{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
+
+/* FLOWCHART */
+.fc{margin:32px 0 48px}
+.fc-title{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px}
+.flow{display:flex;align-items:stretch;background:var(--border);border-radius:12px;overflow:hidden;overflow-x:auto}
+.fn{flex:1;min-width:96px;background:var(--surface);padding:16px 10px;text-align:center;border-right:1px solid var(--border)}
+.fn:last-child{border-right:none}
+.fn.hl{background:var(--accent-bg)}
+.fn.hl .fn-l{color:var(--accent)}
+.fn-i{font-size:18px;margin-bottom:5px}
+.fn-l{font-size:11px;font-weight:500;line-height:1.3;margin-bottom:3px}
+.fn-s{font-size:10px;color:var(--dim);line-height:1.4;font-family:'DM Mono',monospace}
+.fa{display:flex;align-items:center;justify-content:center;background:var(--surface2);padding:0 3px;font-size:11px;color:var(--dim);border-right:1px solid var(--border);flex-shrink:0}
+
+/* ANALOGY */
+.an{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:24px}
+.an-l{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.an p{font-size:14px;color:var(--muted);line-height:1.65;font-style:italic}
+
+/* TABS */
+.tc{margin-bottom:48px}
+.tb{display:flex;gap:2px;background:var(--border);border-radius:12px 12px 0 0;overflow:hidden;flex-wrap:wrap}
+.tb-btn{background:var(--surface2);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--muted);padding:14px 20px;transition:all .15s;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tb-btn:hover{background:var(--surface);color:var(--text)}
+.tb-btn.active{background:var(--tab-dark);color:#fff}
+.t-icon{font-size:15px}
+.t-pane{display:none;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:36px}
+.t-pane.active{display:block}
+.t-intro{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:28px;max-width:680px}
+
+/* PROC CARDS */
+.pcg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
+.pcard{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px}
+.pcard-t{font-size:14px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.dot.or{background:var(--orange)} .dot.re{background:var(--red)} .dot.pu{background:var(--purple)} .dot.bl{background:var(--blue)}
+.pcard-d{font-size:13px;color:var(--muted);line-height:1.65}
+.pcard-n{margin-top:10px;font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);padding-top:10px;border-top:1px solid var(--border)}
+
+/* STEP LIST */
+.sl{display:flex;flex-direction:column;gap:2px;margin:24px 0}
+.sr{display:grid;grid-template-columns:54px 1fr 196px;background:var(--surface2);border:1px solid var(--border);overflow:hidden;transition:background .15s}
+.sr:first-child{border-radius:10px 10px 0 0} .sr:last-child{border-radius:0 0 10px 10px}
+.sr:not(:last-child){border-bottom:none}
+.sr:hover{background:var(--accent-bg)}
+.sr-n{background:var(--surface);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:22px;font-weight:900;color:var(--accent);opacity:.4;padding:18px 0}
+.sr-b{padding:16px 20px;border-right:1px solid var(--border)}
+.sr-name{font-size:14px;font-weight:500;margin-bottom:4px}
+.sr-d{font-size:13px;color:var(--muted);line-height:1.6}
+.sr-s{padding:16px;background:var(--surface)}
+.sr-sl{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.sr-sv{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* EXAMPLE BOX */
+.eb{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:20px 0}
+.eb-h{background:var(--surface2);padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.eb-l{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.eb-n{font-size:14px;font-weight:500}
+.eb-b{padding:20px;background:var(--surface)}
+.eb-b p{font-size:13px;color:var(--muted);line-height:1.65}
+.eb-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.eb-cl{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+.eb-li{list-style:none}
+.eb-li li{font-size:12px;color:var(--muted);padding-left:14px;position:relative;line-height:1.6}
+.eb-li li::before{content:'→';position:absolute;left:0;color:var(--dim);font-size:10px;top:3px}
+
+/* PILL */
+.pill{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;padding:2px 9px;border-radius:20px}
+.pill.gmp{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-bd)}
+.pill.sterile{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
+.pill.bio{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-bd)}
+.pill.std{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+
+/* QC GRID */
+.qcg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px}
+.qcc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px}
+.qcc-i{font-size:22px;margin-bottom:10px}
+.qcc-t{font-size:14px;font-weight:500;margin-bottom:8px}
+.qcc-d{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.qcc-l{list-style:none}
+.qcc-l li{font-size:12px;color:var(--muted);padding-left:14px;position:relative;margin-bottom:4px}
+.qcc-l li::before{content:'✓';position:absolute;left:0;color:var(--accent);font-size:10px;top:2px}
+
+/* COMPARE */
+.ctw{border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:32px}
+.ct{width:100%;border-collapse:collapse}
+.ct th{background:var(--surface2);font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:14px 18px;border-bottom:1px solid var(--border);font-weight:400}
+.ct td{padding:14px 18px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55}
+.ct tr:last-child td{border-bottom:none}
+.ct tr:hover td{background:var(--surface2)}
+.ct td strong{color:var(--text);font-weight:500}
+
+/* FOOTER */
+.ftr{border-top:1px solid var(--border);background:var(--surface);padding:40px 32px;margin-top:40px}
+.ftr-in{max-width:1060px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.ftr-note{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);line-height:1.6}
+.ftr-tags{display:flex;gap:8px;flex-wrap:wrap}
+.ftr-tag{font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border:1px solid var(--border-strong);border-radius:20px;color:var(--dim)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.hero h1{animation:fadeUp .5s ease both}
+.hero p{animation:fadeUp .5s .08s ease both}
+.stats{animation:fadeUp .5s .16s ease both}
+
+@media(max-width:768px){
+  nav{display:none} .hero{padding:48px 20px 40px} .main{padding:0 20px 60px}
+  .hdr-in,.toc-in{padding:0 20px} .pg{grid-template-columns:1fr}
+  .pcg{grid-template-columns:1fr} .sr{grid-template-columns:42px 1fr}
+  .sr-s{display:none} .qcg{grid-template-columns:1fr} .eb-cols{grid-template-columns:1fr}
+  .sh{flex-direction:column;gap:4px;padding-top:48px} .sh-n{font-size:32px}
+  .ftr-in{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <div class="logo"><strong>PHARMA</strong> / Manufacturing Processes</div>
+    <nav>
+      <a href="#phases">Phases</a>
+      <a href="#dosage-forms">Dosage Forms</a>
+      <a href="#qc">Quality Control</a>
+      <a href="#comparison">Comparison</a>
+      <a href="index.html">← Regulatory Reference</a>
+    </nav>
+  </div>
+</header>
+
+<div class="toc">
+  <div class="toc-in">
+    <a href="#phases">01 — Universal phases</a>
+    <a href="#dosage-forms">02 — By dosage form</a>
+    <a href="#qc">03 — Quality control</a>
+    <a href="#comparison">04 — Side-by-side comparison</a>
+    <a href="#gmp">05 — GMP in practice</a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="eyebrow">Plain Language Manufacturing Reference — 2025</div>
+  <h1>How drugs are<br><em>actually made</em></h1>
+  <p>A plain-language walkthrough of pharmaceutical manufacturing — from universal phases every drug goes through, to a deep dive into each dosage form: tablets, injectables, topicals, biologics, oral liquids, and inhaled products. Written for people without a manufacturing background.</p>
+  <div class="stats">
+    <div><div class="stat-n">6</div><div class="stat-l">Universal phases</div></div>
+    <div><div class="stat-n">6</div><div class="stat-l">Dosage form types</div></div>
+    <div><div class="stat-n">0</div><div class="stat-l">Tolerance for sterility failure</div></div>
+    <div><div class="stat-n">21 CFR</div><div class="stat-l">Governing regulation</div></div>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- ═══ SECTION 1: PHASES ═══ -->
+<div class="sh" id="phases">
+  <div class="sh-n">01</div>
+  <div>
+    <div class="sh-small">Universal Framework</div>
+    <div class="sh-title">The phases every drug goes through</div>
+  </div>
+</div>
+
+<p class="s-intro">Regardless of whether it's a tablet, injectable, or biologic, pharmaceutical manufacturing always follows the same broad phases. Steps inside each phase differ by product — but the structure is universal and mandated by GMP regulations globally.</p>
+
+<div class="an"><div class="an-l">Analogy</div><p>Think of drug manufacturing like a high-stakes commercial kitchen with government inspectors watching at any time. You have a recipe (the formula), approved ingredients from vetted suppliers, a strictly controlled kitchen environment, mandatory quality checks before anything leaves, and complete records of everything — because if a patient is harmed, regulators need to trace exactly what was made, how, and when.</p></div>
+
+<div class="pg">
+  <div class="pc"><div class="pc-n">01</div><div class="pc-name">Raw Material Sourcing & Testing</div><p>Every ingredient — the active drug and all excipients (inactive ingredients: fillers, binders, coatings) — must come from approved suppliers, be tested on arrival, and be released by QC before entering manufacturing. Nothing goes in unless verified. Supplier qualification is a separate GMP requirement.</p><div class="tag">Entry Gate</div></div>
+  <div class="pc"><div class="pc-n">02</div><div class="pc-name">Weighing & Dispensing</div><p>Precise quantities of each ingredient are weighed and dispensed in controlled environments. Errors here propagate through the entire batch. Most facilities require two-person verification — one person weighs, one independently checks. The Batch Manufacturing Record (BMR) is issued here and accompanies the batch throughout its entire life.</p><div class="tag or">Critical Control Point</div></div>
+  <div class="pc"><div class="pc-n">03</div><div class="pc-name">Manufacturing / Processing</div><p>The actual conversion of ingredients into a drug product. This is where processes diverge most dramatically by dosage form — granulation and compression for tablets, aseptic filling for injectables, fermentation and purification for biologics. See Section 02 for each type in detail.</p><div class="tag">Product-Specific</div></div>
+  <div class="pc"><div class="pc-n">04</div><div class="pc-name">In-Process & Final QC Testing</div><p>Quality is checked at multiple points during manufacturing (in-process controls) and comprehensively at the end (finished product release testing). A batch cannot be distributed until every specified test passes. Tests cover physical properties, chemical potency, and microbiology.</p><div class="tag re">Release Gate</div></div>
+  <div class="pc"><div class="pc-n">05</div><div class="pc-name">Packaging & Labelling</div><p>Finished product is packaged and labelled under controlled conditions. Labelling errors — applying the wrong label — are among the most common GMP violations and trigger recalls. Line clearance (complete cleaning and verification between products) is mandatory before any packaging run starts.</p><div class="tag or">High Error Risk</div></div>
+  <div class="pc"><div class="pc-n">06</div><div class="pc-name">QA Release & Distribution</div><p>Batch records are reviewed by Quality Assurance. A Qualified Person (QP in EU) or equivalent formally certifies the batch before distribution. The product enters the supply chain under controlled temperature and humidity. BMRs are retained for years after the product's expiry date.</p><div class="tag">Final Certification</div></div>
+</div>
+
+<div class="fc">
+  <div class="fc-title">Universal manufacturing flow — applies to all dosage forms</div>
+  <div class="flow">
+    <div class="fn"><div class="fn-i">📦</div><div class="fn-l">Receive Materials</div><div class="fn-s">Approved supplier, CoA</div></div>
+    <div class="fa">→</div>
+    <div class="fn hl"><div class="fn-i">🧪</div><div class="fn-l">QC Incoming Test</div><div class="fn-s">Identity, purity, potency</div></div>
+    <div class="fa">→</div>
+    <div class="fn"><div class="fn-i">⚖️</div><div class="fn-l">Weigh & Dispense</div><div class="fn-s">2-person check, BMR issued</div></div>
+    <div class="fa">→</div>
+    <div class="fn"><div class="fn-i">⚙️</div><div class="fn-l">Manufacture</div><div class="fn-s">Process-specific steps</div></div>
+    <div class="fa">→</div>
+    <div class="fn hl"><div class="fn-i">🔬</div><div class="fn-l">In-Process QC</div><div class="fn-s">Checks at critical stages</div></div>
+    <div class="fa">→</div>
+    <div class="fn"><div class="fn-i">🏷️</div><div class="fn-l">Pack & Label</div><div class="fn-s">Line clearance first</div></div>
+    <div class="fa">→</div>
+    <div class="fn hl"><div class="fn-i">✅</div><div class="fn-l">QA Release</div><div class="fn-s">QP sign-off, BMR review</div></div>
+    <div class="fa">→</div>
+    <div class="fn"><div class="fn-i">🚚</div><div class="fn-l">Distribute</div><div class="fn-s">Cold chain, GDP rules</div></div>
+  </div>
+</div>
+
+<div class="co"><div class="co-t">What is a Batch Manufacturing Record (BMR)?</div><p>Every batch generates a BMR — a complete document recording every step taken, every measurement made, every deviation observed, and every person involved. Think of it as the birth certificate and life record for a batch of medicine. If a patient is harmed months later, regulators trace it through the BMR. <strong>Under 21 CFR Part 211, BMRs must be retained for at least one year after the batch's expiry date.</strong></p></div>
+
+<!-- ═══ SECTION 2: DOSAGE FORMS ═══ -->
+<div class="sh" id="dosage-forms">
+  <div class="sh-n">02</div>
+  <div>
+    <div class="sh-small">By Product Type</div>
+    <div class="sh-title">Manufacturing by dosage form</div>
+  </div>
+</div>
+<p class="s-intro">The manufacturing process depends entirely on the final product form. A tablet and an injectable require completely different equipment, environments, and regulatory controls. Click each tab to explore how that dosage form is made, step by step, with a real-world example.</p>
+
+<div class="tc">
+<div class="tb">
+  <button class="tb-btn active" onclick="showTab('tablets',this)"><span class="t-icon">💊</span>Tablets & Capsules</button>
+  <button class="tb-btn" onclick="showTab('injectables',this)"><span class="t-icon">💉</span>Injectables</button>
+  <button class="tb-btn" onclick="showTab('topicals',this)"><span class="t-icon">🧴</span>Topicals</button>
+  <button class="tb-btn" onclick="showTab('biologics',this)"><span class="t-icon">🧬</span>Biologics</button>
+  <button class="tb-btn" onclick="showTab('liquids',this)"><span class="t-icon">🫙</span>Oral Liquids</button>
+  <button class="tb-btn" onclick="showTab('inhaled',this)"><span class="t-icon">💨</span>Inhaled</button>
+</div>
+
+<div id="tab-tablets" class="t-pane active">
+<p class="t-intro">Tablets and capsules are the most common dosage forms — roughly 70–80% of all medicines. The manufacturing process combines the active drug with excipients (inactive helpers: binders, fillers, disintegrants, lubricants) and compresses or fills them. Complexity ranges from a 4-ingredient immediate-release tablet to a 20-ingredient modified-release system.</p>
+<div class="pcg">
+  <div class="pcard"><div class="pcard-t"><div class="dot"></div>Two main manufacturing routes</div><div class="pcard-d"><strong>Wet granulation:</strong> mix powders, add liquid binder to form granules, dry them, then compress. Better for poorly compressible APIs. More steps, more controls.<br><br><strong>Direct compression:</strong> blend powders and compress directly. Fewer steps, lower cost — but only works when the API and excipients have good flow and compressibility.</div><div class="pcard-n">Route selection has regulatory implications — changes post-approval require ICH Q12 assessment and may need regulatory notification</div></div>
+  <div class="pcard"><div class="pcard-t"><div class="dot"></div>What excipients actually do</div><div class="pcard-d"><strong>Binders</strong> — hold the tablet together (PVP, HPMC)<br><strong>Fillers/diluents</strong> — bulk the tablet to handleable size (lactose, MCC)<br><strong>Disintegrants</strong> — help the tablet break apart in the stomach (croscarmellose)<br><strong>Lubricants</strong> — prevent sticking to punches during compression (magnesium stearate)<br><strong>Coatings</strong> — protect, mask taste, or control release (HPMC film, Eudragit)</div><div class="pcard-n">Each excipient must be qualified, sourced from approved suppliers, and tested on receipt — same as the API</div></div>
+</div>
+<div class="fc"><div class="fc-title">Wet granulation tablet process — step by step</div>
+<div class="flow">
+  <div class="fn"><div class="fn-i">⚖️</div><div class="fn-l">Dispense & Sieve</div><div class="fn-s">API + excipients weighed, lumps removed</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🔄</div><div class="fn-l">Dry Mix</div><div class="fn-s">Blend uniformity critical</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">💧</div><div class="fn-l">Granulate</div><div class="fn-s">Add liquid binder, high shear</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🌬️</div><div class="fn-l">Dry (FBD)</div><div class="fn-s">LOD spec: 1–3%</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">⚙️</div><div class="fn-l">Mill & Size</div><div class="fn-s">Particle size distribution</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🔄</div><div class="fn-l">Lubricate</div><div class="fn-s">Add Mg stearate — timed exactly</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🗜️</div><div class="fn-l">Compress</div><div class="fn-s">Weight, hardness, thickness</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🎨</div><div class="fn-l">Film Coat</div><div class="fn-s">If required; dissolution spec</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">✅</div><div class="fn-l">Release QC</div><div class="fn-s">Assay, dissolution, CU</div></div>
+</div></div>
+<div class="sl">
+  <div class="sr"><div class="sr-n">1</div><div class="sr-b"><div class="sr-name">Dispensing & sieving</div><div class="sr-d">API and excipients are weighed, dispensed, and sieved to break up lumps and ensure uniform particle size. Done in a dispensing booth with local exhaust ventilation to protect operators from potent dust exposure. Every weighed item is logged in the BMR with quantity, operator ID, and time.</div></div><div class="sr-s"><div class="sr-sl">Environment</div><div class="sr-sv">Humidity-controlled area. Potent APIs require fully enclosed systems or respiratory PPE</div></div></div>
+  <div class="sr"><div class="sr-n">2</div><div class="sr-b"><div class="sr-name">Dry mixing (blending)</div><div class="sr-d">API and intragranular excipients are mixed in a high-shear mixer or tumble blender. Blend uniformity is critical — a poorly blended batch means some tablets contain too much drug, others too little. Sampling must prove uniformity across the entire blend volume before proceeding.</div></div><div class="sr-s"><div class="sr-sl">In-process test</div><div class="sr-sv">Blend uniformity sampling — multiple locations, multiple time points per validated protocol</div></div></div>
+  <div class="sr"><div class="sr-n">3</div><div class="sr-b"><div class="sr-name">Wet granulation</div><div class="sr-d">A liquid binder solution is added to the powder blend while mixing at high shear. The wet mass forms granules — small dense aggregates that compress better than raw powder. Granule size and density must hit defined specifications. Over-granulating makes tablets too hard; under-granulating means poor binding.</div></div><div class="sr-s"><div class="sr-sl">Key parameters</div><div class="sr-sv">Impeller speed, chopper speed, liquid addition rate, granulation end-point (power consumption)</div></div></div>
+  <div class="sr"><div class="sr-n">4</div><div class="sr-b"><div class="sr-name">Drying — fluid bed dryer</div><div class="sr-d">Wet granules are dried in a fluid bed dryer — hot air flows upward through the granule bed, evaporating moisture. Loss on Drying (LOD) is the critical in-process test, typically targeting 1–3%. Too wet causes caking and microbial risk; too dry causes friability and poor compression behaviour.</div></div><div class="sr-s"><div class="sr-sl">Critical test</div><div class="sr-sv">Loss on Drying (LOD) — moisture measured at defined intervals during drying. Final LOD must meet spec before milling</div></div></div>
+  <div class="sr"><div class="sr-n">5</div><div class="sr-b"><div class="sr-name">Milling & sizing</div><div class="sr-d">Dried granules pass through a mill screen to achieve uniform particle size distribution. Oversized agglomerates are broken down; excessive fines are minimised. This controls the flow properties going into the tablet press — poor flow produces weight variation, which means dose variation.</div></div><div class="sr-s"><div class="sr-sl">In-process test</div><div class="sr-sv">Particle size distribution by sieve analysis or laser diffraction. D90 typically ≤500 µm</div></div></div>
+  <div class="sr"><div class="sr-n">6</div><div class="sr-b"><div class="sr-name">Lubrication & final blending</div><div class="sr-d">Extragranular excipients — lubricant, glidant, and disintegrant — are added and blended briefly. This step is critical and unforgiving: too little lubricant and tablets stick to punch faces; too much magnesium stearate creates a hydrophobic barrier causing dissolution failure. Blend time is typically validated to 2–5 minutes only.</div></div><div class="sr-s"><div class="sr-sl">Critical risk</div><div class="sr-sv">Over-lubrication with Mg stearate → hydrophobic film → dissolution failure → drug not released properly in patient</div></div></div>
+  <div class="sr"><div class="sr-n">7</div><div class="sr-b"><div class="sr-name">Tablet compression</div><div class="sr-d">Blend feeds into a rotary tablet press — up to 500,000 tablets/hour on modern equipment. Upper and lower punches compress the blend into tablets. In-process testing every 15–30 minutes: weight, hardness, thickness, friability, and disintegration. Tablet weight directly determines dose — it is the most critical in-process control in tablet manufacturing.</div></div><div class="sr-s"><div class="sr-sl">In-process controls</div><div class="sr-sv">Weight (USP ±5%), hardness, thickness, friability (&lt;1%), disintegration — checked every 15–30 min</div></div></div>
+  <div class="sr"><div class="sr-n">8</div><div class="sr-b"><div class="sr-name">Film coating (if required)</div><div class="sr-d">Tablets tumble in a coating pan while a polymer solution is spray-applied. Coating purposes: taste masking, moisture/light protection, or modified drug release (delayed or sustained). For modified-release products, coating thickness and uniformity directly control how much drug is released at each time point — it becomes a safety-critical specification tied to the dissolution test.</div></div><div class="sr-s"><div class="sr-sl">Post-coating tests</div><div class="sr-sv">Weight gain %, appearance, dissolution profile (critical for MR coatings — defines release rate)</div></div></div>
+  <div class="sr"><div class="sr-n">9</div><div class="sr-b"><div class="sr-name">Final release testing & QA certification</div><div class="sr-d">Full finished-product testing before release: assay (how much drug?), dissolution (does it release correctly?), content uniformity (same dose in every tablet?), microbial limits, appearance, identification. All results reviewed by QA. Batch released only if every specification is met without exception — a single failing result requires investigation and potentially batch rejection.</div></div><div class="sr-s"><div class="sr-sl">Release tests</div><div class="sr-sv">Assay, dissolution, content uniformity, microbial limits, description, identification, related substances</div></div></div>
+</div>
+<div class="eb"><div class="eb-h"><div class="eb-l">Real-world example</div><div class="eb-n">Metformin 500mg tablet — type 2 diabetes, one of the world's most manufactured tablets</div></div>
+<div class="eb-b"><p>Metformin HCl is the API — highly water-soluble but poorly compressible, making wet granulation typical. The challenge: metformin is hygroscopic (absorbs moisture from air), so manufacturing must occur in low-humidity environments. The immediate-release version disintegrates in ~15 minutes; the extended-release version uses a polymer matrix (HPMC) to deliver drug over 8–12 hours — requiring a tighter dissolution specification and different coating system. Both versions appear on the WHO Essential Medicines List.</p>
+<div class="eb-cols">
+  <div><div class="eb-cl">Key process challenges</div><ul class="eb-li"><li>High drug load (~80% API) — little room for excipients</li><li>Hygroscopic API — humidity must be below 45% RH throughout</li><li>High tablet weight (500–1000 mg) — requires robust compression force</li><li>ER version: dissolution profile is the defining release specification</li></ul></div>
+  <div><div class="eb-cl">Key release tests (IR)</div><ul class="eb-li"><li>Assay: 95.0–105.0% of label claim</li><li>Dissolution: ≥80% released at 45 minutes (USP Apparatus 2)</li><li>Content uniformity: RSD &lt;6% across 10 units</li><li>Microbial limits: TAMC ≤1000 CFU/g</li></ul></div>
+</div></div></div>
+</div>
+
+<div id="tab-injectables" class="t-pane">
+<p class="t-intro">Injectables go directly into the body — bloodstream, muscle, or tissue — bypassing every natural defence. This is why they are the most tightly regulated dosage form. <strong>There is zero tolerance for microbial contamination.</strong> A single contaminated vial reaching a patient can cause sepsis or death within hours. Every design decision in injectable manufacturing exists to prevent, detect, and eliminate contamination.</p>
+<div class="pcg">
+  <div class="pcard"><div class="pcard-t"><div class="dot re"></div>Two sterilisation strategies</div><div class="pcard-d"><strong>Terminal sterilisation:</strong> product is filled into its final container and then sterilised — typically by autoclaving (121°C steam). Preferred by regulators because it sterilises the final closed unit. Only possible if the drug is heat-stable.<br><br><strong>Aseptic processing:</strong> the product is sterilised by filtration before filling, then filled into pre-sterilised containers under such clean conditions that contamination cannot occur. Required for heat-labile drugs — most biologics, some APIs. Higher risk, more complex to validate.</div><div class="pcard-n"><span class="pill sterile">Sterile Product</span> — governed by 21 CFR Part 211 Subpart D (US) and EU GMP Annex 1 (2022 revision)</div></div>
+  <div class="pcard"><div class="pcard-t"><div class="dot re"></div>Cleanroom grades explained</div><div class="pcard-d"><strong>Grade A (ISO 5):</strong> the filling zone — HEPA-filtered laminar flow directly over open product. The most controlled environment in any industry.<br><strong>Grade B:</strong> the immediate background environment surrounding Grade A.<br><strong>Grade C:</strong> preparation areas — solution preparation, component washing.<br><strong>Grade D:</strong> gowning rooms, support areas.<br><br>Each grade has strict limits for airborne particles (&gt;0.5 µm and &gt;5 µm) and viable organisms (CFU/m³) that must be monitored continuously and trended.</div><div class="pcard-n">EU GMP Annex 1 (2022 revision) is the current global benchmark for sterile manufacturing facility design and control</div></div>
+</div>
+<div class="fc"><div class="fc-title">Aseptic injectable vial fill/finish — the most regulated manufacturing process in pharma</div>
+<div class="flow">
+  <div class="fn"><div class="fn-i">💧</div><div class="fn-l">Prepare WFI</div><div class="fn-s">Endotoxin, conductivity, TOC</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">⚗️</div><div class="fn-l">Compound Bulk</div><div class="fn-s">Dissolve API, adjust pH</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🔽</div><div class="fn-l">Sterile Filter</div><div class="fn-s">0.22 µm; integrity test pre+post</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🔥</div><div class="fn-l">Depyrogenate Vials</div><div class="fn-s">250°C tunnel; destroys endotoxin</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🏥</div><div class="fn-l">Aseptic Fill</div><div class="fn-s">Grade A; RABS or isolator</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🔒</div><div class="fn-l">Stopper & Crimp</div><div class="fn-s">Seal immediately on exit</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">👁️</div><div class="fn-l">100% Inspect</div><div class="fn-s">Particles, defects, fill vol</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">⏳</div><div class="fn-l">14-Day Sterility</div><div class="fn-s">Incubate; release after</div></div>
+</div></div>
+<div class="sl">
+  <div class="sr"><div class="sr-n">1</div><div class="sr-b"><div class="sr-name">Water for Injection (WFI) preparation</div><div class="sr-d">WFI is the purest pharmaceutical water grade — produced by distillation or reverse osmosis/electrodeionisation. It must meet stringent specifications. Endotoxins — fragments from bacterial cell walls — cause fever even without live bacteria. A drug can be sterile yet still cause a pyrogenic (fever) reaction if endotoxin is present. WFI is circulated continuously to prevent biofilm formation in the distribution system.</div></div><div class="sr-s"><div class="sr-sl">WFI Spec (Ph.Eur/USP)</div><div class="sr-sv">Conductivity ≤1.3 µS/cm, TOC ≤500 ppb, endotoxin ≤0.25 EU/mL, sterile</div></div></div>
+  <div class="sr"><div class="sr-n">2</div><div class="sr-b"><div class="sr-name">Bulk solution compounding</div><div class="sr-d">API dissolves in WFI with excipients — buffers (to control pH), tonicity agents (to match body fluid osmolarity), stabilisers, and preservatives if a multi-dose vial. pH is adjusted precisely. The solution is made up to final volume and checked for clarity. For biologics, temperature, pH, and oxygen exposure must be tightly controlled — the protein can degrade or aggregate under stress.</div></div><div class="sr-s"><div class="sr-sl">In-process tests</div><div class="sr-sv">Assay, pH, osmolality, appearance (clear, colourless, essentially particle-free)</div></div></div>
+  <div class="sr"><div class="sr-n">3</div><div class="sr-b"><div class="sr-name">Bioburden reduction & sterile filtration</div><div class="sr-d">The bulk solution passes through a 0.22 µm sterilising-grade membrane filter. At 0.22 µm, no bacterium or fungus can pass — this removes all biological contamination before filling. Filter integrity testing (bubble point or diffusion test) is mandatory before AND after filtration. A failed post-use filter integrity test means the filtration cannot be confirmed effective — the batch must be rejected.</div></div><div class="sr-s"><div class="sr-sl">Critical test</div><div class="sr-sv">Filter integrity pre- and post-filtration. Post-use failure = mandatory batch rejection and investigation</div></div></div>
+  <div class="sr"><div class="sr-n">4</div><div class="sr-b"><div class="sr-name">Container preparation — washing & depyrogenation</div><div class="sr-d">Glass vials are washed (to remove particulates) then passed through a depyrogenation tunnel — heated to 250°C+ for a defined time period. At these temperatures, endotoxins are destroyed. Sterilisation at 121°C is not sufficient to destroy endotoxins — a separate, more extreme heat step is required. Rubber stoppers are washed, sterilised, and siliconised to enable smooth automated machine handling.</div></div><div class="sr-s"><div class="sr-sl">Depyrogenation</div><div class="sr-sv">250°C / 30 min minimum. Tunnel temperature profile validated; endotoxin challenge study per ISO 13408</div></div></div>
+  <div class="sr"><div class="sr-n">5</div><div class="sr-b"><div class="sr-name">Aseptic filling — Grade A environment</div><div class="sr-d">Sterile solution fills into sterile vials using filling needles under Grade A HEPA-filtered laminar airflow. This is the highest-risk step — the brief moment when product is exposed to the environment. Modern facilities use RABS (Restricted Access Barrier Systems) or isolators to physically separate operators from the filling zone. Fill volume is verified continuously by weight feedback. Every operator action in or near Grade A is documented in real time.</div></div><div class="sr-s"><div class="sr-sl">In-process controls</div><div class="sr-sv">Fill volume every 15 min, environmental monitoring (viable + non-viable particles), gowning verification, interventions logged</div></div></div>
+  <div class="sr"><div class="sr-n">6</div><div class="sr-b"><div class="sr-name">Stoppering, crimping & 100% visual inspection</div><div class="sr-d">Vials are immediately stoppered and crimped as they exit the filling zone. Then every single vial undergoes 100% visual inspection — either by trained human inspectors or automated inspection machines. Inspectors and machines check for particulate matter (visible particles in the solution), container defects (cracks, chips), fill volume anomalies, and cosmetic issues. A vial with visible particles must be rejected — no exceptions under any GMP framework.</div></div><div class="sr-s"><div class="sr-sl">Inspection standard</div><div class="sr-sv">100% inspection per USP &lt;790&gt; / Ph.Eur. 2.9.20. Typical reject rate 0.1–2% on a well-controlled batch</div></div></div>
+  <div class="sr"><div class="sr-n">7</div><div class="sr-b"><div class="sr-name">Sterility testing & 14-day hold</div><div class="sr-d">Samples are incubated for 14 days in two growth media (for aerobic and anaerobic organisms) to confirm no viable contamination. This test samples only a tiny fraction of the batch — real sterility assurance comes from process control, not this test. Modern facilities increasingly use parametric release — certifying sterility from validated process data rather than waiting 14 days for a test that rarely finds anything if the process was controlled correctly.</div></div><div class="sr-s"><div class="sr-sl">Hold time</div><div class="sr-sv">14-day sterility test incubation before batch can be released. Any failure triggers full investigation</div></div></div>
+</div>
+<div class="eb"><div class="eb-h"><div class="eb-l">Real-world example</div><div class="eb-n">mRNA COVID-19 vaccine (BNT162b2 / Comirnaty) — a new class of injectable manufacturing</div></div>
+<div class="eb-b"><p>The Pfizer-BioNTech vaccine introduced manufacturing challenges the industry had never faced at scale. mRNA is exquisitely fragile and cannot enter cells on its own — it must be encapsulated in lipid nanoparticles (LNPs) for delivery. The drug substance (mRNA) and the delivery system (LNPs) are manufactured separately then combined. Ultra-cold storage (-70°C during distribution) adds GDP complexity not seen in conventional injectables. The entire process is aseptic — mRNA cannot survive any terminal sterilisation step.</p>
+<div class="eb-cols">
+  <div><div class="eb-cl">Unique manufacturing challenges</div><ul class="eb-li"><li>mRNA degrades rapidly — ultra-cold chain (-70°C) throughout</li><li>LNP particle size must be 70–120 nm — nanoscale precision required</li><li>Encapsulation efficiency must be &gt;85%</li><li>New analytical methods required — no compendial standards existed</li></ul></div>
+  <div><div class="eb-cl">Key release tests</div><ul class="eb-li"><li>mRNA integrity (capillary electrophoresis)</li><li>Encapsulation efficiency (Ribogreen assay)</li><li>Particle size and polydispersity index (DLS)</li><li>Sterility, endotoxin &lt;2 EU/dose, appearance</li></ul></div>
+</div></div></div>
+</div>
+
+<div id="tab-topicals" class="t-pane">
+<p class="t-intro">Topical products — creams, ointments, gels, lotions, and transdermal patches — are applied to the skin. They don't need to be sterile (skin is not a sterile surface), but they must be microbiologically controlled, physically stable over shelf life, and cosmetically elegant. The core manufacturing challenge is creating the right texture, consistency, and drug distribution — then proving that formulation holds for 2–3 years.</p>
+<div class="pcg">
+  <div class="pcard"><div class="pcard-t"><div class="dot or"></div>Cream vs ointment vs gel</div><div class="pcard-d"><strong>Creams:</strong> oil-in-water or water-in-oil emulsions. Most common topical form. Light, spreadable, cosmetically elegant. Thermodynamically unstable — can phase-separate over time if formulation is poor.<br><br><strong>Ointments:</strong> semisolid, anhydrous oil-based (petrolatum, lanolin). No water — more stable than creams, better skin-barrier protection, but greasier. Simpler to make.<br><br><strong>Gels:</strong> polymer network swollen with solvent. Aqueous (carbomer gel) or hydroalcoholic. Very uniform drug distribution when API is dissolved. Common for anti-inflammatories and antifungals.</div><div class="pcard-n">Dosage form selection affects drug penetration depth, patient compliance, and product stability — all captured in the formulation development report</div></div>
+  <div class="pcard"><div class="pcard-t"><div class="dot or"></div>Transdermal patches — controlled delivery through skin</div><div class="pcard-d">Patches deliver drug through skin into the bloodstream over hours or days (nicotine, fentanyl, estradiol, contraceptive patches). Manufacturing is pharmaceutical coating on a moving web — a drug-in-adhesive or drug-in-reservoir layer is coated onto a backing film at precise thickness, then covered with a release liner.<br><br>Uniformity of the drug layer across millions of patches is the critical quality attribute — variation in coating thickness means variation in dose delivered to the patient.</div><div class="pcard-n"><span class="pill gmp">Modified Release</span> — the drug delivery rate profile IS the product specification; it must be defined and validated</div></div>
+</div>
+<div class="fc"><div class="fc-title">Cream manufacturing — oil-in-water emulsion process</div>
+<div class="flow">
+  <div class="fn"><div class="fn-i">🫙</div><div class="fn-l">Prepare Oil Phase</div><div class="fn-s">Waxes, oils, emulsifiers at 65–80°C</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">💧</div><div class="fn-l">Prepare Water Phase</div><div class="fn-s">Water, preservatives, pH adjust</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">⚡</div><div class="fn-l">Emulsify</div><div class="fn-s">High-shear mixing; droplet size critical</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">❄️</div><div class="fn-l">Cool with Mixing</div><div class="fn-s">Heat-sensitive ingredients added at 35–40°C</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🔬</div><div class="fn-l">In-Process QC</div><div class="fn-s">Viscosity, pH, assay</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🧴</div><div class="fn-l">Fill Tubes/Jars</div><div class="fn-s">Weight, seal integrity</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">✅</div><div class="fn-l">Release QC</div><div class="fn-s">Assay, microbials, viscosity, pH</div></div>
+</div></div>
+<div class="sl">
+  <div class="sr"><div class="sr-n">1</div><div class="sr-b"><div class="sr-name">Oil phase preparation</div><div class="sr-d">All oil-soluble ingredients — waxes, oils, oil-soluble emulsifiers, and oil-soluble API (if any) — are combined in a jacketed manufacturing vessel and heated to 65–80°C. Heating melts solid fats and waxes and ensures complete dissolution of all components. Temperature uniformity across the vessel is critical — localised overheating can degrade heat-sensitive excipients or the API.</div></div><div class="sr-s"><div class="sr-sl">Critical parameter</div><div class="sr-sv">Temperature uniformity ±2°C across vessel. Validated heating profile required per batch size</div></div></div>
+  <div class="sr"><div class="sr-n">2</div><div class="sr-b"><div class="sr-name">Water phase preparation</div><div class="sr-d">All water-soluble ingredients — purified water, humectants, water-soluble emulsifiers, preservatives (parabens, phenoxyethanol), and water-soluble API — are combined and heated to the same temperature as the oil phase. pH of the water phase is adjusted before mixing, as pH affects API stability, preservative efficacy, and emulsion stability.</div></div><div class="sr-s"><div class="sr-sl">In-process test</div><div class="sr-sv">pH of water phase before emulsification — spec defined per formulation development data</div></div></div>
+  <div class="sr"><div class="sr-n">3</div><div class="sr-b"><div class="sr-name">Emulsification</div><div class="sr-d">The water phase is added to the oil phase (or vice versa, depending on emulsion type) under high-shear mixing. This breaks the immiscible phases into tiny droplets (1–10 µm) stabilised by emulsifiers. Droplet size directly determines product texture, appearance, stability, and drug penetration into skin. This step defines the character of the entire product — it must be exactly reproducible batch to batch.</div></div><div class="sr-s"><div class="sr-sl">Critical parameters</div><div class="sr-sv">Mixer speed, temperature at mixing, addition rate of second phase — all validated per batch size</div></div></div>
+  <div class="sr"><div class="sr-n">4</div><div class="sr-b"><div class="sr-name">Cooling with continuous mixing</div><div class="sr-d">The emulsion cools slowly under continuous gentle agitation. Rapid or uneven cooling causes wax crystallisation that produces a grainy, unacceptable texture. Heat-sensitive ingredients — fragrance, certain preservatives, thermolabile APIs — are added during the cooling phase at defined temperatures (typically 35–40°C) to avoid degradation while ensuring complete incorporation.</div></div><div class="sr-s"><div class="sr-sl">Addition temperature</div><div class="sr-sv">Heat-sensitive materials added at 35–40°C. Continuous temperature monitoring throughout cooling</div></div></div>
+  <div class="sr"><div class="sr-n">5</div><div class="sr-b"><div class="sr-name">Final homogenisation & in-process QC</div><div class="sr-d">Final pass through a homogeniser ensures uniform droplet size throughout the full batch. In-process checks: viscosity (must be within spec for filling — too thick won't fill; too thin behaves like a lotion), pH, appearance, and assay. The batch cannot proceed to filling until all in-process specifications are confirmed met.</div></div><div class="sr-s"><div class="sr-sl">In-process tests</div><div class="sr-sv">Viscosity (Brookfield, defined spindle/speed), pH, appearance, assay before proceeding</div></div></div>
+  <div class="sr"><div class="sr-n">6</div><div class="sr-b"><div class="sr-name">Tube/jar filling & sealing</div><div class="sr-d">Cream fills into tubes or jars at controlled temperature to maintain correct viscosity for consistent fill weight. Tube filling machines crimp and seal the base of the tube immediately after filling. Fill weight is checked every 15–30 minutes. Tube seal integrity is verified — a leaking tube is a quality defect and a contamination risk. Batch reconciliation: all filled units accounted for vs materials dispensed.</div></div><div class="sr-s"><div class="sr-sl">In-process controls</div><div class="sr-sv">Fill weight per unit, seal integrity testing, visual appearance of filled units, batch reconciliation at end</div></div></div>
+</div>
+<div class="eb"><div class="eb-h"><div class="eb-l">Real-world example</div><div class="eb-n">Hydrocortisone 1% cream — one of the world's most widely manufactured topical corticosteroids</div></div>
+<div class="eb-b"><p>Hydrocortisone is dissolved in the oil phase. The stability challenge: corticosteroids degrade in the presence of water and metal ions — so the formulation uses pH control (acidic, 4.5–5.5), chelating agents (EDTA inactivates metal catalysts), and antioxidants. The product must remain physically stable (no phase separation) and chemically stable (no degradation beyond limits) for a 2–3 year shelf life — proven through ICH Q1A stability studies at controlled temperature and humidity conditions.</p>
+<div class="eb-cols">
+  <div><div class="eb-cl">ICH Q1A stability programme</div><ul class="eb-li"><li>Long-term: 25°C / 60% RH for 24+ months (real shelf-life claim)</li><li>Accelerated: 40°C / 75% RH for 6 months (early prediction)</li><li>Intermediate: 30°C / 65% RH if accelerated shows change</li><li>Photostability: ICH Q1B light exposure study</li></ul></div>
+  <div><div class="eb-cl">Key release tests</div><ul class="eb-li"><li>Assay: 90.0–110.0% of label claim</li><li>Related substances — degradation products below defined limits</li><li>Microbial limits: TAMC ≤10² CFU/g, TYMC ≤10¹ CFU/g</li><li>Viscosity, pH (4.5–5.5), appearance, preservative content</li></ul></div>
+</div></div></div>
+</div>
+
+<div id="tab-biologics" class="t-pane">
+<p class="t-intro">Biologics are medicines made from or by living organisms — bacteria, yeast, or mammalian cells. Unlike small-molecule drugs, biologics are large, complex molecules that cannot be fully defined by chemical formula alone. <strong>The process IS the product</strong> — even small changes in manufacturing conditions can alter the molecule itself, changing its safety and efficacy. This makes biologic manufacturing the most complex, most capital-intensive, and most regulated category in all of pharma.</p>
+<div class="pcg">
+  <div class="pcard"><div class="pcard-t"><div class="dot pu"></div>Why biologics are fundamentally different</div><div class="pcard-d">Aspirin is the same molecule regardless of who makes it. A monoclonal antibody is a protein with a complex 3D structure that depends on how it folded during cell culture, what post-translational modifications occurred, and how it was processed downstream.<br><br>Two factories making "the same" antibody with slightly different cell culture conditions can produce different glycosylation profiles (sugar chains on the protein), which can alter immune response, half-life, and efficacy in patients. This is why biosimilar approval requires extensive analytical and clinical comparability studies.</div><div class="pcard-n"><span class="pill bio">Biologic</span> — "The process is the product." Any manufacturing change requires a formal comparability exercise</div></div>
+  <div class="pcard"><div class="pcard-t"><div class="dot pu"></div>Main types of biologics</div><div class="pcard-d"><strong>Monoclonal antibodies (mAbs):</strong> largest category — made in mammalian cells (CHO). Examples: adalimumab (Humira), trastuzumab (Herceptin), pembrolizumab (Keytruda)<br><br><strong>Recombinant proteins:</strong> insulin, erythropoietin, clotting factors — expressed in bacteria, yeast, or mammalian cells<br><br><strong>Vaccines:</strong> attenuated virus, inactivated virus, protein subunits, or mRNA-LNP platforms<br><br><strong>Cell &amp; gene therapies:</strong> most complex — the drug is living cells or viral vectors delivering genetic material</div><div class="pcard-n">Each type requires its own distinct manufacturing platform, equipment, and analytical methods</div></div>
+</div>
+<div class="fc"><div class="fc-title">Monoclonal antibody manufacturing — upstream cell culture + downstream purification</div>
+<div class="flow">
+  <div class="fn"><div class="fn-i">🧊</div><div class="fn-l">Thaw Cell Bank</div><div class="fn-s">MCB → WCB vial</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🌱</div><div class="fn-l">Seed Train</div><div class="fn-s">Flask → 50L → 500L</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🫧</div><div class="fn-l">Production Bioreactor</div><div class="fn-s">10–21 days; daily monitoring</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🔄</div><div class="fn-l">Harvest & Clarify</div><div class="fn-s">Remove cells; depth filtration</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🧲</div><div class="fn-l">Protein A Capture</div><div class="fn-s">&gt;99% purity in one step</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🦠</div><div class="fn-l">Viral Clearance</div><div class="fn-s">Low pH + nanofiltration</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">💊</div><div class="fn-l">Formulate & Fill</div><div class="fn-s">Sterile filter; aseptic fill</div></div>
+</div></div>
+<div class="sl">
+  <div class="sr"><div class="sr-n">1</div><div class="sr-b"><div class="sr-name">Cell bank thaw & seed train expansion</div><div class="sr-d">Manufacturing starts from a frozen Master Cell Bank (MCB) — vials of genetically engineered cells stored in liquid nitrogen. A Working Cell Bank (WCB) vial is thawed and cells expanded progressively through increasingly larger vessels — from a flask (mL scale) to 50L, 200L, eventually 2,000–20,000L production bioreactors. This seed train takes 2–4 weeks. The cell bank is characterised extensively: identity, genetic stability, and freedom from viruses, bacteria, and mycoplasma.</div></div><div class="sr-s"><div class="sr-sl">Critical asset</div><div class="sr-sv">Cell bank in dual-location LN₂ tanks. Loss or contamination = months of manufacturing downtime</div></div></div>
+  <div class="sr"><div class="sr-n">2</div><div class="sr-b"><div class="sr-name">Production bioreactor — cell culture</div><div class="sr-d">The production bioreactor runs fed-batch for 10–21 days. Temperature (37°C), pH (7.0–7.4), dissolved oxygen, CO₂, agitation, and feeding schedule are tightly controlled. The cells secrete the antibody into the culture broth. Daily monitoring: cell density, viability, glucose, lactate, dissolved O₂, and product titre. Deviations here directly alter the molecular quality of the final product.</div></div><div class="sr-s"><div class="sr-sl">Daily monitoring</div><div class="sr-sv">Viable cell density, viability %, glucose, lactate, pH, dissolved O₂, daily product titre (HPLC or Protein A assay)</div></div></div>
+  <div class="sr"><div class="sr-n">3</div><div class="sr-b"><div class="sr-name">Harvest & clarification</div><div class="sr-d">At end of culture, bioreactor contents are harvested. Dead cells and debris are removed by centrifugation followed by depth filtration while retaining the antibody. The clarified harvest — the liquid containing antibody, culture media, and cellular proteins — proceeds to purification. Harvest must be processed quickly to prevent protease enzymes from degrading the product.</div></div><div class="sr-s"><div class="sr-sl">Transition point</div><div class="sr-sv">Upstream → Downstream. Typical antibody titre at harvest: 2–15 g/L depending on cell line and process</div></div></div>
+  <div class="sr"><div class="sr-n">4</div><div class="sr-b"><div class="sr-name">Protein A capture chromatography</div><div class="sr-d">The defining purification step for monoclonal antibodies. Protein A resin binds antibodies with extraordinary specificity — almost nothing else sticks. The harvest flows through the column; the antibody is captured; everything else washes through. The antibody is eluted by lowering pH. A single Protein A step achieves ~99% purity from an enormously complex mixture — this is what makes mAb manufacturing economically viable.</div></div><div class="sr-s"><div class="sr-sl">Typical outcome</div><div class="sr-sv">&gt;99% purity; dramatic reduction in host cell proteins (HCPs), DNA, and process-related impurities</div></div></div>
+  <div class="sr"><div class="sr-n">5</div><div class="sr-b"><div class="sr-name">Viral inactivation & polishing chromatography</div><div class="sr-d">Because mammalian cells can harbour latent viruses, two orthogonal viral clearance steps are mandatory: (1) Low pH treatment (pH 3.5 / 60 minutes) — inactivates enveloped viruses. (2) Virus-retentive nanofiltration (20 nm pore) — physically removes small non-enveloped viruses. Further polishing chromatography steps (ion exchange, hydrophobic interaction) remove remaining host cell proteins, DNA, and aggregates (misfolded antibody clusters that can trigger immune reactions in patients).</div></div><div class="sr-s"><div class="sr-sl">Regulatory requirement</div><div class="sr-sv">ICH Q5A — viral clearance studies must demonstrate ≥4 log₁₀ reduction for each independent step</div></div></div>
+  <div class="sr"><div class="sr-n">6</div><div class="sr-b"><div class="sr-name">Formulation, UF/DF & aseptic fill-finish</div><div class="sr-d">Purified antibody undergoes ultrafiltration/diafiltration (UF/DF) — concentrated to target concentration and buffer-exchanged into the formulation buffer. Stabilisers (sugars like trehalose, surfactants like polysorbate 80) are added to prevent aggregation during storage and shipping. Then sterile filtered (0.22 µm) and filled aseptically into vials or pre-filled syringes. Mechanical stress during pumping must be minimised — shear forces cause protein aggregation.</div></div><div class="sr-s"><div class="sr-sl">Sensitive step</div><div class="sr-sv">Pumping shear → protein aggregation. Filling parameters (speed, pressure, nozzle design) validated to minimise mechanical stress</div></div></div>
+</div>
+<div class="eb"><div class="eb-h"><div class="eb-l">Real-world example</div><div class="eb-n">Adalimumab (Humira) — world's best-selling biologic, anti-TNF monoclonal antibody for autoimmune diseases</div></div>
+<div class="eb-b"><p>Made in Chinese Hamster Ovary (CHO) cells. End-to-end manufacturing takes approximately 60 days from cell bank thaw to final product release. The molecule's glycosylation profile — the pattern of sugars attached to the antibody — affects its half-life, Fc-effector function, and immunogenicity. This profile is directly controlled by cell culture conditions and is one of the key attributes checked in biosimilar comparability studies. Humira biosimilar approval required multiple analytical, PK, and clinical studies because "same amino acid sequence" is not sufficient to demonstrate "same medicine."</p>
+<div class="eb-cols">
+  <div><div class="eb-cl">Critical quality attributes</div><ul class="eb-li"><li>Glycosylation profile (G0F, G1F, G2F glycoforms) — process-controlled</li><li>Aggregation (&lt;2% high molecular weight species by SEC-HPLC)</li><li>Charge variants (acidic/basic isoforms by IEX-HPLC)</li><li>Biological activity (TNF-α binding potency by cell-based assay)</li></ul></div>
+  <div><div class="eb-cl">Key release tests</div><ul class="eb-li"><li>Potency by cell-based bioassay (TNF-α neutralisation)</li><li>Protein concentration (UV A280)</li><li>Purity by SEC-HPLC, IEX-HPLC</li><li>Sterility, endotoxin, appearance, pH, osmolality</li></ul></div>
+</div></div></div>
+</div>
+
+<div id="tab-liquids" class="t-pane">
+<p class="t-intro">Oral liquids — solutions, suspensions, emulsions, and syrups — are drugs in liquid form taken by mouth. Essential for patients who can't swallow tablets: paediatric patients, elderly patients, those with dysphagia. Solutions are simplest (drug dissolved, every spoonful identical). Suspensions are more complex — the drug is insoluble and must stay evenly distributed. Settling is the enemy of dose uniformity in a suspension.</p>
+<div class="pcg">
+  <div class="pcard"><div class="pcard-t"><div class="dot bl"></div>Solutions vs suspensions — a critical difference</div><div class="pcard-d"><strong>Solutions:</strong> API fully dissolved — every spoonful contains exactly the same dose. Simple to manufacture but requires the API to be soluble at the required concentration. Examples: paracetamol solution, cough syrups, oral electrolytes.<br><br><strong>Suspensions:</strong> API insoluble, present as fine particles dispersed throughout. Critical challenge: if particles settle, a patient pouring from the bottom of a poorly-mixed bottle gets 5× the intended dose; from the top, almost nothing. "Shake well before use" is a patient safety requirement, not just good practice.</div><div class="pcard-n">Suspensions require extensive rheology development — viscosity and particle size control the settling rate throughout shelf life</div></div>
+  <div class="pcard"><div class="pcard-t"><div class="dot bl"></div>Preservatives — essential but tightly regulated</div><div class="pcard-d">Oral liquids are aqueous systems — water supports microbial growth. Any multi-dose bottle opened repeatedly needs a preservative to prevent it from becoming a bacterial culture. Common preservatives: sodium benzoate, potassium sorbate, methylparaben.<br><br>Regulatory challenge: preservative concentrations are tightly limited (especially in paediatric products — parabens raise safety concerns in neonates). Minimum effective concentration must be demonstrated by Antimicrobial Effectiveness Testing (AET) per Ph.Eur. 5.1.3 / USP &lt;51&gt;.</div><div class="pcard-n"><span class="pill std">Paediatric products</span> — subject to additional excipient safety scrutiny per ICH E11(R1) and EMA paediatric guidelines</div></div>
+</div>
+<div class="sl">
+  <div class="sr"><div class="sr-n">1</div><div class="sr-b"><div class="sr-name">Purified Water preparation</div><div class="sr-d">Purified Water (not WFI — oral products don't require the highest water grade) is the primary solvent. The water system must be monitored continuously for microbial count and conductivity. Water is typically circulated continuously in a heated loop to prevent biofilm formation in pipes — stagnant pharmaceutical water becomes contaminated rapidly and can invalidate entire manufacturing campaigns.</div></div><div class="sr-s"><div class="sr-sl">Water spec (Ph.Eur.)</div><div class="sr-sv">Conductivity ≤4.3 µS/cm at 20°C, TAMC ≤100 CFU/mL, no specified organisms</div></div></div>
+  <div class="sr"><div class="sr-n">2</div><div class="sr-b"><div class="sr-name">Compounding — dissolving or dispersing</div><div class="sr-d">For solutions: excipients (sweeteners, viscosity modifiers, buffers, preservatives) dissolve first, then API is added and dissolved. pH is adjusted to target range — pH affects API stability, taste, and preservative efficacy. For suspensions: API is micronised (particle size reduced to 1–10 µm) before dispersion, then wetted with surfactant and suspended in the viscous vehicle. Particle size of the suspended API is a critical quality attribute that must be controlled.</div></div><div class="sr-s"><div class="sr-sl">In-process tests</div><div class="sr-sv">pH, assay, appearance, particle size (suspensions by laser diffraction), viscosity before filling</div></div></div>
+  <div class="sr"><div class="sr-n">3</div><div class="sr-b"><div class="sr-name">Bulk filtration (solutions) & in-process QC</div><div class="sr-d">Solutions are filtered through a 0.22 µm or coarser filter (not for sterility — for clarity and particle removal only). Suspensions cannot be filtered without losing the drug particles. Bulk in-process checks: assay confirms correct drug concentration, pH within spec, viscosity within spec for filling, appearance. Any out-of-spec result stops the batch for investigation before filling commences.</div></div><div class="sr-s"><div class="sr-sl">Suspension check</div><div class="sr-sv">Particle size distribution (laser diffraction). D90 typically &lt;50 µm for acceptable mouthfeel and dose accuracy</div></div></div>
+  <div class="sr"><div class="sr-n">4</div><div class="sr-b"><div class="sr-name">Filling into bottles & sealing</div><div class="sr-d">Liquid fills into glass or plastic bottles (HDPE or PET). For suspensions, the bulk must be kept under continuous mixing during filling to prevent settling in the holding tank — the dose in the first bottle must be identical to the last. Child-resistant caps (legally required in most markets) are applied and torque-tested for proper sealing. Fill volume is checked every 15 minutes throughout the run.</div></div><div class="sr-s"><div class="sr-sl">In-process controls</div><div class="sr-sv">Fill volume every 15 min, cap torque testing, container integrity, dose uniformity (suspensions sampled top/middle/bottom)</div></div></div>
+</div>
+<div class="eb"><div class="eb-h"><div class="eb-l">Real-world example</div><div class="eb-n">Amoxicillin 250mg/5mL oral suspension — antibiotic for paediatric use globally</div></div>
+<div class="eb-b"><p>Amoxicillin is unstable in aqueous solution — it hydrolyses (breaks down) rapidly in water. The manufacturing solution: the product is supplied as a dry powder blend and reconstituted by the pharmacist or patient just before use by adding a defined volume of water. Manufacturing at the factory produces the dry powder blend only; the suspension is formed at the point of dispensing. This means the factory step is dry blending and powder filling — simpler than liquid manufacturing, but requiring tight control of particle size and blend uniformity to ensure correct dose after reconstitution.</p>
+<div class="eb-cols">
+  <div><div class="eb-cl">Dry powder blend controls</div><ul class="eb-li"><li>Blend uniformity — amoxicillin must be uniformly distributed throughout the powder</li><li>Particle size — affects reconstitution rate and final suspension quality</li><li>Moisture content — moisture triggers rapid hydrolysis degradation</li><li>Reconstitution time — must fully suspend within 60 seconds of mixing with water</li></ul></div>
+  <div><div class="eb-cl">Post-reconstitution shelf-life tests</div><ul class="eb-li"><li>Assay ≥90% of label claim at end of reconstituted shelf life (typically 14 days at 2–8°C)</li><li>Particle size distribution — no crystal growth during storage</li><li>pH within spec throughout storage</li><li>Microbial limits — preservative efficacy must hold for 14 days</li></ul></div>
+</div></div></div>
+</div>
+
+<div id="tab-inhaled" class="t-pane">
+<p class="t-intro">Inhaled products deliver drug directly to the lungs — for local effect (asthma, COPD) or systemic absorption via the lung surface. The defining challenge: the drug particle must be 1–5 µm to reach the deep lung, must be delivered in an exactly reproducible dose, and must deposit in the right part of the lung. Particle size is everything — too large and particles deposit in the throat; too small and they're exhaled. This makes inhaled manufacturing among the most technically demanding in pharma.</p>
+<div class="pcg">
+  <div class="pcard"><div class="pcard-t"><div class="dot bl"></div>Three main delivery systems</div><div class="pcard-d"><strong>pMDI (pressurised Metered-Dose Inhaler):</strong> drug dissolved or suspended in liquefied propellant (HFA). Each actuation delivers a metered dose. Manufacturing involves pressure filling with liquefied propellant. Most widely used globally.<br><br><strong>DPI (Dry Powder Inhaler):</strong> micronised powder inhaled by the patient's own breath. No propellant. More sensitive to humidity — moisture affects particle aggregation and lung deposition. Device engineering and powder formulation are inseparable.<br><br><strong>Nebuliser solutions:</strong> drug dissolved in aqueous solution, aerosolised by a bedside device. Manufactured like an oral liquid but often sterile.</div><div class="pcard-n">Device and drug product are co-developed and co-validated — they cannot be separated at regulatory submission</div></div>
+  <div class="pcard"><div class="pcard-t"><div class="dot bl"></div>APSD — the defining quality test</div><div class="pcard-d">For inhaled products, the critical quality attribute is not just "how much drug" but "where does it deposit in the lung." Aerodynamic Particle Size Distribution (APSD) — measured by cascade impaction — characterises the fraction of each dose reaching different parts of the respiratory tract based on aerodynamic diameter.<br><br><strong>Fine Particle Fraction (FPF):</strong> proportion of particles &lt;5 µm — these reach the lower airways where therapeutic effect occurs.<br><strong>MMAD:</strong> mass median aerodynamic diameter — the particle size where half the dose is larger and half smaller.</div><div class="pcard-n"><span class="pill gmp">Inhaled</span> — APSD by cascade impaction (NGI or ACI) is the primary release test per Ph.Eur. 2.9.18 / USP &lt;601&gt;</div></div>
+</div>
+<div class="fc"><div class="fc-title">DPI manufacturing flow — dry powder inhaler</div>
+<div class="flow">
+  <div class="fn hl"><div class="fn-i">⚡</div><div class="fn-l">Micronise API</div><div class="fn-s">Jet mill → MMAD 1–5 µm</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🧂</div><div class="fn-l">Grade Lactose Carrier</div><div class="fn-s">63–150 µm; single qualified supplier</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🔄</div><div class="fn-l">Drug-Carrier Blend</div><div class="fn-s">API adheres to lactose surface</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">💨</div><div class="fn-l">Fill — &lt;30% RH</div><div class="fn-s">Humidity critical; aggregation risk</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">📊</div><div class="fn-l">APSD Testing</div><div class="fn-s">NGI cascade impaction; FPF, MMAD</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">📦</div><div class="fn-l">DDU Testing</div><div class="fn-s">Dose uniformity across device life</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">✅</div><div class="fn-l">Release QC</div><div class="fn-s">Assay, moisture, microbials</div></div>
+</div></div>
+<div class="sl">
+  <div class="sr"><div class="sr-n">1</div><div class="sr-b"><div class="sr-name">API micronisation — jet milling</div><div class="sr-d">The inhaled API must be reduced to a mass median aerodynamic diameter (MMAD) of 1–5 µm. Achieved by jet milling — particles collide with each other at high velocity in a stream of compressed gas, fracturing to the required size. The resulting micronised powder is extremely fine, cohesive, and prone to electrostatic charging. Particle size distribution is validated and checked on every API batch before it can be used in manufacturing.</div></div><div class="sr-s"><div class="sr-sl">Target PSD</div><div class="sr-sv">MMAD 1–5 µm. D90 typically &lt;10 µm. Measured by laser diffraction after every micronisation batch</div></div></div>
+  <div class="sr"><div class="sr-n">2</div><div class="sr-b"><div class="sr-name">Carrier lactose preparation & qualification</div><div class="sr-d">For DPI, micronised API blends with coarse lactose carrier particles (63–150 µm). Drug adheres to the lactose surface. On inhalation, drug detaches from the carrier and reaches the lung; the larger lactose deposits in the throat harmlessly. Lactose grade (particle size, surface area, surface energy) directly affects drug adhesion and therefore FPF. This is why inhaled manufacturers often qualify single lactose suppliers and treat the carrier as a critical excipient.</div></div><div class="sr-s"><div class="sr-sl">Critical attribute</div><div class="sr-sv">Lactose surface area and particle size must meet tight specifications. Change in lactose grade = full APSD re-evaluation required</div></div></div>
+  <div class="sr"><div class="sr-n">3</div><div class="sr-b"><div class="sr-name">Drug-carrier blending</div><div class="sr-d">Micronised API is blended with carrier lactose under controlled conditions. The blending energy must be validated precisely — over-blending reduces fine particle fraction (API embeds too deeply in lactose surface and won't detach during inhalation); under-blending produces non-uniform drug coating on carrier and poor content uniformity. Relative humidity during blending must be controlled as moisture alters surface adhesion forces.</div></div><div class="sr-s"><div class="sr-sl">In-process test</div><div class="sr-sv">Content uniformity of blend — multiple location samples. Humidity during blending &lt;30% RH throughout</div></div></div>
+  <div class="sr"><div class="sr-n">4</div><div class="sr-b"><div class="sr-name">Filling — under strictly controlled humidity</div><div class="sr-d">DPI powder fills into blister packs, capsules, or reservoir devices under strictly controlled relative humidity — typically below 30% RH (often 15–25%). Moisture causes micronised particles to aggregate — clumps cannot be re-dispersed to single particles on inhalation, dramatically worsening APSD and reducing lung deposition. Humidity control in the filling area is as critical as cleanroom classification is for sterile products.</div></div><div class="sr-s"><div class="sr-sl">Environmental control</div><div class="sr-sv">RH &lt;30% during all powder handling and filling operations. Temperature and humidity continuously monitored and recorded</div></div></div>
+  <div class="sr"><div class="sr-n">5</div><div class="sr-b"><div class="sr-name">APSD testing & Delivered Dose Uniformity (DDU)</div><div class="sr-d">The primary quality release tests. Delivered Dose Uniformity (DDU) tests from across the full device life (beginning, middle, and end) — each dose must fall within ±25% of label claim per Ph.Eur. 2.9.28. APSD by Next Generation Impactor (NGI): the aerosol fires through impaction stages separating particles by aerodynamic size — drug on each stage is assayed. FPF and MMAD must meet product-specific specifications.</div></div><div class="sr-s"><div class="sr-sl">Release tests</div><div class="sr-sv">DDU across device life, APSD (FPF, MMAD by NGI), assay, moisture content (Karl Fischer), microbial limits</div></div></div>
+</div>
+<div class="eb"><div class="eb-h"><div class="eb-l">Real-world example</div><div class="eb-n">Fluticasone/Salmeterol DPI (Advair Diskus / Seretide) — asthma combination inhaler with two APIs</div></div>
+<div class="eb-b"><p>A combination of two micronised APIs (fluticasone propionate for inflammation; salmeterol for bronchodilation) blended with lactose. The challenge: both APIs have different optimal particle sizes and different adhesion energies to lactose — the blend must deliver both at their correct doses simultaneously with the correct APSD for each. Any change to the lactose grade changes the adhesion characteristics and therefore the APSD of both APIs — requiring complete analytical revalidation. This is why inhaled product manufacturers often single-source lactose and treat carrier specification as a regulatory commitment.</p>
+<div class="eb-cols">
+  <div><div class="eb-cl">Manufacturing sensitivities</div><ul class="eb-li"><li>Lactose surface energy affects both APIs differently — single supplier mandatory</li><li>Blending energy validated to ±20 RPM — over/under blending changes FPF</li><li>Humidity &lt;20% RH throughout all powder handling operations</li><li>Device and formulation are co-validated — not interchangeable between manufacturers</li></ul></div>
+  <div><div class="eb-cl">Key release specs</div><ul class="eb-li"><li>Fluticasone DDU: label claim ±25% across full device life</li><li>Salmeterol DDU: label claim ±25% across full device life</li><li>FPF defined minimum % independently for each API</li><li>Moisture content &lt;0.5% by Karl Fischer titration</li></ul></div>
+</div></div></div>
+</div>
+
+</div><!-- end tab container -->
+
+<!-- ═══ SECTION 3: QC ═══ -->
+<div class="sh" id="qc">
+  <div class="sh-n">03</div>
+  <div>
+    <div class="sh-small">Quality Control</div>
+    <div class="sh-title">How quality is tested and verified</div>
+  </div>
+</div>
+<p class="s-intro">Quality Control operates at every stage — incoming materials, during manufacture, and at the finished product. The GMP principle: you cannot test quality into a product. Quality must be built in through controlled processes. Testing is verification of what was already built in — not a substitute for process control.</p>
+
+<div class="qcg">
+  <div class="qcc"><div class="qcc-i">📥</div><div class="qcc-t">Incoming Material Testing</div><div class="qcc-d">Every raw material — API and all excipients — is tested on arrival before use. A Certificate of Analysis (CoA) from the supplier is not sufficient alone; the manufacturer must independently verify it. Testing confirms the material is what the supplier says it is, at the purity stated.</div><ul class="qcc-l"><li>Identity (IR spectroscopy, HPLC)</li><li>Purity / related substances</li><li>Water content (Karl Fischer)</li><li>Microbial limits (for applicable materials)</li><li>Elemental impurities (ICH Q3D)</li></ul></div>
+  <div class="qcc"><div class="qcc-i">⚗️</div><div class="qcc-t">In-Process Controls (IPC)</div><div class="qcc-d">Testing performed during manufacturing at defined critical control points. IPC allows deviations to be caught and corrected during the process — rather than discovering a failed batch only at the end. IPC specifications are typically wider than release specs; they flag trends before problems become failures.</div><ul class="qcc-l"><li>Tablet weight, hardness, thickness every 15–30 min</li><li>Blend uniformity (multiple-location sampling)</li><li>Fill volume / fill weight during filling</li><li>pH and assay during compounding</li><li>Environmental monitoring in clean areas</li></ul></div>
+  <div class="qcc"><div class="qcc-i">🔬</div><div class="qcc-t">Finished Product Release Testing</div><div class="qcc-d">Comprehensive testing of the finished batch before distribution. Every specification must pass — a single failing test means the batch is rejected unless investigation establishes an assignable non-product cause. Release testing is the final gate before patients receive the medicine.</div><ul class="qcc-l"><li>Assay (potency / drug content)</li><li>Related substances / degradation products</li><li>Dissolution / release profile</li><li>Content uniformity (all solid dosage forms)</li><li>Microbial limits / sterility (sterile products)</li><li>Endotoxin / pyrogen (injectables)</li></ul></div>
+  <div class="qcc"><div class="qcc-i">📊</div><div class="qcc-t">Stability Testing</div><div class="qcc-d">Every product must be proven to remain within specification for its entire stated shelf life. Stability studies run at defined temperature and humidity conditions per ICH Q1A. Data from these studies establish the expiry date on the label and prove the stated storage conditions (e.g. "store below 25°C") are sufficient.</div><ul class="qcc-l"><li>Long-term: 25°C/60% RH (real-time shelf-life claim)</li><li>Accelerated: 40°C/75% RH (early prediction)</li><li>Intermediate: 30°C/65% RH (when accelerated shows change)</li><li>Photostability: ICH Q1B light exposure</li><li>In-use stability: after opening (multi-dose products)</li></ul></div>
+  <div class="qcc"><div class="qcc-i">🌡️</div><div class="qcc-t">Environmental Monitoring (EM)</div><div class="qcc-d">For products made in classified cleanrooms, the environment itself is a product quality attribute. EM programmes continuously measure airborne particles and viable microorganisms. Trends must be actively monitored — a gradual increase in environmental counts predicts a contamination event before it occurs.</div><ul class="qcc-l"><li>Viable air sampling (active impaction and settle plates)</li><li>Surface contact plates (equipment, walls, gown surfaces)</li><li>Non-viable particle counts (continuous, ISO 14644)</li><li>Personnel monitoring (glove prints, gown surface)</li><li>Water system monitoring (PW, WFI loops)</li></ul></div>
+  <div class="qcc"><div class="qcc-i">🔎</div><div class="qcc-t">Out-of-Specification (OOS) Investigations</div><div class="qcc-d">When any test result falls outside specification, a formal OOS investigation is mandatory per FDA 2006 OOS guidance. The two-phase process: Phase 1 (lab investigation — was it a testing error?) and Phase 2 (full manufacturing investigation — was the batch actually defective?). True product OOS results mean batch rejection.</div><ul class="qcc-l"><li>Phase 1: analyst error check, instrument verification, retest per protocol</li><li>Phase 2: manufacturing record review, retained sample testing</li><li>Root cause analysis and CAPA required regardless of outcome</li><li>Regulatory notification if distributed batch is affected</li></ul></div>
+</div>
+
+<!-- ═══ SECTION 4: COMPARISON ═══ -->
+<div class="sh" id="comparison">
+  <div class="sh-n">04</div>
+  <div>
+    <div class="sh-small">Side-by-Side</div>
+    <div class="sh-title">Dosage form comparison</div>
+  </div>
+</div>
+<p class="s-intro">Every dosage form has a different manufacturing environment, regulatory burden, cost structure, and primary risk. This table puts them side by side for quick comparison.</p>
+
+<div class="ctw">
+<table class="ct">
+<thead><tr>
+  <th>Dosage form</th><th>Manufacturing environment</th><th>Primary risk</th><th>Typical end-to-end time</th><th>Regulatory complexity</th>
+</tr></thead>
+<tbody>
+  <tr><td><strong>Tablets / Capsules</strong></td><td>Controlled area. Humidity and temperature controlled. No special cleanroom for most products</td><td>Dose uniformity (blend/content), dissolution failure, stability (moisture ingress)</td><td>1–3 days mfg + 2–4 weeks QC release</td><td>Moderate. Well-established expectations (21 CFR 211, ICH Q8/Q9/Q10)</td></tr>
+  <tr><td><strong>Injectables (sterile)</strong></td><td>Classified cleanrooms Grade A–D. Aseptic processing or terminal sterilisation. RABS or isolator technology</td><td>Microbial contamination, endotoxin, particulate matter, sterility assurance failure</td><td>2–5 days mfg + 14-day sterility hold + QC = 3–5 weeks total</td><td>Very high. 21 CFR 211 Subpart D + EU GMP Annex 1 (2022). Most inspected facility type</td></tr>
+  <tr><td><strong>Topicals</strong></td><td>Controlled area. Clean (not sterile) manufacturing. Temperature controlled during emulsification and filling</td><td>Emulsion instability (phase separation), preservative efficacy failure, microbial contamination</td><td>1–2 days mfg + 1–2 weeks QC release</td><td>Moderate-low. Fewer critical risks than sterile but stability and preservative validation are significant</td></tr>
+  <tr><td><strong>Biologics (mAbs)</strong></td><td>Upstream bioreactor facility (large-scale GMP). Downstream purification. Fill-finish in Grade A/B cleanroom</td><td>Aggregate formation, glycosylation variability, viral contamination, process change sensitivity</td><td>60–90 days end-to-end (cell expansion + culture + purification + fill + release)</td><td>Highest. ICH Q5A/Q5B/Q5E + FDA biologics + EMA biosimilar guidelines. Most complex dossier</td></tr>
+  <tr><td><strong>Oral Liquids</strong></td><td>Controlled area. Similar to topicals; aqueous systems carry slightly higher microbial risk</td><td>Dose uniformity in suspensions (settling), microbial contamination, chemical degradation in aqueous environment</td><td>1–2 days mfg + 1–2 weeks QC release</td><td>Moderate. Paediatric products attract extra scrutiny on excipient safety (ICH E11) and dose accuracy</td></tr>
+  <tr><td><strong>Inhaled (DPI/pMDI)</strong></td><td>Low-humidity filling areas (&lt;30% RH mandatory). Pressure-filling equipment for pMDI. Specialised powder handling</td><td>Aerodynamic particle size variability, dose uniformity across device life, device-formulation interaction, humidity</td><td>1–3 days mfg + 2–3 weeks QC (APSD testing is time-intensive)</td><td>High. Product and device are co-filed. APSD methodology and specs are product-specific. Limited compendial guidance</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ═══ SECTION 5: GMP ═══ -->
+<div class="sh" id="gmp">
+  <div class="sh-n">05</div>
+  <div>
+    <div class="sh-small">GMP in Practice</div>
+    <div class="sh-title">What GMP actually means on the factory floor</div>
+  </div>
+</div>
+<p class="s-intro">Good Manufacturing Practice (GMP) is not a certification or a piece of paper — it is a set of behaviours, systems, and controls that must be continuously maintained. A regulator walking your facility is not checking boxes. They are assessing whether your organisation has a functioning quality culture. Here is what that looks like in practice.</p>
+
+<div class="co or"><div class="co-t">What GMP actually requires</div><p>GMP regulations require that manufacturers <strong>adequately control manufacturing operations.</strong> This includes establishing strong quality management systems, obtaining appropriate quality raw materials, establishing robust operating procedures, detecting and investigating product quality deviations, and maintaining reliable testing laboratories. If a manufacturer's processes are not controlled, the product's quality is not assured — regardless of what the release testing shows. — FDA 21 CFR Part 211 framework</p></div>
+
+<div class="pg">
+  <div class="pc"><div class="pc-n" style="font-size:30px">SOPs</div><div class="pc-name">Standard Operating Procedures</div><p>Every manufacturing step, every cleaning activity, and every test method is governed by a written SOP. SOPs are not suggestions — they are the controlled, approved way to perform a task. Deviating from an SOP without authorisation is itself a GMP violation, regardless of outcome. SOPs must be periodically reviewed, kept current, and training must be formally documented for every person who follows them.</p><div class="tag">Foundation Document</div></div>
+  <div class="pc"><div class="pc-n" style="font-size:30px">CAPA</div><div class="pc-name">Corrective & Preventive Action</div><p>When something goes wrong — a failed batch, a deviation, an OOS result, a complaint — CAPA is the formal process for fixing it and preventing recurrence. Corrective action addresses the specific event. Preventive action addresses the root cause so it doesn't happen again elsewhere. Regulators look for CAPA effectiveness — did the fix actually work? Ineffective CAPAs are a major inspection finding.</p><div class="tag or">Continuous Improvement</div></div>
+  <div class="pc"><div class="pc-n" style="font-size:28px">Change Control</div><div class="pc-name">Managing Every Change</div><p>In GMP, you cannot change anything — a supplier, an equipment parameter, a room layout, a SOP, a test method — without formal change control. The change must be assessed for impact on product quality, regulatory filings, and validated states. Some changes require regulatory notification or approval before implementation. Change control records are among the first documents an inspector requests.</p><div class="tag">Risk Management</div></div>
+  <div class="pc"><div class="pc-n" style="font-size:28px">Validation</div><div class="pc-name">Proving Your Process Works</div><p>Before a process is used to make product for patients, it must be validated — demonstrated to consistently produce product meeting all specifications. Process validation is a three-stage lifecycle per FDA 2011 guidance: process design (understanding), process qualification (demonstrating it works at production scale), and continued process verification (monitoring that it continues to work over time using real production data).</p><div class="tag">ICH Q10 Aligned</div></div>
+  <div class="pc"><div class="pc-n" style="font-size:28px">Data Integrity</div><div class="pc-name">The Foundation of Trust</div><p>All data generated during manufacturing must be ALCOA+: <strong>A</strong>ttributable (who generated it?), <strong>L</strong>egible (can it be read?), <strong>C</strong>ontemporaneous (recorded at time of action?), <strong>O</strong>riginal (not a copy?), <strong>A</strong>ccurate — plus Complete, Consistent, Enduring, and Available. Data integrity failures — deleting results, backdating records, recording only passing results — are among the most serious GMP violations and can result in criminal prosecution.</p><div class="tag re">Critical Compliance Area</div></div>
+  <div class="pc"><div class="pc-n" style="font-size:28px">PQR</div><div class="pc-name">Annual Product Quality Review</div><p>Every year, for every product, a formal PQR compiles all batch data, OOS results, deviations, stability data, complaints, and CAPA status into a single review document. The PQR assesses whether the process is in a state of control — is quality consistent year over year? Are there trends? Are specifications still appropriate? Regulators review PQRs during inspections as a window into overall manufacturing performance.</p><div class="tag">Annual Requirement</div></div>
+</div>
+
+<div class="co bl"><div class="co-t">Where AI fits into GMP manufacturing</div><p>AI systems in GMP manufacturing must operate within — not outside — this GMP infrastructure. An AI model that flags deviations is generating data subject to data integrity requirements. An AI that recommends process adjustments is effecting a change that must go through change control if it falls outside validated parameters. An AI-generated SOP is a document that requires qualified human review and approval before use. <strong>FDA's 2025 AI credibility framework does not replace GMP — it sits on top of it.</strong> The architectural question is whether the AI system generates GMP-compliant evidence as a byproduct of normal operation, or whether it requires a separate evidence-construction exercise every time a regulator asks.</p></div>
+
+</main>
+
+<footer class="ftr">
+  <div class="ftr-in">
+    <div class="ftr-note">Pharma Manufacturing Processes Reference — plain-language guide.<br>For informational purposes only. Not regulatory or technical advice.<br>Sources: FDA.gov, EMA.europa.eu, ICH.org, USP, Ph.Eur. — as of 2025.</div>
+    <div class="ftr-tags">
+      <span class="ftr-tag">Tablets</span><span class="ftr-tag">Injectables</span><span class="ftr-tag">Biologics</span>
+      <span class="ftr-tag">Topicals</span><span class="ftr-tag">GMP</span><span class="ftr-tag">QC</span><span class="ftr-tag">21 CFR 211</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.t-pane').forEach(function(el){el.classList.remove('active')});
+  document.querySelectorAll('.tb-btn').forEach(function(el){el.classList.remove('active')});
+  var pane = document.getElementById('tab-' + id);
+  if (pane) pane.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>
