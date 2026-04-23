@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMP Investigations Reference — Plain Language Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f2ed;--surface:#fff;--surface2:#f0ede8;--surface3:#ebe7e1;
+  --border:rgba(0,0,0,.08);--border-strong:rgba(0,0,0,.14);
+  --text:#1a1714;--muted:#5c5650;--dim:#9a948e;
+  --accent:#006a5a;--accent-bg:#e6f4f1;--accent-bd:#9dd4c8;
+  --tab-dark:#1a3c35;
+  --orange:#b85c00;--orange-bg:#fff3e6;--orange-bd:#f0b880;
+  --blue:#005fa3;--blue-bg:#e8f2fc;--blue-bd:#9bcbef;
+  --purple:#6030b0;--purple-bg:#f0ebfa;--purple-bd:#c4a8e8;
+  --red:#a02020;--red-bg:#fdf0f0;--red-bd:#e8a8a8;
+  --gold:#7a5c00;--gold-bg:#fdf8e6;--gold-bd:#e0cc80;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+
+/* HEADER */
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200}
+.hdr-in{max-width:1060px;margin:0 auto;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'DM Mono',monospace;font-size:12px;color:var(--dim);letter-spacing:.06em}
+.logo strong{color:var(--accent);font-weight:500}
+nav a{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:6px 14px;border-radius:20px;letter-spacing:.04em;transition:background .15s,color .15s}
+nav a:hover{background:var(--surface2);color:var(--text)}
+
+/* TOC */
+.toc{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:56px;z-index:190;overflow-x:auto}
+.toc-in{max-width:1060px;margin:0 auto;padding:0 32px;display:flex}
+.toc a{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);text-decoration:none;padding:10px 16px;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;letter-spacing:.04em}
+.toc a:hover{color:var(--text);border-color:var(--accent)}
+
+/* HERO */
+.hero{max-width:1060px;margin:0 auto;padding:80px 32px 64px}
+.eyebrow{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.eyebrow::after{content:'';flex:1;height:1px;background:var(--border-strong);max-width:60px}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(36px,5vw,64px);font-weight:900;line-height:1.06;margin-bottom:24px;max-width:740px}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero-lead{font-size:17px;color:var(--muted);max-width:640px;line-height:1.75;margin-bottom:48px}
+.stats{display:flex;gap:40px;flex-wrap:wrap}
+.stat-n{font-family:'Fraunces',serif;font-size:36px;font-weight:700;line-height:1}
+.stat-l{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);margin-top:4px}
+
+/* MAIN */
+.main{max-width:1060px;margin:0 auto;padding:0 32px 80px}
+
+/* SECTION HEAD */
+.sh{padding:64px 0 32px;border-top:1px solid var(--border);display:flex;align-items:baseline;gap:20px}
+.sh-n{font-family:'Fraunces',serif;font-size:48px;font-weight:900;color:var(--border-strong);line-height:1;flex-shrink:0}
+.sh-sm{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.sh-title{font-family:'Fraunces',serif;font-size:28px;font-weight:700;line-height:1.2}
+.s-intro{font-size:15px;color:var(--muted);line-height:1.7;max-width:700px;margin-bottom:32px}
+
+/* CALLOUTS */
+.co{border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;background:var(--surface);padding:20px 24px;margin:24px 0}
+.co.or{border-left-color:var(--orange)}.co.re{border-left-color:var(--red)}.co.bl{border-left-color:var(--blue)}.co.pu{border-left-color:var(--purple)}.co.go{border-left-color:var(--gold)}
+.co-t{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
+.co.or .co-t{color:var(--orange)}.co.re .co-t{color:var(--red)}.co.bl .co-t{color:var(--blue)}.co.pu .co-t{color:var(--purple)}.co.go .co-t{color:var(--gold)}
+.co p{font-size:14px;color:var(--muted);line-height:1.7}.co p strong{color:var(--text);font-weight:500}
+
+/* TYPE GRID — investigation overview cards */
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);border-radius:16px;overflow:hidden;margin-bottom:48px}
+.tc-card{background:var(--surface);padding:26px;transition:background .15s;cursor:default}
+.tc-card:hover{background:var(--surface2)}
+.tc-icon{font-size:26px;margin-bottom:10px}
+.tc-name{font-size:15px;font-weight:600;margin-bottom:4px}
+.tc-trigger{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);margin-bottom:10px}
+.tc-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.tc-reg{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);padding-top:10px;border-top:1px solid var(--border)}
+.tc-tag{display:inline-block;margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;padding:2px 9px;border-radius:20px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-bd)}
+.tc-tag.or{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd)}
+.tc-tag.re{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
+.tc-tag.bl{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd)}
+.tc-tag.pu{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-bd)}
+.tc-tag.go{background:var(--gold-bg);color:var(--gold);border-color:var(--gold-bd)}
+
+/* COMPARE TABLE */
+.ctw{border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:32px}
+.ct{width:100%;border-collapse:collapse}
+.ct th{background:var(--surface2);font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:13px 18px;border-bottom:1px solid var(--border);font-weight:400}
+.ct td{padding:13px 18px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55}
+.ct tr:last-child td{border-bottom:none}.ct tr:hover td{background:var(--surface2)}.ct td strong{color:var(--text);font-weight:500}
+.pill{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:20px}
+.pill.re{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
+.pill.or{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-bd)}
+.pill.go{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-bd)}
+.pill.gr{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-bd)}
+.pill.bl{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bd)}
+
+/* WORKFLOW SECTION */
+.wf-section{margin-bottom:48px}
+
+/* PHASE STRIP — horizontal phase header */
+.phase-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:var(--border);border-radius:12px;overflow:hidden;margin-bottom:28px}
+.ps-card{background:var(--surface);padding:16px 14px;text-align:center;transition:background .15s}
+.ps-card:hover{background:var(--surface2)}
+.ps-num{font-family:'Fraunces',serif;font-size:28px;font-weight:900;color:var(--border-strong);line-height:1;margin-bottom:4px}
+.ps-name{font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px}
+.ps-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim)}
+
+/* STEP LIST */
+.sl{display:flex;flex-direction:column;gap:2px;margin:16px 0 28px}
+.sr{display:grid;grid-template-columns:52px 1fr 200px;background:var(--surface2);border:1px solid var(--border);overflow:hidden;transition:background .15s}
+.sr:first-child{border-radius:10px 10px 0 0}.sr:last-child{border-radius:0 0 10px 10px}.sr:not(:last-child){border-bottom:none}
+.sr:hover{background:var(--accent-bg)}
+.sr-n{background:var(--surface);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:20px;font-weight:900;color:var(--accent);opacity:.4;padding:18px 0}
+.sr-b{padding:16px 20px;border-right:1px solid var(--border)}
+.sr-name{font-size:14px;font-weight:500;margin-bottom:4px}
+.sr-d{font-size:13px;color:var(--muted);line-height:1.6}
+.sr-s{padding:16px;background:var(--surface)}
+.sr-sl{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.sr-sv{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* DECISION DIAMOND */
+.diamond-wrap{margin:20px 0;display:flex;justify-content:center}
+.diamond-box{background:var(--surface);border:2px solid var(--border-strong);border-radius:12px;padding:18px 28px;max-width:540px;text-align:center;position:relative}
+.diamond-box::before{content:'◆';position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:22px;color:var(--orange);background:var(--bg);padding:0 8px}
+.diamond-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--orange);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.diamond-q{font-size:15px;font-weight:500;color:var(--text);margin-bottom:14px}
+.diamond-paths{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.dp{padding:8px 18px;border-radius:20px;font-size:13px;font-weight:500;font-family:'DM Mono',monospace}
+.dp.yes{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-bd)}
+.dp.no{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-bd)}
+.dp.unk{background:var(--surface2);color:var(--muted);border:1px solid var(--border-strong)}
+
+/* FLOWCHART */
+.fc-title{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
+.flow{display:flex;align-items:stretch;background:var(--border);border-radius:12px;overflow:hidden;overflow-x:auto;margin:12px 0 24px}
+.fn{flex:1;min-width:88px;background:var(--surface);padding:14px 8px;text-align:center;border-right:1px solid var(--border)}
+.fn:last-child{border-right:none}.fn.hl{background:var(--accent-bg)}.fn.hl .fn-l{color:var(--accent)}
+.fn.warn{background:var(--orange-bg)}.fn.warn .fn-l{color:var(--orange)}
+.fn.crit{background:var(--red-bg)}.fn.crit .fn-l{color:var(--red)}
+.fn.bl{background:var(--blue-bg)}.fn.bl .fn-l{color:var(--blue)}
+.fn-i{font-size:16px;margin-bottom:4px}.fn-l{font-size:11px;font-weight:500;line-height:1.3;margin-bottom:2px}
+.fn-s{font-size:10px;color:var(--dim);line-height:1.4;font-family:'DM Mono',monospace}
+.fa{display:flex;align-items:center;justify-content:center;background:var(--surface2);padding:0 3px;font-size:11px;color:var(--dim);border-right:1px solid var(--border);flex-shrink:0}
+
+/* EVIDENCE TABLE */
+.ft-wrap{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:18px 0}
+.ft-head{background:var(--surface2);padding:11px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.ft-title{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.ft-badge{font-family:'DM Mono',monospace;font-size:10px;padding:2px 9px;border-radius:20px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-bd)}
+.ft-badge.or{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd)}
+.ft-badge.re{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
+.ft{width:100%;border-collapse:collapse}
+.ft th{background:var(--surface3);font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:10px 16px;border-bottom:1px solid var(--border);font-weight:400}
+.ft td{padding:12px 16px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);vertical-align:top;line-height:1.55}
+.ft tr:last-child td{border-bottom:none}.ft tr:hover td{background:var(--surface2)}.ft td strong{color:var(--text);font-weight:500}
+.req{font-family:'DM Mono',monospace;font-size:10px;padding:1px 7px;border-radius:20px}
+.req.m{background:var(--red-bg);color:var(--red);border:1px solid var(--red-bd)}
+.req.r{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-bd)}
+
+/* CRIT BOX */
+.crit-box{background:var(--red-bg);border:1px solid var(--red-bd);border-radius:12px;padding:20px 24px;margin:18px 0}
+.crit-box-t{font-family:'DM Mono',monospace;font-size:10px;color:var(--red);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+.crit-items{display:flex;flex-direction:column;gap:8px}
+.crit-item{display:flex;gap:12px;align-items:flex-start}
+.crit-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--red);opacity:.6;flex-shrink:0;padding-top:1px}
+.crit-text{font-size:13px;color:var(--muted);line-height:1.6}.crit-text strong{color:var(--text);font-weight:500}
+
+/* GOOD BOX */
+.good-box{background:var(--accent-bg);border:1px solid var(--accent-bd);border-radius:12px;padding:20px 24px;margin:18px 0}
+.good-box-t{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+.good-items{display:flex;flex-direction:column;gap:8px}
+.good-item{display:flex;gap:12px;align-items:flex-start}
+.good-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);opacity:.7;flex-shrink:0;padding-top:1px}
+.good-text{font-size:13px;color:var(--muted);line-height:1.6}.good-text strong{color:var(--text);font-weight:500}
+
+/* RCA GRID */
+.rc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.rc-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.rc-name{font-size:14px;font-weight:500;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.rc-badge{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:20px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-bd)}
+.rc-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+.rc-when{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);padding-top:10px;border-top:1px solid var(--border)}
+
+/* FIVE-WHY VISUAL */
+.fivewhy{display:flex;flex-direction:column;gap:2px;margin:18px 0}
+.fw-row{display:grid;grid-template-columns:56px 80px 1fr;border:1px solid var(--border);background:var(--surface);overflow:hidden;transition:background .15s}
+.fw-row:first-child{border-radius:10px 10px 0 0}.fw-row:last-child{border-radius:0 0 10px 10px}.fw-row:not(:last-child){border-bottom:none}
+.fw-row:hover{background:var(--accent-bg)}
+.fw-n{background:var(--surface2);border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;color:var(--dim);font-weight:500}
+.fw-q{padding:14px 16px;border-right:1px solid var(--border);font-family:'DM Mono',monospace;font-size:11px;color:var(--orange);display:flex;align-items:center}
+.fw-a{padding:14px 18px;font-size:13px;color:var(--muted);line-height:1.55}
+.fw-a strong{color:var(--text);font-weight:500}
+.fw-row.root{background:var(--accent-bg)}.fw-row.root .fw-a strong{color:var(--accent)}
+
+/* SCOPE MAP */
+.scope-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.scope-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+.scope-title{font-size:13px;font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.scope-icon{font-size:16px}
+.scope-list{list-style:none;display:flex;flex-direction:column;gap:5px}
+.scope-list li{font-size:12px;color:var(--muted);padding-left:14px;position:relative;line-height:1.5}
+.scope-list li::before{content:'→';position:absolute;left:0;color:var(--dim);font-size:10px;top:3px}
+
+/* CHECKLIST (accordion-style) */
+.cl-section{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:12px 0}
+.cl-head{background:var(--surface2);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;transition:background .15s}
+.cl-head:hover{background:var(--surface3)}
+.cl-head-left{display:flex;align-items:center;gap:12px}
+.cl-head-icon{font-size:16px}
+.cl-head-title{font-size:14px;font-weight:500}
+.cl-head-badge{font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:20px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-bd)}
+.cl-head-badge.or{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd)}
+.cl-head-badge.re{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
+.cl-toggle{font-family:'DM Mono',monospace;font-size:12px;color:var(--dim);transition:transform .2s}
+.cl-body{display:none;padding:0 18px 16px;background:var(--surface)}
+.cl-body.open{display:block}
+.cl-items{display:flex;flex-direction:column;gap:0}
+.cl-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.cl-item:last-child{border-bottom:none}
+.cl-cb{width:16px;height:16px;border:2px solid var(--border-strong);border-radius:4px;flex-shrink:0;margin-top:2px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent}
+.cl-cb.checked{background:var(--accent);border-color:var(--accent);color:#fff}
+.cl-item-text{font-size:13px;color:var(--muted);line-height:1.6}
+.cl-item-text strong{color:var(--text);font-weight:500}
+.cl-item-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);margin-top:3px}
+
+/* TABS */
+.tb-c{margin-bottom:48px}
+.tb-bar{display:flex;gap:2px;background:var(--border);border-radius:12px 12px 0 0;overflow:hidden;flex-wrap:wrap}
+.tb-btn{background:var(--surface2);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--muted);padding:12px 18px;transition:all .15s;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.tb-btn:hover{background:var(--surface);color:var(--text)}.tb-btn.active{background:var(--tab-dark);color:#fff}
+.t-icon{font-size:14px}
+.t-pane{display:none;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:36px}
+.t-pane.active{display:block}
+.t-intro{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:24px;max-width:700px}
+
+/* TWO-COL layout */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:18px 0}
+
+/* FOOTER */
+.ftr{border-top:1px solid var(--border);background:var(--surface);padding:40px 32px;margin-top:40px}
+.ftr-in{max-width:1060px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.ftr-note{font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);line-height:1.6}
+.ftr-tags{display:flex;gap:8px;flex-wrap:wrap}
+.ftr-tag{font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border:1px solid var(--border-strong);border-radius:20px;color:var(--dim)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.hero h1{animation:fadeUp .5s ease both}
+.hero-lead{animation:fadeUp .5s .08s ease both}
+.stats{animation:fadeUp .5s .16s ease both}
+
+@media(max-width:768px){
+  nav{display:none}.hero{padding:48px 20px 40px}.main{padding:0 20px 60px}
+  .hdr-in,.toc-in{padding:0 20px}.type-grid{grid-template-columns:1fr}
+  .phase-strip{grid-template-columns:repeat(3,1fr)}.sr{grid-template-columns:42px 1fr}.sr-s{display:none}
+  .rc-grid{grid-template-columns:1fr}.two-col{grid-template-columns:1fr}.scope-grid{grid-template-columns:1fr}
+  .sh{flex-direction:column;gap:4px;padding-top:48px}.sh-n{font-size:32px}
+  .ftr-in{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <div class="logo"><strong>PHARMA</strong> / GMP Investigations</div>
+    <nav>
+      <a href="#types">Types</a>
+      <a href="#oos-workflow">OOS Workflow</a>
+      <a href="#rca">Root Cause</a>
+      <a href="#checklists">Checklists</a>
+      <a href="#pitfalls">Pitfalls</a>
+      <a href="documentation.html">← Documentation</a>
+      <a href="index.html">← Regulatory</a>
+    </nav>
+  </div>
+</header>
+
+<div class="toc">
+  <div class="toc-in">
+    <a href="#types">01 — Investigation types</a>
+    <a href="#oos-workflow">02 — OOS full workflow</a>
+    <a href="#deviation-workflow">03 — Deviation workflow</a>
+    <a href="#rca">04 — Root cause methods</a>
+    <a href="#checklists">05 — Investigation checklists</a>
+    <a href="#scope">06 — Scope & impact</a>
+    <a href="#pitfalls">07 — Failures & pitfalls</a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="eyebrow">Plain Language Investigation Reference — 2025</div>
+  <h1>How GMP investigations<br><em>actually work</em></h1>
+  <p class="hero-lead">A comprehensive guide to pharmaceutical quality investigations — from the moment an anomaly is detected through root cause analysis, impact assessment, CAPA, and final closure. Covers OOS, OOT, deviations, contamination events, and complaints. Built around the FDA 2006 OOS Guidance and ICH Q10 framework.</p>
+  <div class="stats">
+    <div><div class="stat-n">6</div><div class="stat-l">Investigation types</div></div>
+    <div><div class="stat-n">2</div><div class="stat-l">OOS investigation phases</div></div>
+    <div><div class="stat-n">4</div><div class="stat-l">RCA methods covered</div></div>
+    <div><div class="stat-n">FDA 2006</div><div class="stat-l">Governing guidance</div></div>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- ═══ SECTION 1: INVESTIGATION TYPES ═══ -->
+<div class="sh" id="types">
+  <div class="sh-n">01</div>
+  <div><div class="sh-sm">Overview</div><div class="sh-title">Types of GMP investigations</div></div>
+</div>
+
+<p class="s-intro">A GMP investigation is triggered whenever something departs from what was expected, approved, or specified. The type of investigation — OOS, OOT, deviation, contamination, complaint, or audit finding — determines the initial procedure, but all share the same underlying framework: detect → contain → investigate → root cause → CAPA → close.</p>
+
+<div class="type-grid">
+  <div class="tc-card">
+    <div class="tc-icon">🔍</div>
+    <div class="tc-name">OOS — Out-of-Specification</div>
+    <div class="tc-trigger">Trigger: any test result outside approved specification limits</div>
+    <div class="tc-desc">The most formally regulated investigation type in pharma. Triggered when any analytical test result — assay, dissolution, microbial, identity, related substances — falls outside the limits defined in the product specification or compendial standard. Governed by specific FDA guidance with a mandatory two-phase investigation structure that cannot be short-circuited.</div>
+    <div class="tc-reg">FDA OOS Guidance 2006 · 21 CFR 211.192 · 21 CFR 211.194</div>
+    <div class="tc-tag re">Mandatory 2-Phase Process</div>
+  </div>
+  <div class="tc-card">
+    <div class="tc-icon">📈</div>
+    <div class="tc-name">OOT — Out-of-Trend</div>
+    <div class="tc-trigger">Trigger: result within spec but statistically anomalous vs historical data</div>
+    <div class="tc-desc">An OOT result is still within specification — but it is statistically unusual relative to the established trend for that product and test. The concern is predictive: if the trend continues, the product may eventually fall out of specification before its expiry date. Most commonly identified in stability testing, where gradual degradation must be tracked against the expected rate. OOT is an early-warning system for approaching failures.</div>
+    <div class="tc-reg">ICH Q10 · FDA Stability Guidance · 21 CFR 211.166</div>
+    <div class="tc-tag or">Trending-Based Detection</div>
+  </div>
+  <div class="tc-card">
+    <div class="tc-icon">⚠️</div>
+    <div class="tc-name">Deviation / Non-Conformance</div>
+    <div class="tc-trigger">Trigger: any unplanned departure from an approved SOP or process parameter</div>
+    <div class="tc-desc">The broadest category — any event where what was done differs from what was approved. Deviations range from minor documentation errors (wrong date format) to critical process failures (aseptic breach in a sterile fill area). Not all deviations require the same investigation depth — severity classification (Critical / Major / Minor) drives the investigation intensity and batch disposition decision.</div>
+    <div class="tc-reg">21 CFR 211.192 · EU GMP Chapter 1 · ICH Q10</div>
+    <div class="tc-tag">Severity-Classified</div>
+  </div>
+  <div class="tc-card">
+    <div class="tc-icon">🦠</div>
+    <div class="tc-name">Contamination Investigation</div>
+    <div class="tc-trigger">Trigger: microbial, chemical, or particulate contamination found in product or environment</div>
+    <div class="tc-desc">Triggered when contamination is found — in finished product, environmental monitoring samples, water system, or during manufacturing. For sterile products, any viable contamination in the aseptic core (Grade A or B) triggers a full investigation including manufacturing review, personnel gowning review, process simulation (media fill) review, and environmental mapping. The most urgent investigation type due to direct patient safety risk.</div>
+    <div class="tc-reg">EU GMP Annex 1 (2022) · 21 CFR 211.113 · USP &lt;71&gt;</div>
+    <div class="tc-tag re">Patient Safety Critical</div>
+  </div>
+  <div class="tc-card">
+    <div class="tc-icon">📢</div>
+    <div class="tc-name">Product Complaint Investigation</div>
+    <div class="tc-trigger">Trigger: complaint received from healthcare professional, patient, or distributor</div>
+    <div class="tc-desc">Every product complaint must be evaluated to determine whether it indicates a manufacturing defect or safety issue. Complaint investigations assess: is the complaint credible? Does it indicate a distributed batch quality problem? Are other complaints of the same type trending upward? Could the issue represent an undeclared product defect requiring a recall or field safety action? Complaints are a real-world quality signal about batches already in patient use.</div>
+    <div class="tc-reg">21 CFR 211.198 · EU GMP Chapter 8 · ICH Q10</div>
+    <div class="tc-tag bl">Post-Market Signal</div>
+  </div>
+  <div class="tc-card">
+    <div class="tc-icon">📋</div>
+    <div class="tc-name">Audit / Inspection Finding</div>
+    <div class="tc-trigger">Trigger: observation raised during internal audit, supplier audit, or regulatory inspection</div>
+    <div class="tc-desc">Regulatory inspection observations (FDA Form 483 items, EU GMP non-compliance statements, MHRA observations) and internal audit findings both require formal investigation and CAPA. For regulatory findings, the response must be submitted to the regulatory authority within a defined timeframe (typically 15 business days for US, 30 days for EU). The quality of the investigation response often determines whether an observation escalates to a Warning Letter.</div>
+    <div class="tc-reg">21 CFR 214.160 · 21 CFR Part 211 · EMA Compliance Procedures</div>
+    <div class="tc-tag pu">Regulatory Response Required</div>
+  </div>
+</div>
+
+<div class="co or">
+  <div class="co-t">The investigation hierarchy — which triggers which</div>
+  <p>Investigations are not always independent. An OOS result may trigger a deviation (the batch failed its specification). A deviation investigation may uncover a contamination source. A contamination investigation may lead to a complaint investigation if distributed product is affected. A complaint investigation may trigger a regulatory audit. <strong>Understanding how investigation types connect — and when one type must escalate into another — is as important as understanding each type in isolation.</strong></p>
+</div>
+
+<div class="ctw" style="margin-top:24px">
+<table class="ct">
+<thead><tr><th>Type</th><th>Immediate action</th><th>Time limit</th><th>Batch held?</th><th>Regulatory notification?</th><th>Primary document</th></tr></thead>
+<tbody>
+  <tr><td><strong>OOS</strong></td><td>Halt release; QC supervisor notification; Phase 1 lab investigation start</td><td>Phase 1 within 24h of OOS detection; investigation closed per site SOP (typically 30–90 days)</td><td><span class="pill re">Yes — mandatory</span></td><td>If distributed batch is affected, assessment required. Annual reporting in some markets</td><td>OOS Investigation Report</td></tr>
+  <tr><td><strong>OOT</strong></td><td>Notify QA; trend assessment; evaluate stability programme</td><td>No fixed regulatory mandate; site SOP defines. Typically 14–30 days for initial assessment</td><td><span class="pill or">Evaluate — may hold</span></td><td>May trigger annual stability reporting updates</td><td>Stability / OOT Report</td></tr>
+  <tr><td><strong>Deviation — Critical</strong></td><td>Quarantine batch; senior QA escalation; immediate containment; possible plant shutdown</td><td>Deviation opened same day; initial assessment within 24h</td><td><span class="pill re">Yes — mandatory</span></td><td>Frequently yes — depending on type and product. Competent authority may need to be notified within days</td><td>Deviation Report + CAPA</td></tr>
+  <tr><td><strong>Deviation — Major</strong></td><td>QA notification; batch hold pending investigation</td><td>Deviation opened within 24–72h per site SOP</td><td><span class="pill re">Yes — pending QA assessment</span></td><td>Possible — QA assessment required</td><td>Deviation Report + CAPA</td></tr>
+  <tr><td><strong>Contamination</strong></td><td>Quarantine area and product; preserve environmental samples; do not clean until QA releases</td><td>Environmental investigation starts within 24h; full investigation typically 30–45 days</td><td><span class="pill re">Yes — all affected lots</span></td><td>Usually yes — especially sterile products. May trigger market withdrawal</td><td>Contamination Investigation Report</td></tr>
+  <tr><td><strong>Complaint</strong></td><td>Acknowledge complaint; retain complaining unit if possible; open investigation</td><td>Initial triage within 3 business days; full investigation typically 30 days</td><td><span class="pill or">Evaluate — based on type</span></td><td>Serious complaints: MedWatch (FDA) / EudraVigilance (EMA). Safety signals mandatory</td><td>Complaint Investigation Report</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ═══ SECTION 2: OOS FULL WORKFLOW ═══ -->
+<div class="sh" id="oos-workflow">
+  <div class="sh-n">02</div>
+  <div><div class="sh-sm">OOS Investigation</div><div class="sh-title">The complete OOS workflow</div></div>
+</div>
+
+<p class="s-intro">The Out-of-Specification investigation is the most formally structured investigation in GMP. The FDA 2006 OOS Guidance mandates a specific two-phase process that cannot be skipped or reordered. Every step has documentation requirements. Every decision point — "is this a lab error?" — must be answered with evidence, not assumption.</p>
+
+<div class="co re">
+  <div class="co-t">The most important OOS rule</div>
+  <p>The original OOS result is always valid until invalidated by documented, specific, assignable laboratory cause. You cannot invalidate an OOS result simply because subsequent retests passed. You cannot average OOS results with passing results. You cannot release a batch while an OOS investigation is open without QA documented justification. <strong>A passing retest does not make a failing result go away — it raises an additional question: why did the two results disagree?</strong></p>
+</div>
+
+<div class="fc-title">OOS detection-to-closure flowchart</div>
+<div class="flow">
+  <div class="fn crit"><div class="fn-i">🚨</div><div class="fn-l">OOS Result Detected</div><div class="fn-s">Analyst flags; supervisor notified same shift</div></div>
+  <div class="fa">→</div>
+  <div class="fn warn"><div class="fn-i">🔒</div><div class="fn-l">Batch Quarantined</div><div class="fn-s">No release until investigation closed</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🔬</div><div class="fn-l">Phase 1A Lab Check</div><div class="fn-s">Analyst self-review; supervisor review</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">⚖️</div><div class="fn-l">Decision 1</div><div class="fn-s">Assignable lab cause found?</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🔁</div><div class="fn-l">Phase 1B Retest</div><div class="fn-s">Pre-approved protocol; same sample</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🏭</div><div class="fn-l">Phase 2 Mfg Review</div><div class="fn-s">BMR, logbooks, materials</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">📊</div><div class="fn-l">Root Cause + Scope</div><div class="fn-s">All affected batches assessed</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">📤</div><div class="fn-l">Batch Disposition</div><div class="fn-s">Release / Reject / Rework</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">✅</div><div class="fn-l">CAPA + Close</div><div class="fn-s">QA signature; effectiveness check</div></div>
+</div>
+
+<!-- PHASE 1A -->
+<div style="margin-bottom:8px">
+  <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;padding:10px 16px;background:var(--accent-bg);border:1px solid var(--accent-bd);border-radius:8px;display:inline-block">Phase 1A — Initial Laboratory Investigation</div>
+</div>
+<p class="s-intro" style="margin-bottom:16px">Phase 1A is performed immediately by the analyst who generated the result, reviewed by the QC supervisor. It must be completed before any retest is considered. The purpose is to determine whether there is a documented, specific reason the result cannot be considered valid — a laboratory error that can be definitively attributed. If found, the result is invalidated and a retest is performed with a new sample preparation. Phase 1A must never become a fishing expedition to find any possible justification to invalidate an inconvenient result.</p>
+
+<div class="sl">
+  <div class="sr"><div class="sr-n">1</div><div class="sr-b"><div class="sr-name">Identify and document the OOS result</div><div class="sr-d">The analyst records the OOS result exactly as generated — no rounding to make it appear "borderline." The result, the test method, the specification limit, and the degree of deviation are all recorded contemporaneously. The QC supervisor is notified in the same work shift. A preliminary event notification goes to QA. The batch or lot associated with the sample is identified and placed on hold immediately.</div></div><div class="sr-s"><div class="sr-sl">Documentation</div><div class="sr-sv">OOS report number assigned; batch hold documented; QA notification logged with time</div></div></div>
+  <div class="sr"><div class="sr-n">2</div><div class="sr-b"><div class="sr-name">Analyst self-review of laboratory work</div><div class="sr-d">The analyst carefully reviews their own work against the approved test method SOP. Check: Was the correct sample used — right lot, right sample point? Was the correct test method version followed? Were all reagents and reference standards in date and properly prepared? Were instrument settings correct? Was the calculation performed correctly? Were control samples within limits? Was sample preparation correct? This review is documented with each item checked and the result of the check.</div></div><div class="sr-s"><div class="sr-sl">Checklist items</div><div class="sr-sv">Sample identity, method version, reagent status, standard preparation, instrument calibration status, calculation verification, control sample result</div></div></div>
+  <div class="sr"><div class="sr-n">3</div><div class="sr-b"><div class="sr-name">Supervisor review of raw data and audit trail</div><div class="sr-d">The QC supervisor independently reviews all raw data — instrument printouts, audit trail from electronic systems, chromatograms, spectral data, or dissolution profiles as applicable. Specifically looking for: anomalous peak shapes, baseline issues, integration errors, unexpected system suitability failures, or any indication the data may have been collected or processed incorrectly. Electronic audit trails must be reviewed — not just reported data.</div></div><div class="sr-s"><div class="sr-sl">Raw data review</div><div class="sr-sv">Instrument audit trail, system suitability results, chromatogram visual inspection, integration review, all supporting calculations</div></div></div>
+  <div class="sr"><div class="sr-n">4</div><div class="sr-b"><div class="sr-name">Phase 1A conclusion — with evidence</div><div class="sr-d">One of three conclusions: (a) <strong>Assignable laboratory cause found</strong> — specific documented error identified, result may be invalidated with full documentation and a retest performed; (b) <strong>No assignable cause found</strong> — proceed to Phase 1B with a written retest protocol approved by QA before retesting begins; (c) <strong>Analyst confirms result is correct</strong> — proceed directly to Phase 2. The conclusion must be supported by specific evidence, not general statements. "We could not find anything wrong" is not an assignable cause.</div></div><div class="sr-s"><div class="sr-sl">Timeframe</div><div class="sr-sv">Phase 1A completed within 1 business day of OOS detection. QA approves the Phase 1A conclusion before Phase 1B begins</div></div></div>
+</div>
+
+<div class="diamond-wrap">
+  <div class="diamond-box">
+    <div class="diamond-label">Decision Point 1 — End of Phase 1A</div>
+    <div class="diamond-q">Was a specific, documented, assignable laboratory cause identified?</div>
+    <div class="diamond-paths">
+      <div class="dp yes">YES → Invalidate result; document cause; retest with new preparation; if retest passes: investigation may close at Phase 1</div>
+      <div class="dp no">NO → Open Phase 1B: QA-approved retest protocol required before any retesting</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 1B -->
+<div style="margin:20px 0 8px">
+  <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--orange);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;padding:10px 16px;background:var(--orange-bg);border:1px solid var(--orange-bd);border-radius:8px;display:inline-block">Phase 1B — Extended Laboratory Investigation</div>
+</div>
+<p class="s-intro" style="margin-bottom:16px">Phase 1B is triggered when Phase 1A finds no assignable laboratory cause. Before any retesting occurs, a written retest protocol must be reviewed and approved by QA. The protocol must pre-specify: how many retests, which analyst(s), from which retained sample, and what the acceptance criteria are for the retests. Ad hoc retesting — running additional tests until a passing result appears — is one of the most serious data integrity violations in pharmaceutical laboratory work.</p>
+
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Phase 1B retest protocol — required elements</div><div class="ft-badge or">QA Pre-Approval Required</div></div>
+  <table class="ft">
+    <thead><tr><th>Element</th><th>What it must specify</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Rationale</strong></td><td>Why Phase 1A did not find an assignable cause; what specifically is being investigated in Phase 1B</td><td>Without documented rationale, retesting looks like an attempt to replace a bad result with a good one</td></tr>
+      <tr><td><strong>Sample to be used</strong></td><td>Which retained sample (same lot, same composite, same timepoint for stability); preparation method (fresh preparation from retained sample)</td><td>Using a different sample or a different preparation than the original confounds results — both pass/fail are uninterpretable</td></tr>
+      <tr><td><strong>Number of retests</strong></td><td>Pre-specified number — typically 1–3. Cannot be open-ended. Retesting stops after the pre-specified number regardless of results</td><td>Open-ended retesting is statistical manipulation. A fixed number is a pre-commitment to an honest process</td></tr>
+      <tr><td><strong>Analyst requirement</strong></td><td>Same analyst as original (to assess repeatability) or different analyst (to assess operator variability) — specified in advance</td><td>Choosing "different analyst" after the original result to get a passing result is data manipulation. The choice must be made before retesting begins</td></tr>
+      <tr><td><strong>Acceptance criteria</strong></td><td>What constitutes a "passing" Phase 1B outcome — all retests within specification, or majority passing with explanation for outlier</td><td>Without pre-defined acceptance criteria, the conclusion can be manipulated to suit the desired outcome</td></tr>
+      <tr><td><strong>Escalation trigger</strong></td><td>If any retest result is OOS, Phase 2 manufacturing investigation is automatically triggered regardless of other results</td><td>Prevents selectively continuing Phase 1B after a confirming OOS to avoid the manufacturing investigation</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="diamond-wrap">
+  <div class="diamond-box">
+    <div class="diamond-label">Decision Point 2 — End of Phase 1B</div>
+    <div class="diamond-q">Did all Phase 1B retests pass? Is there a supported explanation for the original OOS?</div>
+    <div class="diamond-paths">
+      <div class="dp yes">YES (all pass + explanation) → Phase 1 conclusion: probable laboratory variability; detailed documentation; QA decides whether Phase 2 still needed; batch may be evaluable for release</div>
+      <div class="dp no">NO (any retest OOS) → Mandatory Phase 2 manufacturing investigation</div>
+      <div class="dp unk">MIXED → Phase 2 mandatory — conflicting results require manufacturing investigation to resolve</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 2 -->
+<div style="margin:20px 0 8px">
+  <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;padding:10px 16px;background:var(--blue-bg);border:1px solid var(--blue-bd);border-radius:8px;display:inline-block">Phase 2 — Manufacturing Investigation</div>
+</div>
+<p class="s-intro" style="margin-bottom:16px">Phase 2 is a full investigation of the manufacturing process that produced the sample. It begins with record review and expands to physical investigation as needed. The Phase 2 investigation must determine whether the OOS result reflects a true product quality problem. Every finding must be documented. The investigation cannot close with "no cause found" and release the batch — an inconclusive OOS mandates batch rejection.</p>
+
+<div class="sl">
+  <div class="sr"><div class="sr-n">1</div><div class="sr-b"><div class="sr-name">BMR review — complete, line by line</div><div class="sr-d">The Batch Manufacturing Record for the affected batch is reviewed completely — not just the steps that seem relevant. Looking for: any unrecorded deviations, parameters that were at the edge of their specification, equipment that was not in its qualified state, materials with any non-conforming incoming test results, yield calculations that are slightly low or high, any step that was performed out of sequence. The BMR review must be documented — not just "reviewed and no issues found."</div></div><div class="sr-s"><div class="sr-sl">Documents reviewed</div><div class="sr-sv">BMR all pages, deviation cross-references, yield calculations, equipment IDs, all operator signatures and dates</div></div></div>
+  <div class="sr"><div class="sr-n">2</div><div class="sr-b"><div class="sr-name">Equipment logbook and calibration review</div><div class="sr-d">Every piece of equipment used in manufacturing the affected batch is identified from the BMR. For each: review the equipment logbook for the relevant date — what was made before this batch? Was the equipment cleaned and cleaning verified? Check the calibration certificate — was the equipment within its calibration interval? Review any maintenance events. Particular attention to analytical instruments used for in-process testing — were they calibrated? Were system suitability results within criteria?</div></div><div class="sr-s"><div class="sr-sl">Key question</div><div class="sr-sv">What was on this equipment before this batch? Was it cleaned? Who verified the cleaning and when?</div></div></div>
+  <div class="sr"><div class="sr-n">3</div><div class="sr-b"><div class="sr-name">Raw material review</div><div class="sr-d">Review the incoming test results (CoA and analytical report) for every raw material used in the affected batch. Were all materials within their specifications? Were there any borderline results on incoming testing? Check material lot numbers in the BMR against the incoming test records. Confirm that only released materials were used — check that the material status label was "Released" at the time of dispensing. Any material with even a marginal result on incoming testing becomes a hypothesis to investigate.</div></div><div class="sr-s"><div class="sr-sl">Documents reviewed</div><div class="sr-sv">Incoming test reports for all materials in BMR, material status labels, supplier CoAs, temperature records during storage</div></div></div>
+  <div class="sr"><div class="sr-n">4</div><div class="sr-b"><div class="sr-name">Personnel and training review</div><div class="sr-d">Identify all operators who performed critical steps in the affected batch from the BMR signatures. Confirm that each operator has current, documented training on the relevant SOPs. Check training records — not just the training system — for completeness. Interview operators about the batch if the investigation timeline allows. Document interviews formally with date, participants, and content. If an operator recalls an unusual event that was not documented in the BMR, this itself is a finding requiring separate documentation.</div></div><div class="sr-s"><div class="sr-sl">Training records</div><div class="sr-sv">SOP training records for each operator who signed the BMR. Verify training was before the batch date and on the current SOP version</div></div></div>
+  <div class="sr"><div class="sr-n">5</div><div class="sr-b"><div class="sr-name">Environmental and utility review</div><div class="sr-d">Review environmental monitoring data for the manufacturing area on the date of batch manufacture. Were there any environmental alert or action limit exceedances on or near the manufacturing date? Review temperature and humidity records for manufacturing areas and storage areas. Review water system data (purified water or WFI) for the relevant period. For sterile products, review particle count data and viable monitoring results. Any environmental anomaly — even below action limits — is a potential contributing factor.</div></div><div class="sr-s"><div class="sr-sl">Data reviewed</div><div class="sr-sv">EM settle plates and air sample results, HVAC temperature/humidity records, water system TOC and conductivity, clean utility data</div></div></div>
+  <div class="sr"><div class="sr-n">6</div><div class="sr-b"><div class="sr-name">Reserve sample testing</div><div class="sr-d">Testing of the retained/reserve sample from the batch, ideally using an alternative validated method or a second laboratory. If the reserve sample also fails — the OOS is confirmed as a true product failure. If the reserve sample passes — there is a discrepancy between the original sample and the reserve that itself requires explanation (sampling error? degradation? testing issue?). Reserve sample results must be reported in full — including if they contradict the desired conclusion.</div></div><div class="sr-s"><div class="sr-sl">Critical rule</div><div class="sr-sv">Both the failing and passing reserve sample results must be reported. Reporting only the passing result when the reserve sample was tested multiple times is data integrity violation</div></div></div>
+  <div class="sr"><div class="sr-n">7</div><div class="sr-b"><div class="sr-name">Scope assessment — other potentially affected batches</div><div class="sr-d">Based on the evidence gathered, identify all other batches that could have been affected by the same root cause. If the root cause is a contaminated raw material lot — assess all batches that used that material lot. If the root cause is an equipment malfunction — assess all batches processed on that equipment during the relevant period. If root cause is still unknown — assess all batches from the same campaign. Scope assessment is one of the most commonly cited Phase 2 deficiencies — it is typically done too narrowly.</div></div><div class="sr-s"><div class="sr-sl">FDA expectation</div><div class="sr-sv">FDA explicitly requires that the scope be expanded beyond the triggering batch unless there is documented justification for limiting it</div></div></div>
+</div>
+
+<div class="diamond-wrap">
+  <div class="diamond-box">
+    <div class="diamond-label">Decision Point 3 — Phase 2 Conclusion</div>
+    <div class="diamond-q">What does the manufacturing investigation conclude about the OOS result?</div>
+    <div class="diamond-paths">
+      <div class="dp yes">TRUE PRODUCT FAILURE — Root cause identified in manufacturing; batch rejected; CAPA initiated; affected batches assessed</div>
+      <div class="dp no">INCONCLUSIVE — No root cause found in either lab or manufacturing; batch must be rejected; cannot release on hope</div>
+      <div class="dp unk">LAB INVALIDATED — Phase 2 confirms Phase 1 lab error with manufacturing data support; batch potentially releasable with full QA justification</div>
+    </div>
+  </div>
+</div>
+
+<div class="crit-box">
+  <div class="crit-box-t">What you are prohibited from doing during an OOS investigation — FDA is explicit</div>
+  <div class="crit-items">
+    <div class="crit-item"><div class="crit-num">✗</div><div class="crit-text"><strong>Average the OOS result with passing retests.</strong> Reporting an "average" of 88% (OOS) and 99% (retest) as 93.5% (pass) is fraud. Each result stands independently until invalidated with documented cause.</div></div>
+    <div class="crit-item"><div class="crit-num">✗</div><div class="crit-text"><strong>Perform unlimited retests until you get a passing result.</strong> The number of retests must be pre-specified in the Phase 1B protocol. Running tests 4, 5, 6, 7... until you get a pass, then reporting only the passing results, is testing into compliance — a violation that has led to criminal prosecution.</div></div>
+    <div class="crit-item"><div class="crit-num">✗</div><div class="crit-text"><strong>Release the batch while the investigation is still open.</strong> Unless QA has documented a specific, justified rationale, a batch in an open OOS investigation cannot be distributed. Distribution of product under active OOS investigation without documented QA justification is a critical violation.</div></div>
+    <div class="crit-item"><div class="crit-num">✗</div><div class="crit-text"><strong>Close the investigation as "inconclusive" and release the batch.</strong> An inconclusive OOS investigation — where neither Phase 1 nor Phase 2 could identify the cause — mandates batch rejection. "We investigated but couldn't find anything" does not constitute a basis for releasing a batch that failed its specification.</div></div>
+    <div class="crit-item"><div class="crit-num">✗</div><div class="crit-text"><strong>Discard the OOS result from the laboratory records.</strong> Every result generated during the investigation — including all failing results — must be retained in the full laboratory record. Selective reporting of only passing results is falsification regardless of the electronic system used.</div></div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 3: DEVIATION WORKFLOW ═══ -->
+<div class="sh" id="deviation-workflow">
+  <div class="sh-n">03</div>
+  <div><div class="sh-sm">Deviation Investigation</div><div class="sh-title">Planned, unplanned, and how to handle both</div></div>
+</div>
+
+<p class="s-intro">Deviation investigations are the most frequent investigation type in GMP manufacturing. Every unplanned departure from an approved process — no matter how small it seems in the moment — triggers a deviation investigation. The investigation must determine: what happened, why it happened, whether the batch is affected, and what must be changed to prevent recurrence. The severity of the deviation determines the depth of investigation required.</p>
+
+<div class="fc-title">Unplanned deviation — detection to closure</div>
+<div class="flow">
+  <div class="fn crit"><div class="fn-i">⚠️</div><div class="fn-l">Deviation Detected</div><div class="fn-s">During or after manufacturing</div></div>
+  <div class="fa">→</div>
+  <div class="fn warn"><div class="fn-i">🛑</div><div class="fn-l">Immediate Containment</div><div class="fn-s">Stop if critical; notify QA; preserve evidence</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">📊</div><div class="fn-l">Severity Classification</div><div class="fn-s">Critical / Major / Minor</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">📋</div><div class="fn-l">Open Deviation Report</div><div class="fn-s">Within 24–72h per site SOP</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🔍</div><div class="fn-l">Impact Assessment</div><div class="fn-s">Batch and patient risk</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">🧩</div><div class="fn-l">Root Cause Analysis</div><div class="fn-s">5-Why / Fishbone / FTA</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">🔧</div><div class="fn-l">CAPA</div><div class="fn-s">CA + PA; owner; due date</div></div>
+  <div class="fa">→</div>
+  <div class="fn hl"><div class="fn-i">📤</div><div class="fn-l">Batch Disposition</div><div class="fn-s">QA written decision</div></div>
+  <div class="fa">→</div>
+  <div class="fn"><div class="fn-i">✅</div><div class="fn-l">QA Closure</div><div class="fn-s">Effectiveness verified</div></div>
+</div>
+
+<div class="tb-c">
+<div class="tb-bar">
+  <button class="tb-btn active" onclick="showTab('dev-critical',this)"><span class="t-icon">🔴</span>Critical Deviations</button>
+  <button class="tb-btn" onclick="showTab('dev-major',this)"><span class="t-icon">🟠</span>Major Deviations</button>
+  <button class="tb-btn" onclick="showTab('dev-minor',this)"><span class="t-icon">🟡</span>Minor Deviations</button>
+  <button class="tb-btn" onclick="showTab('dev-planned',this)"><span class="t-icon">📋</span>Planned Deviations</button>
+</div>
+
+<div id="tab-dev-critical" class="t-pane active">
+<p class="t-intro">Critical deviations have directly impacted — or could directly impact — patient safety or product sterility. The batch is immediately at risk. These deviations require the most intensive investigation, the fastest response, and typically trigger regulatory notification.</p>
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Critical deviation examples and immediate actions</div><div class="ft-badge re">Immediate QA Escalation</div></div>
+  <table class="ft">
+    <thead><tr><th>Deviation type</th><th>Immediate action</th><th>Investigation scope</th><th>Regulatory notification?</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Aseptic breach in sterile Grade A/B area</strong></td><td>Halt filling; quarantine all product from that run; do not clean area until QA reviews; preserve environmental plates; document all personnel who entered</td><td>Review all vials from the period of breach; review EM data; review gowning records; assess media fill validation currency; may require unscheduled media fill</td><td>Usually yes — national competent authority; may trigger batch recall</td></tr>
+      <tr><td><strong>Failed post-use filter integrity for injectable</strong></td><td>Quarantine entire batch; do not release any portion; do not retest without QA approval; retain filter for examination</td><td>Review filter usage log; review filter handling SOP compliance; assess whether filtration provided adequate bioburden control; test reserve samples</td><td>Yes if batch was distributed; field safety assessment required</td></tr>
+      <tr><td><strong>Wrong API dispensed to batch</strong></td><td>Halt manufacturing immediately; quarantine all product; identify scope of mix-up (were other batches affected?); check all materials in area</td><td>Full BMR review; material traceability from receipt to dispensing; dispensing area layout review; training review for all dispensing operators</td><td>If distributed: immediate — possible recall. If caught in house: competent authority may require notification depending on product</td></tr>
+      <tr><td><strong>Contamination found in finished sterile product</strong></td><td>Quarantine affected lot and all adjacent lots; preserve contaminated unit; alert QA, microbiology, and management; initiate recall assessment</td><td>Environmental investigation; manufacturing timeline reconstruction; previous product review; HVAC system assessment; personnel and gowning review</td><td>Yes — immediate regulatory notification; likely recall</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<div id="tab-dev-major" class="t-pane">
+<p class="t-intro">Major deviations may have affected product quality, efficacy, or safety — but do not create an immediate, definitive patient safety risk. The batch is held pending investigation. Whether the batch is ultimately released depends on the QA assessment of impact after investigation.</p>
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Major deviation examples and investigation approach</div><div class="ft-badge or">Batch Hold Required</div></div>
+  <table class="ft">
+    <thead><tr><th>Deviation type</th><th>Key investigation questions</th><th>Typical disposition path</th></tr></thead>
+    <tbody>
+      <tr><td><strong>In-process parameter exceedance</strong><br><small>e.g. blend time exceeded, temperature out of range</small></td><td>By how much was it exceeded? What is the scientific basis for the limit? What is the likely impact on the product CQA? Can retained samples be tested to confirm product meets release specifications?</td><td>Hold; test retained samples; if release spec met AND impact assessment shows minimal risk: potential release with documented QA justification</td></tr>
+      <tr><td><strong>Equipment used outside calibration interval</strong></td><td>How far outside the interval? What was the equipment? What measurements did it make? Were those measurements critical (e.g. balance for dispensing) or informational? Can the measurements be verified by another means?</td><td>Depends on criticality of the measurement. Critical measurements (weights, temperatures affecting safety) → likely reject. Non-critical informational measurements → potentially releasable</td></tr>
+      <tr><td><strong>Wrong SOP version followed</strong></td><td>What changed between the version used and the current version? Was the change substantial or administrative? Did following the old version actually change what was done?</td><td>If the old vs new version difference was purely administrative (e.g. formatting change): potentially releasable. If the old version specified different process parameters actually used: likely reject</td></tr>
+      <tr><td><strong>Raw material used without identity testing completion</strong></td><td>Was the material from a qualified supplier? Were supplier CoA values within specification? Can identity testing be performed on retained sample?</td><td>Test retained sample immediately. If testing confirms identity and all CoA values are within spec: potentially releasable with documented justification</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<div id="tab-dev-minor" class="t-pane">
+<p class="t-intro">Minor deviations have no impact on product quality, patient safety, or process performance. They are typically administrative or documentation errors. The batch is usually not held, but the deviation must still be documented, root-caused, and assessed for trends — because a pattern of minor deviations can indicate a systemic quality system weakness.</p>
+<div class="co">
+  <div class="co-t">The trap of treating minor deviations as unimportant</div>
+  <p>A single entry with the wrong date format is a minor deviation. Ten batches in the same area with wrong date formats is a training failure or SOP clarity issue. Twenty sites each with "minor" documentation deviations of different types is a systemic documentation culture problem. <strong>Regulators review APQR data and look specifically for trends in minor deviations that should have triggered systemic intervention but did not.</strong> Minor does not mean unimportant — it means limited immediate product impact. The process correction is still required.</p>
+</div>
+<div class="ft-wrap">
+  <div class="ft-head"><div class="ft-title">Minor deviation examples and documentation requirements</div></div>
+  <table class="ft">
+    <thead><tr><th>Example</th><th>Required documentation</th><th>Investigation depth</th></tr></thead>
+    <tbody>
+      <tr><td>Wrong date format in BMR (e.g. MM/DD/YY instead of DD-MMM-YYYY)</td><td>Deviation report; corrected entry in BMR per correction procedure; operator re-trained on date format requirement</td><td>Brief — confirm this is the only occurrence in the batch; check if recurring across batches (if so: elevate to major)</td></tr>
+      <tr><td>SOP revision number mis-recorded in batch record (wrote Rev 5, current version is Rev 6, but Rev 5 and 6 are identical in all process steps)</td><td>Deviation report confirming versions are equivalent; corrected entry; training check</td><td>Confirm version equivalency with documented comparison; if any differences exist between versions, re-classify as major</td></tr>
+      <tr><td>Delayed training record — operator performed step before training was formally recorded, but was observed to be competent</td><td>Deviation report; retrospective training record completed with explanation; assessment that operator was adequately competent at time of activity</td><td>Confirm competency at time of activity; assess whether batch product is affected by any training gap</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<div id="tab-dev-planned" class="t-pane">
+<p class="t-intro">A planned deviation — also called a temporary change or concession — is a pre-approved departure from a standard procedure for a specific, defined set of batches. It is not a failure of the quality system; it is the quality system working correctly to accommodate a known, bounded situation with proper oversight. Planned deviations must not become a substitute for proper change control for ongoing situations.</p>
+<div class="sl">
+  <div class="sr"><div class="sr-n">1</div><div class="sr-b"><div class="sr-name">Identify and document the need for departure</div><div class="sr-d">The production or QA team identifies that a specific, time-limited situation will require departing from the standard approved procedure for a defined set of batches. The departure is described specifically: what step, what parameter, what alternative approach, for how many batches, for what time period. A vague planned deviation ("may need to use different supplier") is not acceptable — the specific alternative must be described.</div></div><div class="sr-s"><div class="sr-sl">Key requirement</div><div class="sr-sv">Described before the batch starts. A retroactive "planned deviation" raised after the fact is a contradiction in terms and is treated as an unplanned deviation</div></div></div>
+  <div class="sr"><div class="sr-n">2</div><div class="sr-b"><div class="sr-name">Impact assessment before approval</div><div class="sr-d">QA assesses whether the proposed departure could affect product quality, safety, or efficacy. Assessment includes: scientific basis for believing the departure is acceptable, any additional testing required to confirm product quality, whether the departure affects validated state of the process, and whether regulatory notification is required. The assessment is documented and becomes part of the planned deviation record.</div></div><div class="sr-s"><div class="sr-sl">QA approval</div><div class="sr-sv">Written QA approval is mandatory before the batch starts. No QA approval = the departure becomes an unplanned deviation upon detection</div></div></div>
+  <div class="sr"><div class="sr-n">3</div><div class="sr-b"><div class="sr-name">Change control trigger assessment</div><div class="sr-d">If the same planned deviation is needed for more than 2–3 batches or is expected to continue beyond its original scope, it must be converted to a permanent change through the formal change control process. Repeated planned deviations to the same procedure are a regulatory red flag — they indicate that the procedure no longer reflects actual practice and that the facility is using planned deviations to avoid the work of formal change control.</div></div><div class="sr-s"><div class="sr-sl">Conversion trigger</div><div class="sr-sv">If the situation is expected to continue or recur: open a change control. A planned deviation is for genuinely exceptional, time-limited circumstances only</div></div></div>
+</div>
+</div>
+</div><!-- end tabs -->
+
+<!-- ═══ SECTION 4: ROOT CAUSE ANALYSIS ═══ -->
+<div class="sh" id="rca">
+  <div class="sh-n">04</div>
+  <div><div class="sh-sm">Root Cause Analysis</div><div class="sh-title">Methods, examples, and documentation</div></div>
+</div>
+
+<p class="s-intro">Root cause analysis is the structured process of identifying why an event occurred — not just what occurred. Every GMP investigation must document the RCA method used, the evidence considered, and the conclusion reached. "We discussed it and agreed it was operator error" is not an RCA. A documented, systematic method applied to the evidence is required. This section covers the four methods most commonly used in pharmaceutical investigations, with pharmaceutical-specific examples for each.</p>
+
+<div class="co or">
+  <div class="co-t">The most common RCA failure mode</div>
+  <p>"Operator error" as a root cause is almost never acceptable in a GMP investigation. It describes what happened — not why it was possible. If an operator made an error, the real root cause is almost always one of: the SOP was ambiguous; training was inadequate; the workspace design made the error easy to commit; there was no engineering control to prevent it; the workload or time pressure was unreasonable. <strong>Stopping at "operator error" means the CAPA will be "retrain the operator" — and the same error will occur again, committed by a different trained operator in the same poorly-designed system.</strong></p>
+</div>
+
+<div class="rc-grid">
+  <div class="rc-card">
+    <div class="rc-name">5-Why Analysis <div class="rc-badge">Most Common</div></div>
+    <div class="rc-desc">Asks "why?" iteratively — each answer becomes the next question — until the root systemic cause is reached. Deceptively simple but very effective at exposing the gap between symptom and cause. Requires discipline to keep pushing past the proximate cause. Works best for linear causal chains.</div>
+    <div class="rc-when">Best for: events with a clear causal sequence. Avoid when multiple independent causes are possible simultaneously.</div>
+  </div>
+  <div class="rc-card">
+    <div class="rc-name">Fishbone / Ishikawa Diagram</div>
+    <div class="rc-desc">Organises potential causes into the 6M categories: Man, Machine, Method, Material, Measurement, Mother Nature (environment). Forces the team to systematically consider every cause category — not just the most obvious. Produces a visual diagram that becomes part of the investigation report. Prevents tunnel vision.</div>
+    <div class="rc-when">Best for: complex events with multiple possible causes. Effective for team-based investigations where brainstorming is valuable.</div>
+  </div>
+  <div class="rc-card">
+    <div class="rc-name">Fault Tree Analysis (FTA)</div>
+    <div class="rc-desc">A top-down logic tree mapping all combinations of conditions that could produce the observed event. Uses AND/OR logic gates. AND gate: both conditions must exist simultaneously. OR gate: either condition is sufficient. Proves that an identified cause is necessary — not just possible. More rigorous than 5-Why for complex system failures.</div>
+    <div class="rc-when">Best for: sterility failures, complex multi-system failures, when you need to prove a cause is necessary not just plausible.</div>
+  </div>
+  <div class="rc-card">
+    <div class="rc-name">FMEA — Failure Mode & Effects Analysis</div>
+    <div class="rc-desc">Systematically evaluates each process step for all possible failure modes, their effects, and the existing controls. In an investigation context: which failure mode in which process step most likely produced the observed outcome, given the existing control environment? Bridges process risk assessment and investigation finding.</div>
+    <div class="rc-when">Best for: confirming root cause probability, systematic review of all process steps, risk-ranked investigations where resources must be allocated.</div>
+  </div>
+</div>
+
+<div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin:28px 0 12px">5-Why worked example — tablet dissolution failure OOS investigation</div>
+<div class="fivewhy">
+  <div class="fw-row"><div class="fw-n">Why 1</div><div class="fw-q">WHY?</div><div class="fw-a"><strong>The batch failed dissolution — only 65% released at 45 min (spec ≥80%).</strong> The tablets disintegrated slowly and released the drug below the required rate.</div></div>
+  <div class="fw-row"><div class="fw-n">Why 2</div><div class="fw-q">WHY?</div><div class="fw-a">The tablet coating was <strong>thicker than the approved specification</strong> — weight gain was 5.8% instead of the approved 3.0–4.5% range. A thicker polymer coating slows drug release.</div></div>
+  <div class="fw-row"><div class="fw-n">Why 3</div><div class="fw-q">WHY?</div><div class="fw-a">The coating pan operator <strong>continued spraying beyond the target weight gain</strong> because he was checking the weight against the wrong line in the BMR — the theoretical yield field rather than the coating weight gain specification field.</div></div>
+  <div class="fw-row"><div class="fw-n">Why 4</div><div class="fw-q">WHY?</div><div class="fw-a">The BMR layout placed the <strong>coating weight gain specification and the theoretical yield fields adjacent to each other</strong>, formatted similarly, with no visual distinction between a critical process parameter and a yield calculation field.</div></div>
+  <div class="fw-row root"><div class="fw-n">Why 5 ✓</div><div class="fw-q">ROOT</div><div class="fw-a"><strong>Root cause: the BMR template was poorly designed.</strong> Critical in-process specifications were not visually differentiated from informational yield fields. The design made confusion possible — and in a multi-step process, likely. The corrective action is BMR template redesign, not operator retraining.</div></div>
+</div>
+
+<div class="co">
+  <div class="co-t">Documenting the RCA — what the record must show</div>
+  <p>The RCA documentation must show: which method was used and why it was appropriate; what evidence was considered; what hypotheses were generated and tested; which hypotheses were ruled out and why; what root cause was concluded; and how the root cause was verified (i.e. "if we fix this, would the event have been prevented?"). A root cause stated without the investigational logic — just the conclusion — is not adequate RCA documentation. <strong>The investigation record must show the reasoning, not just the answer.</strong></p>
+</div>
+
+<!-- ═══ SECTION 5: CHECKLISTS ═══ -->
+<div class="sh" id="checklists">
+  <div class="sh-n">05</div>
+  <div><div class="sh-sm">Investigation Checklists</div><div class="sh-title">What to check at every investigation stage</div></div>
+</div>
+
+<p class="s-intro">These checklists cover the key actions at each investigation stage. They are not exhaustive — specific investigations will require additional steps. But every item listed here is either a regulatory requirement or a common finding when missing. Use these as a baseline and extend for your specific investigation type.</p>
+
+<div class="cl-section">
+  <div class="cl-head" onclick="toggleCL(this)">
+    <div class="cl-head-left"><div class="cl-head-icon">🚨</div><div class="cl-head-title">Detection & Immediate Response</div><div class="cl-head-badge re">Within Hours</div></div>
+    <div class="cl-toggle">▼</div>
+  </div>
+  <div class="cl-body open">
+    <div class="cl-items">
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Document the event as observed</strong> — exact result, exact time, exact person who detected it. Objective description only — no conclusions yet.</div><div class="cl-item-note">21 CFR 211.192 — contemporaneous documentation required</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Notify QA and supervisor in the same shift</strong> — not the next day. Time-stamp the notification.</div><div class="cl-item-note">Same-shift notification is the GMP standard for significant quality events</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Contain immediately</strong> — quarantine the batch, the equipment, or the area as appropriate. Apply quarantine labels. Do not proceed with manufacturing the affected batch pending QA assessment.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Preserve all evidence</strong> — do not clean the equipment, do not dispose of samples, do not restart the process. The investigation needs to examine the state at the time of the event.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Secure raw data and all original records</strong> — instrument printouts, paper records in the area, any electronic data generated during the event period.</div><div class="cl-item-note">Audit trail data must be secured before any instrument is used again</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Make an initial severity classification</strong> — Critical, Major, or Minor. This determines the urgency and depth of the investigation. QA must confirm the classification.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Open the formal investigation record</strong> — Deviation Report, OOS form, or event notification — within the site-SOP defined timeframe (typically 24h for major, same shift for critical).</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="cl-section">
+  <div class="cl-head" onclick="toggleCL(this)">
+    <div class="cl-head-left"><div class="cl-head-icon">📊</div><div class="cl-head-title">Impact Assessment</div><div class="cl-head-badge or">Within 48–72 Hours</div></div>
+    <div class="cl-toggle">▼</div>
+  </div>
+  <div class="cl-body open">
+    <div class="cl-items">
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Identify all batches potentially affected by the same root cause</strong> — same equipment, same material lot, same operator, same process run. Do not limit the scope to the triggering batch without documented justification.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Assess patient safety risk</strong> — could any patient currently using distributed product be harmed? Is there an immediate health hazard? This question must be answered explicitly and documented — not left as an implication.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Check distribution status</strong> — has the affected batch been distributed? To which markets? Can it be recalled? What is the status of the batch in the supply chain?</div><div class="cl-item-note">Distribution status determines regulatory notification obligations</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Assess regulatory notification requirement</strong> — does this event trigger a mandatory report to the regulatory authority? Time limits for notification vary by market and event type.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Quarantine all potentially affected batches</strong> — until the investigation has cleared them or confirmed they are unaffected. Do not release batches from the affected scope without explicit QA justification.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Document the impact assessment explicitly</strong> — including batches assessed and cleared. "Assessed other batches — none affected" is not documentation. List the batches, state what was reviewed, and state why they were cleared.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="cl-section">
+  <div class="cl-head" onclick="toggleCL(this)">
+    <div class="cl-head-left"><div class="cl-head-icon">🔬</div><div class="cl-head-title">Document & Evidence Review</div><div class="cl-head-badge">Investigation Phase</div></div>
+    <div class="cl-toggle">▼</div>
+  </div>
+  <div class="cl-body open">
+    <div class="cl-items">
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Review the BMR for the affected batch completely</strong> — all pages, all steps, all deviations cross-referenced. Document what was found and what was checked.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Review equipment logbooks for every piece of equipment involved</strong> — cleaning records, previous product, calibration status at time of batch. Document the review with dates and findings.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Review incoming test results for all raw materials used</strong> — not just the finished product results. Were any results borderline? Were all materials from approved suppliers?</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Review training records for all operators who signed the BMR</strong> — confirm training was complete before batch date, on current SOP versions.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Review environmental monitoring data</strong> for the manufacturing area on the batch date — alert and action limit exceedances, trends, unusual results.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Review any prior deviations or OOS events</strong> on the same process, same equipment, or same product — for prior pattern evidence. Prior events with the same characteristics strengthen a root cause hypothesis.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Interview operators and supervisors involved</strong> — formally, with documented date, participants, and content. If an operator recalls an unrecorded event, document the interview and investigate the disclosure separately.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="cl-section">
+  <div class="cl-head" onclick="toggleCL(this)">
+    <div class="cl-head-left"><div class="cl-head-icon">🧩</div><div class="cl-head-title">Root Cause Analysis & CAPA</div><div class="cl-head-badge">Core Investigation</div></div>
+    <div class="cl-toggle">▼</div>
+  </div>
+  <div class="cl-body open">
+    <div class="cl-items">
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Select and apply a documented RCA method</strong> — 5-Why, Fishbone, FTA, FMEA, or combination. The method must be named in the investigation report. "Team discussed" is not an RCA method.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Generate and test multiple hypotheses</strong> — do not commit to the first plausible cause. Test each hypothesis against the available evidence. Document which hypotheses were ruled out and why.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Verify the root cause</strong> — ask: "If this cause did not exist, would the event have occurred?" If the answer is no, you have a necessary cause. If yes — you have a contributing factor but not the root cause.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Do not accept "operator error" as root cause</strong> without at least two more levels of why: why was the operator able to make this error? What system permitted it?</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Define corrective action (CA) specifically</strong> — with named owner, specific due date, verifiable outcome. "Fix the issue" is not a CA. "Revise SOP-0041 Section 4.3 to specify coating weight gain acceptance criteria in bold" is a CA.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Define preventive action (PA) that addresses the systemic cause</strong> — not just the specific instance. The PA prevents recurrence anywhere in the facility, not just for this product.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Define effectiveness check with specific criteria</strong> — what data will prove the CAPA worked, collected by whom, over what time period. This must be defined before the CAPA is implemented, not added as an afterthought when closure is due.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="cl-section">
+  <div class="cl-head" onclick="toggleCL(this)">
+    <div class="cl-head-left"><div class="cl-head-icon">✅</div><div class="cl-head-title">Closure Requirements</div><div class="cl-head-badge">Final QA Sign-Off</div></div>
+    <div class="cl-toggle">▼</div>
+  </div>
+  <div class="cl-body open">
+    <div class="cl-items">
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Batch disposition is documented explicitly</strong> — "Released" or "Rejected" or "Destroyed" with the specific QA justification for the decision. Disposition cannot be implied — it must be a written, signed statement.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>All required sections of the investigation report are complete</strong> — event description, immediate actions, impact assessment, evidence reviewed, root cause analysis, CAPA, and disposition. No blank sections.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>All CAPA actions have named owners and due dates</strong> — before closure. CAPAs without these are incomplete regardless of whether the investigation summary is written.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>QA formal signature and date on closure</strong> — the QA reviewer must attest that the investigation is complete, the conclusion is supported by evidence, and all required actions are in place.</div></div></div>
+      <div class="cl-item"><div class="cl-cb" onclick="toggleCB(this)">✓</div><div><div class="cl-item-text"><strong>Regulatory notification assessment is documented</strong> — whether notification was required and whether it was sent, or why it was not required. Not completing this assessment is itself a finding.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 6: SCOPE & IMPACT ═══ -->
+<div class="sh" id="scope">
+  <div class="sh-n">06</div>
+  <div><div class="sh-sm">Scope & Impact Assessment</div><div class="sh-title">How far to extend every investigation</div></div>
+</div>
+
+<p class="s-intro">Scope assessment is one of the most consistently cited investigation deficiencies in FDA Warning Letters. The default human instinct is to investigate the minimum — the specific batch, the specific event. Regulators expect the opposite: start broad and narrow down with evidence. The investigation scope must encompass everything that could have been affected by the same root cause.</p>
+
+<div class="scope-grid">
+  <div class="scope-card">
+    <div class="scope-title"><div class="scope-icon">🔴</div>Critical — expand scope immediately</div>
+    <ul class="scope-list">
+      <li>All batches made on the same equipment in the relevant period</li>
+      <li>All batches using the same raw material lot number</li>
+      <li>All batches manufactured by the same operator on critical steps (if training/competency issue)</li>
+      <li>All batches in the same stability station (if stability OOS)</li>
+      <li>All batches distributed in the same shipment (if cold chain excursion)</li>
+      <li>All products sharing the same manufacturing area (if environmental event)</li>
+    </ul>
+  </div>
+  <div class="scope-card">
+    <div class="scope-title"><div class="scope-icon">🟠</div>Commonly missed scope items</div>
+    <ul class="scope-list">
+      <li>Batches made before the detected event — the problem may have existed longer than detected</li>
+      <li>Other products sharing the same supplier material lot</li>
+      <li>Batches from prior campaigns using the same now-suspect equipment</li>
+      <li>Distributed lots — not just in-house product</li>
+      <li>Stability samples on stability — not just released product</li>
+      <li>Similar products with similar process steps (transfer of risk)</li>
+    </ul>
+  </div>
+  <div class="scope-card">
+    <div class="scope-title"><div class="scope-icon">📋</div>How to document scope assessment</div>
+    <ul class="scope-list">
+      <li>List every batch considered in scope assessment</li>
+      <li>State the criterion for inclusion (same equipment, same lot, same period)</li>
+      <li>For batches cleared: state the specific reason they were cleared</li>
+      <li>For batches held: document the hold and the assessment plan</li>
+      <li>Date the scope assessment — scope may expand as investigation develops</li>
+      <li>QA to confirm scope is adequate before investigation closes</li>
+    </ul>
+  </div>
+  <div class="scope-card">
+    <div class="scope-title"><div class="scope-icon">✅</div>Narrowing scope — when it is justified</div>
+    <ul class="scope-list">
+      <li>Root cause is specific to a unique event (e.g. power outage that affected only one equipment at one time)</li>
+      <li>Evidence from reserve samples and records proves other batches were unaffected</li>
+      <li>The failure mode is physically impossible to have occurred in other batches (e.g. equipment decommissioned before other batches were made)</li>
+      <li>All of the above must be documented — not implied</li>
+    </ul>
+  </div>
+</div>
+
+<div class="co re">
+  <div class="co-t">The scope assessment FDA Warning Letter pattern</div>
+  <p>The most frequent scope criticism in FDA Warning Letters reads: <em>"Your firm failed to extend the investigation to include other batches potentially affected by the same root cause."</em> The root cause identified was a supplier material quality issue — but the investigation covered only the single batch that failed, not the 12 other batches that used product from the same supplier lot. All 12 were already distributed. <strong>Narrow scope investigations protect no one — they protect the batch count, not the patient.</strong></p>
+</div>
+
+<!-- ═══ SECTION 7: PITFALLS ═══ -->
+<div class="sh" id="pitfalls">
+  <div class="sh-n">07</div>
+  <div><div class="sh-sm">Failures & Pitfalls</div><div class="sh-title">What investigations get wrong</div></div>
+</div>
+
+<p class="s-intro">Investigation failures fall into predictable patterns. The same types of errors appear in FDA Warning Letters, consent decrees, and inspection 483 observations year after year. Understanding these patterns is as important as understanding the correct process — because the failures are systematic and preventable, not random.</p>
+
+<div class="crit-box">
+  <div class="crit-box-t">The 10 investigation failure patterns — from FDA Warning Letters and inspection data</div>
+  <div class="crit-items">
+    <div class="crit-item"><div class="crit-num">01</div><div class="crit-text"><strong>Predetermined conclusions.</strong> The investigation begins with a conclusion — "it was probably a testing anomaly" — and then gathers evidence to support it, ignoring contradictory evidence. A proper investigation generates hypotheses from the evidence, tests them, and reaches the conclusion last. Regulators are trained to recognise reverse-engineered investigation logic in the narrative structure of the report.</div></div>
+    <div class="crit-item"><div class="crit-num">02</div><div class="crit-text"><strong>"Operator error" accepted as root cause without further investigation.</strong> In a GMP quality system, human error is a symptom — the root cause is the system that permitted the human error. SOP ambiguity, training gaps, workspace design, cognitive load, time pressure — any of these can cause an operator to make an error. If operator error is the conclusion, the CAPA must address why the system permitted the error, not just retrain the individual operator.</div></div>
+    <div class="crit-item"><div class="crit-num">03</div><div class="crit-text"><strong>Scope deliberately limited to avoid inconvenient findings.</strong> An investigation that looks only at the batch that failed — without assessing whether the same root cause affected earlier batches — is doing the minimum required to justify releasing the current batch, not fulfilling the purpose of the investigation. FDA explicitly expects scope expansion unless there is documented evidence that restriction is justified.</div></div>
+    <div class="crit-item"><div class="crit-num">04</div><div class="crit-text"><strong>CAPA with unverifiable or vague actions.</strong> "Retrain staff," "increase awareness," "remind operators," "improve communication" — these are not CAPAs. They are aspirations. A CAPA must be specific, attributable to a named person, due by a date, and verifiable by objective evidence. An unverifiable CAPA is an un-closed investigation gap that will be rediscovered at the next inspection.</div></div>
+    <div class="crit-item"><div class="crit-num">05</div><div class="crit-text"><strong>Effectiveness check not completed.</strong> The CAPA was implemented — the SOP was revised, the training was delivered, the equipment was fixed. The investigation was closed. Six months later, the same event occurred again. If an effectiveness check had been designed and executed — verifying that the changed system actually prevented recurrence through data — the second event would have been caught earlier or the CAPA failure detected before recurrence. This is the most cited gap in global CAPA system reviews.</div></div>
+    <div class="crit-item"><div class="crit-num">06</div><div class="crit-text"><strong>Timeline inconsistencies in the investigation narrative.</strong> The investigation report says the event was detected at 14:00, but the deviation was opened the following morning. The investigation report says an immediate containment action was taken at 14:30, but the BMR shows the equipment was used again at 16:00. Timeline contradictions either indicate sloppy documentation or retroactive record creation — both are serious findings. Timeline reconstruction should be one of the first tasks in any investigation.</div></div>
+    <div class="crit-item"><div class="crit-num">07</div><div class="crit-text"><strong>Investigation closed before all CAPA actions are complete.</strong> The investigation narrative is finished and QA has signed the closure — but the CAPA item "validate the revised cleaning method" has a due date three months in the future and has not yet been performed. The investigation itself cannot be fully closed with open critical CAPAs — or the open CAPAs must be tracked as separate items with explicit acknowledgement that they remain open and the investigation was closed with them outstanding.</div></div>
+    <div class="crit-item"><div class="crit-num">08</div><div class="crit-text"><strong>Recurring events with identical root causes.</strong> The same root cause appears in four separate investigation reports over 18 months — each investigated in isolation, each resulting in the same "retrain the operator" CAPA, each closed as complete. The fourth occurrence should have triggered a systemic review of the CAPA effectiveness for the first three events. Recurring events demonstrate that neither the investigation nor the CAPA system are working as intended.</div></div>
+    <div class="crit-item"><div class="crit-num">09</div><div class="crit-text"><strong>Low deviation rates presented as evidence of quality.</strong> A facility with 4 deviations per year across 200 batches is not demonstrating excellence — it is demonstrating that deviations are not being captured. All manufacturing has process variability. The industry average for a well-managed facility is tens to hundreds of deviations per year depending on scale. Extremely low deviation rates are an inspection red flag, not a quality indicator.</div></div>
+    <div class="crit-item"><div class="crit-num">10</div><div class="crit-text"><strong>Batch released on the basis of a "likely passing" retest without investigation completion.</strong> The OOS investigation is still open. Someone has decided informally that the batch "probably" passes based on one passing retest. The batch is released. The investigation is eventually closed with an inconclusive finding. This sequence — release before investigation conclusion — is a serious regulatory violation. A batch with an open OOS investigation requires documented QA justification to release, not an informal assessment.</div></div>
+  </div>
+</div>
+
+<div class="good-box">
+  <div class="good-box-t">Markers of a high-quality investigation — what regulators want to see</div>
+  <div class="good-items">
+    <div class="good-item"><div class="good-num">✓</div><div class="good-text"><strong>The investigation logic is visible.</strong> The report shows which hypotheses were generated, how each was tested against the evidence, which were ruled out and why, and how the conclusion was reached. Reading the investigation tells the story of how the investigators thought — not just what they concluded.</div></div>
+    <div class="good-item"><div class="good-num">✓</div><div class="good-text"><strong>The scope was appropriately wide and then narrowed with evidence.</strong> The investigation began by identifying all potentially affected batches, materials, and equipment. The scope was then narrowed based on documented evidence — specific records reviewed, specific tests performed, specific observations made — that cleared items from the scope. The narrowing is justified, not assumed.</div></div>
+    <div class="good-item"><div class="good-num">✓</div><div class="good-text"><strong>The root cause is systemic, not personal.</strong> Even when an operator action was the proximate cause, the root cause identified is the system condition that permitted it — the ambiguous SOP, the absent engineering control, the inadequate training programme. The CAPA addresses the system, not just the individual.</div></div>
+    <div class="good-item"><div class="good-num">✓</div><div class="good-text"><strong>The CAPA has an effectiveness check with data.</strong> Six months after CAPA implementation, the report shows: deviation rate for this type of event is now zero where it was 3 per year; or the system suitability pass rate is now 99.5% where it was 94%; or the audit score for the area improved from 72% to 96%. Numbers, not assertions.</div></div>
+    <div class="good-item"><div class="good-num">✓</div><div class="good-text"><strong>Prior similar events were reviewed and referenced.</strong> The investigation explicitly searched for prior events with similar characteristics and referenced them. Where prior CAPAs exist, the investigation assessed whether the prior CAPA was effective — and if not, addressed why the prior intervention failed.</div></div>
+  </div>
+</div>
+
+</main>
+
+<footer class="ftr">
+  <div class="ftr-in">
+    <div class="ftr-note">GMP Investigations Reference — plain-language guide.<br>For informational purposes only. Not regulatory or legal advice.<br>Sources: FDA OOS Guidance 2006, 21 CFR 211.192, ICH Q10, EU GMP Chapter 1, FDA Warning Letter database — as of 2025.</div>
+    <div class="ftr-tags">
+      <span class="ftr-tag">OOS</span><span class="ftr-tag">OOT</span><span class="ftr-tag">Deviations</span>
+      <span class="ftr-tag">CAPA</span><span class="ftr-tag">Root Cause</span><span class="ftr-tag">FDA 2006</span><span class="ftr-tag">21 CFR 211</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.t-pane').forEach(function(el){el.classList.remove('active')});
+  document.querySelectorAll('.tb-btn').forEach(function(el){el.classList.remove('active')});
+  var pane = document.getElementById('tab-' + id);
+  if (pane) pane.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function toggleCL(head) {
+  var body = head.nextElementSibling;
+  var toggle = head.querySelector('.cl-toggle');
+  body.classList.toggle('open');
+  toggle.style.transform = body.classList.contains('open') ? 'rotate(0deg)' : 'rotate(-90deg)';
+}
+
+function toggleCB(cb) {
+  cb.classList.toggle('checked');
+}
+</script>
+</body>
+</html>
