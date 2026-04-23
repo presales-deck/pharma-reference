@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LeucineOS Celestara · Platform Architecture · Pharma Manufacturers</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Primary: Teal scale */
+  --t900: #04332A; --t800: #085041; --t700: #0B6B58; --t600: #11886F;
+  --t500: #1D9E75; --t400: #3DB88E; --t300: #7DD4B3; --t200: #B4E8D4;
+  --t100: #DDF5EB; --t50: #F0FAF5;
+  /* Accent: Bronze / warm gold */
+  --a700: #7A5A1E; --a600: #9E7424; --a500: #B8892E; --a400: #D4A84A;
+  --a300: #E8C97A; --a200: #F2DCAA; --a100: #FAF0D8; --a50: #FEFBF3;
+  /* Neutrals */
+  --n900: #1A1A18; --n800: #2C2C2A; --n700: #444442; --n600: #5F5E5A;
+  --n500: #7A7A76; --n400: #9B9A96; --n300: #C4C3BF; --n200: #E0DFDB;
+  --n100: #F0EFE9; --n50: #F8F7F4; --white: #FFFFFF;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Figtree', sans-serif; color: var(--n900); background: var(--white); font-size: 13px; line-height: 1.6; }
+
+/* ══════════════════════════════════════════
+   COVER
+   ══════════════════════════════════════════ */
+.cover {
+  background: linear-gradient(165deg, var(--t800) 0%, var(--t900) 100%);
+  color: white; min-height: 100vh; padding: 56px 64px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden; page-break-after: always;
+}
+.cover::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--t500); }
+.cover::after { content: ''; position: absolute; right: -60px; top: -60px; width: 280px; height: 280px; border-radius: 50%; border: 40px solid rgba(125,212,179,0.04); }
+.cover-top { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1; }
+.cover-brand { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--t300); }
+.cover-label { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; background: rgba(29,158,117,0.15); color: var(--t300); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(125,212,179,0.15); }
+.cover-body { position: relative; z-index: 1; }
+.cover-pretitle { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--a400); margin-bottom: 14px; }
+.cover-title { font-family: 'DM Serif Display', serif; font-size: 54px; font-weight: 400; line-height: 1.05; letter-spacing: -0.5px; margin-bottom: 18px; }
+.cover-title em { font-style: italic; color: var(--t300); }
+.cover-subtitle { font-size: 17px; opacity: 0.6; line-height: 1.55; max-width: 540px; }
+.cover-bottom { display: flex; gap: 48px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.1); position: relative; z-index: 1; }
+.cover-field { display: flex; flex-direction: column; gap: 4px; }
+.field-label { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.35; }
+.field-value { font-size: 14px; font-weight: 500; color: var(--t200); }
+
+/* ══════════════════════════════════════════
+   SLIDE
+   ══════════════════════════════════════════ */
+.slide { padding: 44px 64px 40px; page-break-before: always; }
+.slide-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.slide-num { width: 26px; height: 26px; border-radius: 50%; background: var(--t700); color: white; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; flex-shrink: 0; }
+.slide-tag { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--t600); }
+.slide-title { font-family: 'DM Serif Display', serif; font-size: 28px; font-weight: 400; letter-spacing: -0.3px; margin-bottom: 18px; color: var(--n900); }
+
+/* ══════════════════════════════════════════
+   ARCHITECTURE LAYERS
+   ══════════════════════════════════════════ */
+.arch-diagram { display: flex; flex-direction: column; gap: 0; }
+.arch-layer { border-radius: 12px; padding: 18px 20px; border: 1.5px solid; }
+
+/* Layer 5: Experience — darkest */
+.layer-exp { background: var(--t900); border-color: var(--t800); }
+/* Layer 4: Agents — warm accent on neutral */
+.layer-agents { background: var(--a50); border-color: var(--a200); }
+/* Layer 3: Ontology — teal core */
+.layer-ontology { background: var(--t50); border-color: var(--t200); }
+/* Layer 2: ETL — light neutral */
+.layer-etl { background: var(--n50); border-color: var(--n200); }
+/* Layer 1: Sources — white on neutral */
+.layer-sources { background: var(--white); border-color: var(--n200); }
+
+/* Layer headers */
+.layer-hdr { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.layer-badge { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; padding: 3px 9px; border-radius: 20px; flex-shrink: 0; }
+
+.layer-exp .layer-badge      { background: rgba(125,212,179,0.12); color: var(--t300); }
+.layer-agents .layer-badge   { background: var(--a100); color: var(--a600); }
+.layer-ontology .layer-badge { background: var(--t100); color: var(--t700); }
+.layer-etl .layer-badge      { background: var(--n100); color: var(--n600); }
+.layer-sources .layer-badge  { background: var(--n100); color: var(--n600); }
+
+.layer-name { font-family: 'DM Serif Display', serif; font-size: 15px; font-weight: 400; }
+.layer-exp .layer-name      { color: white; }
+.layer-agents .layer-name   { color: var(--a700); }
+.layer-ontology .layer-name { color: var(--t800); }
+.layer-etl .layer-name      { color: var(--n800); }
+.layer-sources .layer-name  { color: var(--n800); }
+
+.layer-name-sub { font-family: 'Figtree', sans-serif; font-size: 11.5px; font-weight: 400; opacity: 0.6; }
+
+.layer-desc { font-size: 10px; margin-left: auto; font-family: 'DM Mono', monospace; letter-spacing: 0.02em; }
+.layer-exp .layer-desc      { color: rgba(255,255,255,0.3); }
+.layer-agents .layer-desc   { color: var(--a500); opacity: 0.6; }
+.layer-ontology .layer-desc { color: var(--t500); opacity: 0.65; }
+.layer-etl .layer-desc      { color: var(--n400); }
+.layer-sources .layer-desc  { color: var(--n400); }
+
+/* ── Experience Layer ── */
+.exp-grid { display: grid; grid-template-columns: 5fr 7fr; gap: 10px; }
+.exp-col-label { font-family: 'DM Mono', monospace; font-size: 8.5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--t300); opacity: 0.55; margin-bottom: 7px; }
+.exp-col-items { display: flex; flex-direction: column; gap: 6px; }
+.exp-persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.exp-node { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09); border-radius: 8px; padding: 10px 14px; color: white; display: flex; align-items: center; gap: 11px; }
+.exp-icon { width: 30px; height: 30px; border-radius: 7px; background: rgba(125,212,179,0.08); border: 1px solid rgba(125,212,179,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.exp-icon svg { width: 14px; height: 14px; stroke: var(--t300); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.exp-node-title { font-size: 11.5px; font-weight: 600; line-height: 1.3; }
+.exp-node-sub { font-size: 9.5px; opacity: 0.35; font-family: 'DM Mono', monospace; line-height: 1.3; margin-top: 1px; }
+
+/* ── Agent Layer ── */
+.agent-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.agent-card { background: var(--white); border: 1px solid var(--a200); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.agent-card-hdr { display: flex; align-items: center; gap: 9px; }
+.agent-icon { width: 26px; height: 26px; border-radius: 6px; background: var(--a100); border: 1px solid var(--a200); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.agent-icon svg { width: 13px; height: 13px; stroke: var(--a600); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.agent-card-name { font-size: 12px; font-weight: 600; color: var(--n900); line-height: 1.25; }
+.skill-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.skill-tag { font-size: 8.5px; padding: 2px 7px; border-radius: 4px; background: var(--a50); color: var(--a600); border: 1px solid var(--a200); font-family: 'DM Mono', monospace; letter-spacing: 0.02em; }
+
+/* ── MCP Bars ── */
+.mcp-bar { margin-top: 12px; padding-top: 12px; border-top: 1px dashed; }
+.mcp-bar.agent-mcp { border-color: var(--a200); }
+.mcp-bar.etl-mcp   { border-color: var(--n200); }
+.mcp-bar-hdr { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.mcp-bar-label { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; }
+.mcp-bar.agent-mcp .mcp-bar-label { color: var(--a600); }
+.mcp-bar.etl-mcp   .mcp-bar-label { color: var(--n500); }
+.mcp-bar-line { flex: 1; height: 1px; }
+.mcp-bar.agent-mcp .mcp-bar-line { background: var(--a200); }
+.mcp-bar.etl-mcp   .mcp-bar-line { background: var(--n200); }
+.mcp-tools-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.mcp-tool { font-family: 'DM Mono', monospace; font-size: 10px; padding: 3px 10px; background: var(--white); border: 1px solid var(--a200); border-radius: 4px; color: var(--a700); }
+
+/* ── Ontology Layer ── */
+.entity-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.entity-node { background: var(--white); border: 1px solid var(--t200); border-radius: 8px; padding: 9px 12px; text-align: center; flex: 1; min-width: 80px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.entity-icon { width: 24px; height: 24px; border-radius: 6px; background: var(--t100); border: 1px solid var(--t200); display: flex; align-items: center; justify-content: center; }
+.entity-icon svg { width: 12px; height: 12px; stroke: var(--t600); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.entity-type { font-size: 10.5px; font-weight: 600; color: var(--t800); white-space: nowrap; }
+
+.datasets-bar { margin-top: 11px; padding-top: 11px; border-top: 1px dashed var(--t200); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.datasets-label { font-family: 'DM Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--t600); margin-right: 2px; }
+.dataset-chip { font-family: 'DM Mono', monospace; font-size: 9px; padding: 3px 9px; background: var(--white); border: 1px solid var(--t200); border-radius: 4px; color: var(--t700); }
+
+/* ── ETL Layer ── */
+.etl-nodes { display: flex; gap: 0; align-items: stretch; }
+.etl-arrow { display: flex; align-items: center; color: var(--n300); font-size: 18px; padding: 0 2px; flex-shrink: 0; }
+.etl-node { background: var(--white); border: 1px solid var(--n200); border-radius: 8px; padding: 11px 13px; flex: 1; }
+.etl-step-hdr { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
+.etl-step-num { font-family: 'DM Mono', monospace; font-size: 9px; width: 18px; height: 18px; border-radius: 50%; background: var(--n100); border: 1px solid var(--n200); display: flex; align-items: center; justify-content: center; color: var(--n600); flex-shrink: 0; }
+.etl-step-name { font-size: 11px; font-weight: 600; color: var(--n800); }
+.etl-step-desc { font-size: 10px; color: var(--n500); line-height: 1.4; }
+
+/* ── Source Systems ── */
+.source-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.source-node { background: var(--n50); border: 1px solid var(--n200); border-radius: 8px; padding: 10px 13px; flex: 1; min-width: 100px; }
+.source-type { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--t600); margin-bottom: 3px; }
+.source-name { font-size: 11px; font-weight: 600; color: var(--n900); margin-bottom: 2px; }
+.source-ex { font-size: 10px; color: var(--n400); line-height: 1.4; }
+.source-tag { font-family: 'DM Mono', monospace; font-size: 8.5px; margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--n100); color: var(--t600); }
+
+/* ── Connectors ── */
+.arch-connector { display: flex; align-items: center; gap: 10px; padding: 6px 20px; }
+.conn-line { flex: 1; border-top: 1.5px dashed var(--n200); }
+.conn-pill { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--n400); text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; background: var(--white); padding: 3px 10px; border: 1px solid var(--n200); border-radius: 20px; }
+.conn-pill.mcp { color: var(--t700); border-color: var(--t200); background: var(--t50); font-weight: 500; }
+.conn-arrow { color: var(--n300); font-size: 15px; line-height: 1; flex-shrink: 0; }
+
+/* ── Callout ── */
+.rec-box { background: var(--t50); border: 1.5px solid var(--t200); border-radius: 12px; padding: 24px 28px; position: relative; overflow: hidden; margin-top: 18px; }
+.rec-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--t500); border-radius: 12px 0 0 12px; }
+.rec-box p { font-family: 'DM Serif Display', serif; font-size: 15px; font-weight: 400; line-height: 1.65; color: var(--t800); font-style: italic; }
+
+/* ── Principles ── */
+.principles-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 20px; }
+.principle-card { border-radius: 10px; padding: 18px 20px; border: 1.5px solid var(--t200); background: var(--t50); }
+.principle-num { font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500; color: var(--t500); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+.principle-title { font-family: 'DM Serif Display', serif; font-size: 15px; font-weight: 400; color: var(--t800); margin-bottom: 6px; }
+.principle-text { font-size: 11.5px; color: var(--n600); line-height: 1.55; }
+
+/* ── Footer ── */
+.doc-footer { margin: 40px 64px 0; padding: 16px 0; border-top: 1px solid var(--n100); display: flex; justify-content: space-between; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--n400); }
+
+@page { size: A4; margin: 14mm 0 12mm 0; }
+@page :first { margin: 0; }
+@media print {
+  *, *::before, *::after { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { font-size: 12px; }
+  .cover { min-height: 275mm; padding: 40px 56px; }
+  .slide { padding: 32px 56px 28px; }
+  .principle-card, .agent-card, .rec-box { break-inside: avoid; page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- SVG ICONS -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4 20h16L14 9.5V3"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="i-file-check" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></symbol>
+  <symbol id="i-bar-chart" viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-package" viewBox="0 0 24 24"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></symbol>
+  <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
+  <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"/><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/></symbol>
+  <symbol id="i-trending" viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></symbol>
+</svg>
+
+<!-- ░░ COVER ░░ -->
+<div class="cover">
+  <div class="cover-top">
+    <span class="cover-brand">Leucine</span>
+    <span class="cover-label">Architecture Overview</span>
+  </div>
+  <div class="cover-body">
+    <div class="cover-title">Agentic<br><em>Platform</em><br>Architecture</div>
+    <div class="cover-subtitle">How source systems, an agent-ready database, and engineered skills come together to perform quality work autonomously.</div>
+  </div>
+  <div class="cover-bottom">
+    <div class="cover-field"><span class="field-label">Platform</span><span class="field-value">LeucineOS Celestara</span></div>
+    <div class="cover-field"><span class="field-label">Layers</span><span class="field-value">5</span></div>
+    <div class="cover-field"><span class="field-label">Protocol</span><span class="field-value">MCP (End-to-End)</span></div>
+    <div class="cover-field"><span class="field-label">Date</span><span class="field-value">April 2026</span></div>
+  </div>
+</div>
+
+<!-- ░░ ARCHITECTURE SLIDE ░░ -->
+<section class="slide">
+  <div class="slide-meta"><div class="slide-num">01</div><span class="slide-tag">System Architecture</span></div>
+  <h2 class="slide-title">Five-Layer Agentic Platform</h2>
+
+  <div class="arch-diagram">
+
+    <!-- LAYER 5 · EXPERIENCE -->
+    <div class="arch-layer layer-exp">
+      <div class="layer-hdr">
+        <span class="layer-badge">Layer 5 · Experience</span>
+        <span class="layer-name">Application</span>
+        <span class="layer-desc">Chat interface · Persona dashboards · API gateway</span>
+      </div>
+      <div class="exp-grid">
+        <div>
+          <div class="exp-col-label">Platform</div>
+          <div class="exp-col-items">
+            <div class="exp-node"><div class="exp-icon"><svg><use href="#i-chat"/></svg></div><div><div class="exp-node-title">Chat Interface</div><div class="exp-node-sub">Primary interaction layer</div></div></div>
+            <div class="exp-node"><div class="exp-icon"><svg><use href="#i-grid"/></svg></div><div><div class="exp-node-title">API Gateway</div><div class="exp-node-sub">Embed intelligence externally</div></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="exp-col-label">Personas</div>
+          <div class="exp-persona-grid">
+            <div class="exp-node"><div class="exp-icon"><svg><use href="#i-clipboard"/></svg></div><div class="exp-node-title">QA Manager</div></div>
+            <div class="exp-node"><div class="exp-icon"><svg><use href="#i-search"/></svg></div><div class="exp-node-title">Investigator</div></div>
+            <div class="exp-node"><div class="exp-icon"><svg><use href="#i-flask"/></svg></div><div class="exp-node-title">Batch Release Lead</div></div>
+            <div class="exp-node"><div class="exp-icon"><svg><use href="#i-shield"/></svg></div><div class="exp-node-title">Regulatory Affairs</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-connector"><div class="conn-arrow">&#8597;</div><div class="conn-pill">REST / WebSocket / SSE</div><div class="conn-line"></div></div>
+
+    <!-- LAYER 4 · AGENTS -->
+    <div class="arch-layer layer-agents">
+      <div class="layer-hdr">
+        <span class="layer-badge">Layer 4 · Agents</span>
+        <span class="layer-name">Agent Layer</span>
+        <span class="layer-desc">Domain-specialized AI agents with engineered Skills</span>
+      </div>
+      <div class="agent-grid">
+        <div class="agent-card"><div class="agent-card-hdr"><div class="agent-icon"><svg><use href="#i-search"/></svg></div><div class="agent-card-name">Investigation Agent</div></div><div class="skill-tags"><span class="skill-tag">OOS Investigation</span><span class="skill-tag">Deviation Classification</span><span class="skill-tag">Root Cause Analysis</span></div></div>
+        <div class="agent-card"><div class="agent-card-hdr"><div class="agent-icon"><svg><use href="#i-file-check"/></svg></div><div class="agent-card-name">Batch Release Agent</div></div><div class="skill-tags"><span class="skill-tag">Record Review</span><span class="skill-tag">Exception Detection</span><span class="skill-tag">Disposition Support</span></div></div>
+        <div class="agent-card"><div class="agent-card-hdr"><div class="agent-icon"><svg><use href="#i-shield"/></svg></div><div class="agent-card-name">Regulatory Intel Agent</div></div><div class="skill-tags"><span class="skill-tag">FDA 483 Monitoring</span><span class="skill-tag">SOP Gap Analysis</span><span class="skill-tag">Impact Assessment</span></div></div>
+        <div class="agent-card"><div class="agent-card-hdr"><div class="agent-icon"><svg><use href="#i-bar-chart"/></svg></div><div class="agent-card-name">Manufacturing Intel Agent</div></div><div class="skill-tags"><span class="skill-tag">CPP Trend Analysis</span><span class="skill-tag">Drift Detection</span><span class="skill-tag">Root Cause Drill-Down</span></div></div>
+        <div class="agent-card"><div class="agent-card-hdr"><div class="agent-icon"><svg><use href="#i-settings"/></svg></div><div class="agent-card-name">CAPA Agent</div></div><div class="skill-tags"><span class="skill-tag">Action Planning</span><span class="skill-tag">Effectiveness Check</span></div></div>
+        <div class="agent-card"><div class="agent-card-hdr"><div class="agent-icon"><svg><use href="#i-refresh"/></svg></div><div class="agent-card-name">Change Control Agent</div></div><div class="skill-tags"><span class="skill-tag">Impact Analysis</span><span class="skill-tag">Risk Scoring</span><span class="skill-tag">Approval Routing</span></div></div>
+      </div>
+      <div class="mcp-bar agent-mcp">
+        <div class="mcp-bar-hdr"><span class="mcp-bar-label">MCP Tool Calls (logged and traceable)</span><div class="mcp-bar-line"></div></div>
+        <div class="mcp-tools-row">
+          <span class="mcp-tool">get_batch_record()</span><span class="mcp-tool">list_open_capas()</span><span class="mcp-tool">search_deviations()</span><span class="mcp-tool">query_entity()</span><span class="mcp-tool">get_related_entities()</span><span class="mcp-tool">semantic_search()</span><span class="mcp-tool">get_fda_observations()</span><span class="mcp-tool">get_process_parameters()</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-connector"><div class="conn-arrow">&#8597;</div><div class="conn-pill mcp">MCP Protocol</div><div class="conn-line"></div></div>
+
+    <!-- LAYER 3 · ONTOLOGY -->
+    <div class="arch-layer layer-ontology">
+      <div class="layer-hdr">
+        <span class="layer-badge">Layer 3 · Ontology</span>
+        <span class="layer-name">Ontology <span class="layer-name-sub">(Agent-Ready Database)</span></span>
+        <span class="layer-desc">Structured + unstructured data, unified</span>
+      </div>
+      <div class="entity-row">
+        <div class="entity-node"><div class="entity-icon"><svg><use href="#i-package"/></svg></div><div class="entity-type">Product</div></div>
+        <div class="entity-node"><div class="entity-icon"><svg><use href="#i-layers"/></svg></div><div class="entity-type">Batch</div></div>
+        <div class="entity-node"><div class="entity-icon"><svg><use href="#i-alert"/></svg></div><div class="entity-type">Deviation</div></div>
+        <div class="entity-node"><div class="entity-icon"><svg><use href="#i-settings"/></svg></div><div class="entity-type">CAPA</div></div>
+        <div class="entity-node"><div class="entity-icon"><svg><use href="#i-file-text"/></svg></div><div class="entity-type">SOP</div></div>
+        <div class="entity-node"><div class="entity-icon"><svg><use href="#i-tool"/></svg></div><div class="entity-type">Equipment</div></div>
+        <div class="entity-node"><div class="entity-icon"><svg><use href="#i-users"/></svg></div><div class="entity-type">Personnel</div></div>
+        <div class="entity-node"><div class="entity-icon"><svg><use href="#i-building"/></svg></div><div class="entity-type">Site</div></div>
+        <div class="entity-node"><div class="entity-icon"><svg><use href="#i-award"/></svg></div><div class="entity-type">Training</div></div>
+        <div class="entity-node"><div class="entity-icon"><svg><use href="#i-trending"/></svg></div><div class="entity-type">Process Data</div></div>
+      </div>
+      <div class="datasets-bar">
+        <span class="datasets-label">Stores</span>
+        <span class="dataset-chip">Entity Graph</span><span class="dataset-chip">Relationships</span><span class="dataset-chip">Event Log</span><span class="dataset-chip">Vector Embeddings</span><span class="dataset-chip">Audit Trail</span>
+      </div>
+    </div>
+
+    <div class="arch-connector"><div class="conn-arrow">&#8597;</div><div class="conn-pill mcp">MCP Protocol</div><div class="conn-line"></div></div>
+
+    <!-- LAYER 2 · DATA INTEGRATION -->
+    <div class="arch-layer layer-etl">
+      <div class="layer-hdr">
+        <span class="layer-badge">Layer 2 · Integration</span>
+        <span class="layer-name">Data Integration Layer</span>
+        <span class="layer-desc">Extract · Normalize · Validate · Enrich · Load</span>
+      </div>
+      <div class="etl-nodes">
+        <div class="etl-node"><div class="etl-step-hdr"><span class="etl-step-num">1</span><span class="etl-step-name">Extract</span></div><div class="etl-step-desc">Pull from source systems via MCP.</div></div>
+        <div class="etl-arrow">&#x203A;</div>
+        <div class="etl-node"><div class="etl-step-hdr"><span class="etl-step-num">2</span><span class="etl-step-name">Normalize</span></div><div class="etl-step-desc">Harmonize schemas and field names.</div></div>
+        <div class="etl-arrow">&#x203A;</div>
+        <div class="etl-node"><div class="etl-step-hdr"><span class="etl-step-num">3</span><span class="etl-step-name">Validate</span></div><div class="etl-step-desc">Quality, completeness, dedup.</div></div>
+        <div class="etl-arrow">&#x203A;</div>
+        <div class="etl-node"><div class="etl-step-hdr"><span class="etl-step-num">4</span><span class="etl-step-name">Enrich</span></div><div class="etl-step-desc">Infer cross-entity relationships.</div></div>
+        <div class="etl-arrow">&#x203A;</div>
+        <div class="etl-node"><div class="etl-step-hdr"><span class="etl-step-num">5</span><span class="etl-step-name">Load</span></div><div class="etl-step-desc">Write to the agent-ready database.</div></div>
+      </div>
+      <div class="mcp-bar etl-mcp">
+        <div class="mcp-bar-hdr"><span class="mcp-bar-label">MCP Integration Protocol (one pattern, every source system)</span><div class="mcp-bar-line"></div></div>
+      </div>
+    </div>
+
+    <div class="arch-connector"><div class="conn-arrow">&#8597;</div><div class="conn-pill mcp">MCP Protocol</div><div class="conn-line"></div></div>
+
+    <!-- LAYER 1 · SOURCES -->
+    <div class="arch-layer layer-sources">
+      <div class="layer-hdr">
+        <span class="layer-badge">Layer 1 · Sources</span>
+        <span class="layer-name">Pharma Data Sources</span>
+        <span class="layer-desc">Enterprise systems of record</span>
+      </div>
+      <div class="source-row">
+        <div class="source-node"><div class="source-type">ERP</div><div class="source-name">SAP</div><div class="source-ex">Materials, BOMs, Production Orders</div><div class="source-tag">Integrated: Active</div></div>
+        <div class="source-node"><div class="source-type">QMS</div><div class="source-name">AmpleLogic</div><div class="source-ex">Deviations, CAPAs, Change Controls</div><div class="source-tag">Integrated: Active</div></div>
+        <div class="source-node"><div class="source-type">LIMS</div><div class="source-name">Laboratory System</div><div class="source-ex">Lab Results, Specs, OOS Events</div><div class="source-tag">Integrated: Active</div></div>
+        <div class="source-node"><div class="source-type">Paper Records</div><div class="source-name">Batch Records</div><div class="source-ex">Paper BMRs, Logbooks, Protocols</div><div class="source-tag">Unstructured Data</div></div>
+        <div class="source-node"><div class="source-type">DMS</div><div class="source-name">Document Management</div><div class="source-ex">SOPs, Validation Protocols</div></div>
+        <div class="source-node"><div class="source-type">Regulatory</div><div class="source-name">FDA Consolidated DB</div><div class="source-ex">483s, Warning Letters, Inspections</div><div class="source-tag">Leucine: Integrated</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="rec-box">
+    <p>Every agent action passes through MCP and is mediated by the ontology. Agents never query source systems directly. All reads and writes create a single, traceable record of every AI action taken on the platform.</p>
+  </div>
+
+  <!-- PRINCIPLES -->
+  <div class="principles-row">
+    <div class="principle-card"><div class="principle-num">Principle 01</div><div class="principle-title">MCP End-to-End</div><div class="principle-text">One standardized protocol from source systems through the ontology to agent actions. No translation layers, no middleware gaps.</div></div>
+    <div class="principle-card"><div class="principle-num">Principle 02</div><div class="principle-title">Agent-Ready Database</div><div class="principle-text">Structured process data and unstructured paper records in one unified layer. The agent accesses everything the way your QA team thinks about it.</div></div>
+    <div class="principle-card"><div class="principle-num">Principle 03</div><div class="principle-title">Skills, Not Prompts</div><div class="principle-text">Engineered procedures with defined inputs, outputs, and guardrails at every step. Refined across pharma companies, adapted to your process.</div></div>
+  </div>
+</section>
+
+<div class="doc-footer">
+  <span>LeucineOS Celestara · Architecture Overview</span>
+  <span>April 2026</span>
+</div>
+</body>
+</html>
