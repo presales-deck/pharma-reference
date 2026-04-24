@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MES Deep Dive — ERP, MES & OSD Manufacturing</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f2ed;
+  --surface: #ffffff;
+  --surface2: #f0ede8;
+  --surface3: #ebe7e1;
+  --border: rgba(0,0,0,0.10);
+  --border2: rgba(0,0,0,0.06);
+  --accent: #006a5a;
+  --accent2: #005fa3;
+  --accent3: #b85c00;
+  --accent4: #6030b0;
+  --accent5: #a02020;
+  --text: #1a1714;
+  --muted: #9a948e;
+  --muted2: #5c5650;
+  --success: #006a5a;
+  --warning: #b85c00;
+  --danger: #a02020;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Instrument Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  overflow-x:hidden;
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.16);border-radius:3px;}
+
+/* ─── NAV ─── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:999;
+  background:rgba(245,242,237,0.96);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border2);
+  padding:0 1.5rem;
+  display:flex;align-items:center;height:56px;gap:0;
+}
+.nav-logo{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.75rem;color:var(--accent);
+  letter-spacing:0.1em;margin-right:1.5rem;
+  white-space:nowrap;
+}
+.nav-links{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;flex:1;}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-link{
+  padding:0 0.9rem;height:56px;
+  display:flex;align-items:center;
+  font-size:0.73rem;font-weight:500;
+  color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all 0.2s;white-space:nowrap;
+  letter-spacing:0.03em;
+}
+.nav-link:hover,.nav-link.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* ─── HERO ─── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  text-align:center;padding:80px 2rem 4rem;
+  position:relative;overflow:hidden;
+}
+.hero-dots{
+  position:absolute;inset:0;
+  background-image:radial-gradient(rgba(0,106,90,0.07) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+.hero-glow1{
+  position:absolute;width:500px;height:500px;
+  background:radial-gradient(circle,rgba(0,106,90,0.04) 0%,transparent 70%);
+  top:30%;left:20%;transform:translate(-50%,-50%);pointer-events:none;
+}
+.hero-glow2{
+  position:absolute;width:400px;height:400px;
+  background:radial-gradient(circle,rgba(0,95,163,0.03) 0%,transparent 70%);
+  top:60%;left:75%;transform:translate(-50%,-50%);pointer-events:none;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  background:rgba(0,106,90,0.07);
+  border:1px solid rgba(0,106,90,0.22);
+  color:var(--accent);
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.65rem;letter-spacing:0.14em;
+  padding:0.35rem 1rem;border-radius:100px;
+  margin-bottom:2rem;
+  animation:fadeUp 0.6s ease both;
+}
+.hero h1{
+  font-family:'Fraunces',serif;
+  font-size:clamp(2.6rem,5.5vw,4.8rem);
+  line-height:1.08;margin-bottom:1.5rem;
+  animation:fadeUp 0.6s 0.1s ease both;
+  letter-spacing:-0.02em;
+}
+.hero h1 em{color:var(--accent);font-style:italic;}
+.hero h1 .blue{color:var(--accent2);}
+.hero-sub{
+  font-size:1.05rem;color:var(--muted2);
+  max-width:580px;margin-bottom:3rem;
+  animation:fadeUp 0.6s 0.2s ease both;
+  line-height:1.7;
+}
+.hero-pills{
+  display:flex;gap:0.75rem;flex-wrap:wrap;
+  justify-content:center;
+  animation:fadeUp 0.6s 0.3s ease both;
+}
+.pill{
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:0.6rem 1.2rem;border-radius:100px;
+  cursor:pointer;transition:all 0.2s;
+  font-size:0.82rem;font-weight:500;
+  display:flex;align-items:center;gap:0.4rem;
+}
+.pill:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px);}
+.pill .pn{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--accent);opacity:0.7;}
+
+/* ─── LAYOUT ─── */
+.wrap{max-width:1160px;margin:0 auto;padding:4.5rem 2rem;}
+
+/* ─── CHAPTER HEADER ─── */
+.ch{
+  background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);
+  border:1px solid var(--border);
+  border-radius:20px;padding:2.5rem;
+  margin-bottom:3rem;position:relative;overflow:hidden;
+}
+.ch::after{
+  content:attr(data-n);
+  position:absolute;right:2rem;top:50%;
+  transform:translateY(-50%);
+  font-family:'Fraunces',serif;
+  font-size:9rem;color:rgba(0,0,0,0.04);
+  pointer-events:none;line-height:1;
+}
+.ch-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.65rem;letter-spacing:0.14em;
+  color:var(--accent);text-transform:uppercase;margin-bottom:0.6rem;
+}
+.ch-title{
+  font-family:'Fraunces',serif;
+  font-size:clamp(1.7rem,2.8vw,2.5rem);
+  line-height:1.15;margin-bottom:0.6rem;
+}
+.ch-sub{color:var(--muted2);font-size:0.95rem;max-width:580px;}
+
+/* ─── STICKY LABEL ─── */
+.sticky{
+  position:sticky;top:56px;z-index:100;
+  background:var(--bg);padding:0.5rem 0;
+  border-bottom:1px solid var(--border2);
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.62rem;letter-spacing:0.1em;
+  color:var(--muted);text-transform:uppercase;
+  display:flex;align-items:center;gap:0.6rem;
+  margin-bottom:2.5rem;
+}
+.sticky span{color:var(--accent);}
+
+/* ─── SECTION LABELS ─── */
+.s-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.65rem;letter-spacing:0.14em;
+  color:var(--accent);text-transform:uppercase;
+  margin-bottom:0.5rem;
+}
+.s-title{
+  font-family:'Fraunces',serif;
+  font-size:clamp(1.6rem,2.4vw,2.2rem);
+  line-height:1.2;margin-bottom:0.75rem;
+}
+.s-desc{color:var(--muted2);font-size:0.92rem;max-width:620px;margin-bottom:2.5rem;}
+
+/* ─── CARDS ─── */
+.grid{display:grid;gap:1.25rem;}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr));}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));}
+.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));}
+
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:1.8rem;
+  transition:all 0.25s;position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;inset:0;
+  border-radius:inherit;opacity:0;transition:opacity 0.25s;
+}
+.card.ca::before{background:linear-gradient(135deg,rgba(0,106,90,0.05),transparent 60%);}
+.card.cb::before{background:linear-gradient(135deg,rgba(0,95,163,0.05),transparent 60%);}
+.card.cc::before{background:linear-gradient(135deg,rgba(184,92,0,0.05),transparent 60%);}
+.card.cd::before{background:linear-gradient(135deg,rgba(96,48,176,0.05),transparent 60%);}
+.card.ce::before{background:linear-gradient(135deg,rgba(160,32,32,0.05),transparent 60%);}
+.card:hover::before{opacity:1;}
+.card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,0.09);}
+
+.c-icon{
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.15rem;margin-bottom:1rem;
+}
+.ia{background:rgba(0,106,90,0.08);}
+.ib{background:rgba(0,95,163,0.08);}
+.ic{background:rgba(184,92,0,0.08);}
+.id{background:rgba(96,48,176,0.08);}
+.ie{background:rgba(160,32,32,0.08);}
+
+.card h3{font-size:0.98rem;font-weight:600;margin-bottom:0.5rem;}
+.card p{font-size:0.85rem;color:var(--muted2);line-height:1.6;}
+
+/* ─── INFO / WARN BOXES ─── */
+.ibox{
+  background:rgba(0,95,163,0.04);
+  border:1px solid rgba(0,95,163,0.15);
+  border-left:4px solid var(--accent2);
+  border-radius:0 12px 12px 0;
+  padding:1.1rem 1.4rem;margin:1.5rem 0;font-size:0.88rem;
+}
+.ibox strong{color:var(--accent2);}
+.wbox{
+  background:rgba(184,92,0,0.04);
+  border:1px solid rgba(184,92,0,0.15);
+  border-left:4px solid var(--warning);
+  border-radius:0 12px 12px 0;
+  padding:1.1rem 1.4rem;margin:1.5rem 0;font-size:0.88rem;
+}
+.wbox strong{color:var(--warning);}
+.abox{
+  background:rgba(0,106,90,0.04);
+  border:1px solid rgba(0,106,90,0.15);
+  border-left:4px solid var(--accent);
+  border-radius:0 12px 12px 0;
+  padding:1.1rem 1.4rem;margin:1.5rem 0;font-size:0.88rem;
+}
+.abox strong{color:var(--accent);}
+
+/* ─── DEEP LINKS ─── */
+.dl{
+  display:inline-flex;align-items:center;gap:0.3em;
+  color:var(--accent2);font-size:0.75rem;
+  font-family:'JetBrains Mono',monospace;
+  text-decoration:none;border-bottom:1px dashed rgba(0,95,163,0.35);
+  padding-bottom:1px;transition:all 0.2s;
+}
+.dl:hover{color:#003d6b;border-bottom-color:#003d6b;}
+.dl.v{color:var(--accent3);border-bottom-color:rgba(184,92,0,0.4);}
+.dl.v:hover{color:#8a4400;border-bottom-color:#8a4400;}
+.dl.g{color:var(--accent);border-bottom-color:rgba(0,106,90,0.4);}
+.dl.g:hover{color:#003d33;border-bottom-color:#003d33;}
+
+/* ─── ERP FLOW DIAGRAM ─── */
+.erp-flow{margin:2.5rem 0;}
+.erp-row{display:flex;align-items:stretch;gap:0;margin-bottom:0;}
+
+.erp-system{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:14px;padding:1.4rem 1.6rem;
+  flex:1;position:relative;transition:all 0.25s;cursor:default;
+}
+.erp-system:hover{border-color:var(--accent2);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.08);}
+.erp-sys-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;letter-spacing:0.12em;
+  color:var(--muted);text-transform:uppercase;margin-bottom:0.4rem;
+}
+.erp-sys-name{font-size:1rem;font-weight:600;margin-bottom:0.5rem;}
+.erp-sys-desc{font-size:0.8rem;color:var(--muted2);line-height:1.5;}
+.erp-arrow{
+  display:flex;align-items:center;justify-content:center;
+  padding:0 0.6rem;color:var(--muted);font-size:1rem;
+  flex-shrink:0;
+}
+
+/* ─── WHO DOES WHAT TABLE ─── */
+.who-table{width:100%;border-collapse:collapse;font-size:0.85rem;margin:1.5rem 0;}
+.who-table th{
+  background:var(--surface2);padding:0.75rem 1rem;
+  text-align:left;font-family:'JetBrains Mono',monospace;
+  font-size:0.62rem;letter-spacing:0.08em;color:var(--muted);
+  text-transform:uppercase;border-bottom:1px solid var(--border);
+}
+.who-table td{
+  padding:0.85rem 1rem;border-bottom:1px solid var(--border);
+}
+.who-table tr:hover td{background:var(--surface2);}
+.role-chip{
+  font-family:'JetBrains Mono',monospace;font-size:0.6rem;
+  padding:0.15rem 0.55rem;border-radius:5px;font-weight:600;
+  letter-spacing:0.04em;white-space:nowrap;
+}
+.rc-planner{background:rgba(0,95,163,0.09);color:var(--accent2);}
+.rc-buyer{background:rgba(0,106,90,0.09);color:var(--accent);}
+.rc-prod{background:rgba(184,92,0,0.09);color:var(--accent3);}
+.rc-qa{background:rgba(96,48,176,0.09);color:var(--accent4);}
+.rc-finance{background:rgba(160,32,32,0.09);color:var(--accent5);}
+.rc-warehouse{background:rgba(184,92,0,0.09);color:var(--warning);}
+
+/* ─── ERP→MES HANDOFF VISUAL ─── */
+.handoff{
+  display:flex;align-items:center;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:0;overflow:hidden;
+  margin:2rem 0;
+}
+.handoff-side{
+  flex:1;padding:1.8rem;
+}
+.handoff-left{background:rgba(0,95,163,0.03);border-right:1px solid var(--border);}
+.handoff-right{background:rgba(0,106,90,0.03);}
+.handoff-mid{
+  width:80px;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0.3rem;padding:1.5rem 0.5rem;
+  background:var(--surface2);
+}
+.handoff-mid .arr{font-size:1.4rem;color:var(--accent);}
+.handoff-mid .lbl{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.55rem;letter-spacing:0.1em;
+  color:var(--muted);text-transform:uppercase;
+  writing-mode:vertical-rl;text-orientation:mixed;
+}
+.handoff-sys{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;letter-spacing:0.12em;
+  color:var(--muted);text-transform:uppercase;margin-bottom:0.4rem;
+}
+.handoff-name{font-size:0.95rem;font-weight:600;margin-bottom:0.75rem;}
+.handoff-items{display:flex;flex-direction:column;gap:0.4rem;}
+.h-item{
+  display:flex;align-items:center;gap:0.6rem;
+  font-size:0.82rem;color:var(--muted2);
+}
+.h-item::before{
+  content:'→';font-family:'JetBrains Mono',monospace;
+  font-size:0.7rem;color:var(--accent);flex-shrink:0;
+}
+
+/* ─── OSD PROCESS FLOW ─── */
+.osd-flow{margin:2.5rem 0;}
+.osd-steps{display:flex;flex-direction:column;gap:0;position:relative;}
+.osd-steps::before{
+  content:'';position:absolute;
+  left:24px;top:50px;bottom:50px;width:2px;
+  background:linear-gradient(to bottom,var(--accent),var(--accent2),var(--accent3),var(--accent4),var(--accent5));opacity:0.55;
+}
+
+.osd-step{
+  display:flex;gap:1.25rem;
+  align-items:flex-start;padding:1rem 0;
+  cursor:pointer;position:relative;
+}
+.osd-dot{
+  width:50px;height:50px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;font-weight:600;
+  flex-shrink:0;position:relative;z-index:1;
+  transition:all 0.2s;border:2px solid transparent;
+}
+.osd-step:hover .osd-dot{transform:scale(1.12);}
+.d1{background:rgba(0,106,90,0.10);color:var(--accent);border-color:var(--accent);}
+.d2{background:rgba(0,95,163,0.10);color:var(--accent2);border-color:var(--accent2);}
+.d3{background:rgba(184,92,0,0.10);color:var(--accent3);border-color:var(--accent3);}
+.d4{background:rgba(96,48,176,0.10);color:var(--accent4);border-color:var(--accent4);}
+.d5{background:rgba(160,32,32,0.10);color:var(--accent5);border-color:var(--accent5);}
+.d6{background:rgba(184,92,0,0.10);color:var(--warning);border-color:var(--warning);}
+.d7{background:rgba(0,106,90,0.10);color:var(--accent);border-color:var(--accent);}
+.d8{background:rgba(0,95,163,0.10);color:var(--accent2);border-color:var(--accent2);}
+.d9{background:rgba(184,92,0,0.10);color:var(--accent3);border-color:var(--accent3);}
+.d10{background:rgba(96,48,176,0.10);color:var(--accent4);border-color:var(--accent4);}
+
+.osd-body{
+  flex:1;background:var(--surface);
+  border:1px solid var(--border);border-radius:14px;
+  padding:1.4rem;transition:all 0.2s;
+}
+.osd-step:hover .osd-body{border-color:rgba(0,106,90,0.25);box-shadow:0 4px 14px rgba(0,0,0,0.08);}
+
+.osd-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.4rem;gap:0.75rem;}
+.osd-title{font-size:0.97rem;font-weight:600;}
+.tag-row{display:flex;gap:0.35rem;flex-wrap:wrap;flex-shrink:0;}
+.tag{
+  font-family:'JetBrains Mono',monospace;font-size:0.58rem;
+  padding:0.12rem 0.45rem;border-radius:4px;font-weight:700;
+  letter-spacing:0.04em;
+}
+.tqa{background:rgba(0,106,90,0.08);color:var(--accent);border:1px solid rgba(0,106,90,0.2);}
+.tauto{background:rgba(0,95,163,0.08);color:var(--accent2);border:1px solid rgba(0,95,163,0.2);}
+.tcrit{background:rgba(160,32,32,0.08);color:var(--accent5);border:1px solid rgba(160,32,32,0.2);}
+.tipc{background:rgba(184,92,0,0.08);color:var(--accent3);border:1px solid rgba(184,92,0,0.2);}
+
+.osd-desc{font-size:0.84rem;color:var(--muted2);margin-bottom:0.5rem;}
+
+.osd-detail{
+  display:none;border-top:1px solid var(--border);
+  padding-top:1rem;margin-top:0.5rem;
+  animation:slideD 0.25s ease;
+}
+.osd-detail.open{display:block;}
+
+.detail-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:0.65rem;margin-bottom:0.75rem;
+}
+.df{
+  background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  padding:0.7rem 0.85rem;font-size:0.8rem;
+}
+.df label{
+  display:block;font-family:'JetBrains Mono',monospace;
+  font-size:0.58rem;letter-spacing:0.08em;
+  color:var(--muted);text-transform:uppercase;margin-bottom:0.25rem;
+}
+.df .v{font-weight:500;color:var(--text);}
+.df .v.hi{color:var(--accent);}
+.df .v.wa{color:var(--warning);}
+.df .v.da{color:var(--danger);}
+
+.step-links{
+  display:flex;gap:0.75rem;flex-wrap:wrap;
+  padding-top:0.75rem;border-top:1px solid var(--border);
+  margin-top:0.5rem;
+}
+
+/* ─── OSD SUMMARY TABLE ─── */
+.osd-table{width:100%;border-collapse:collapse;font-size:0.83rem;margin:1.5rem 0;}
+.osd-table th{
+  background:var(--surface2);padding:0.7rem 0.9rem;
+  text-align:left;font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;letter-spacing:0.08em;color:var(--muted);
+  text-transform:uppercase;border-bottom:1px solid var(--border);
+}
+.osd-table td{padding:0.75rem 0.9rem;border-bottom:1px solid var(--border);}
+.osd-table tr:hover td{background:var(--surface2);}
+.sc{
+  font-family:'JetBrains Mono',monospace;font-size:0.58rem;
+  padding:0.12rem 0.45rem;border-radius:4px;font-weight:700;
+}
+.sc-done{background:rgba(0,106,90,0.08);color:var(--accent);}
+.sc-prog{background:rgba(0,95,163,0.08);color:var(--accent2);}
+.sc-pend{background:rgba(184,92,0,0.08);color:var(--accent3);}
+
+/* ─── TABLET ANATOMY ─── */
+.tablet-anatomy{
+  display:flex;flex-direction:column;align-items:center;
+  margin:2rem 0;gap:0;
+}
+.layer-wrap{width:100%;max-width:700px;}
+.t-layer{
+  padding:1rem 1.5rem;text-align:center;
+  cursor:pointer;transition:all 0.2s;
+  border:1px solid var(--border);
+  margin:2px 0;
+  position:relative;
+}
+.t-layer:first-child{border-radius:16px 16px 0 0;}
+.t-layer:last-child{border-radius:0 0 16px 16px;}
+.t-layer:hover{filter:brightness(0.97);}
+
+.tl1{background:rgba(0,95,163,0.07);border:1px solid rgba(0,95,163,0.18);width:100%;}
+.tl2{background:rgba(0,106,90,0.06);border:1px solid rgba(0,106,90,0.16);width:92%;margin:2px auto;}
+.tl3{background:rgba(96,48,176,0.06);border:1px solid rgba(96,48,176,0.16);width:82%;margin:2px auto;}
+.tl4{background:rgba(184,92,0,0.06);border:1px solid rgba(184,92,0,0.16);width:68%;margin:2px auto;}
+.tl5{background:rgba(160,32,32,0.07);border:1px solid rgba(160,32,32,0.16);width:52%;margin:2px auto;border-radius:100px;}
+
+.t-layer-name{font-size:0.88rem;font-weight:600;margin-bottom:0.2rem;}
+.t-layer-desc{font-size:0.76rem;color:var(--muted2);}
+
+/* ─── CQA TABLE ─── */
+.cqa-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.7rem 0;border-bottom:1px solid var(--border);
+  font-size:0.85rem;
+}
+.cqa-row:last-child{border-bottom:none;}
+.cqa-name{flex:1;font-weight:500;}
+.cqa-spec{
+  font-family:'JetBrains Mono',monospace;font-size:0.75rem;
+  color:var(--accent);background:rgba(0,106,90,0.08);border:1px solid rgba(0,106,90,0.18);
+  padding:0.15rem 0.5rem;border-radius:5px;
+}
+.cqa-why{flex:1.5;font-size:0.78rem;color:var(--muted2);padding-left:1rem;}
+
+/* ─── ERP LIFECYCLE VISUAL ─── */
+.lifecycle{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:0;margin:2rem 0;
+  border:1px solid var(--border);border-radius:16px;overflow:hidden;
+}
+.lc-step{
+  padding:1.4rem 1rem;text-align:center;
+  border-right:1px solid var(--border);
+  position:relative;transition:all 0.2s;cursor:pointer;
+}
+.lc-step:last-child{border-right:none;}
+.lc-step:hover{background:var(--surface2);}
+.lc-step::after{
+  content:'→';
+  position:absolute;right:-10px;top:50%;
+  transform:translateY(-50%);
+  font-size:1rem;color:var(--muted);z-index:2;
+}
+.lc-step:last-child::after{display:none;}
+.lc-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.6rem;color:var(--muted);margin-bottom:0.4rem;
+  letter-spacing:0.08em;
+}
+.lc-icon{font-size:1.5rem;margin-bottom:0.4rem;}
+.lc-name{font-size:0.8rem;font-weight:600;margin-bottom:0.2rem;}
+.lc-who{
+  font-size:0.7rem;color:var(--muted2);
+}
+
+/* ─── ERP MODULES VISUAL ─── */
+.erp-modules{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:1rem;margin:2rem 0;
+}
+.erp-mod{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:1.2rem;
+  transition:all 0.2s;
+}
+.erp-mod:hover{border-color:var(--accent2);transform:translateY(-2px);}
+.em-icon{font-size:1.3rem;margin-bottom:0.5rem;}
+.em-name{font-size:0.88rem;font-weight:600;margin-bottom:0.3rem;}
+.em-desc{font-size:0.78rem;color:var(--muted2);line-height:1.5;}
+
+/* ─── RESOURCE CARDS ─── */
+.res-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1rem;margin-top:1.5rem;
+}
+.res-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:1.2rem 1.3rem;
+  text-decoration:none;color:var(--text);
+  display:flex;flex-direction:column;gap:0.45rem;
+  transition:all 0.2s;position:relative;
+}
+.res-card:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,0.09);}
+.res-card.rv{border-color:rgba(184,92,0,0.18);}
+.res-card.rv:hover{border-color:var(--accent3);}
+.res-card.ra{border-color:rgba(0,106,90,0.18);}
+.res-card.ra:hover{border-color:var(--accent);}
+.res-card.rs{border-color:rgba(96,48,176,0.18);}
+.res-card.rs:hover{border-color:var(--accent4);}
+.res-card.rc{border-color:rgba(0,95,163,0.18);}
+.res-card.rc:hover{border-color:var(--accent2);}
+.res-badge{
+  font-family:'JetBrains Mono',monospace;font-size:0.58rem;
+  letter-spacing:0.08em;padding:0.15rem 0.5rem;
+  border-radius:4px;font-weight:700;width:fit-content;
+}
+.rv .res-badge{background:rgba(184,92,0,0.08);color:var(--accent3);}
+.ra .res-badge{background:rgba(0,106,90,0.08);color:var(--accent);}
+.rs .res-badge{background:rgba(96,48,176,0.08);color:var(--accent4);}
+.rc .res-badge{background:rgba(0,95,163,0.08);color:var(--accent2);}
+.res-title{font-size:0.88rem;font-weight:600;line-height:1.4;}
+.res-desc{font-size:0.78rem;color:var(--muted2);line-height:1.5;}
+.res-meta{
+  font-family:'JetBrains Mono',monospace;font-size:0.62rem;
+  color:var(--muted);margin-top:auto;padding-top:0.4rem;
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;
+}
+.res-arr{
+  position:absolute;top:1rem;right:1rem;
+  font-size:0.75rem;opacity:0.25;transition:all 0.2s;
+}
+.res-card:hover .res-arr{opacity:1;transform:translate(2px,-2px);}
+
+.res-cat{
+  font-family:'JetBrains Mono',monospace;font-size:0.65rem;
+  letter-spacing:0.12em;color:var(--muted);
+  text-transform:uppercase;margin:2.5rem 0 1rem;
+  display:flex;align-items:center;gap:0.6rem;
+}
+.res-cat::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ─── QUIZ ─── */
+.quiz-wrap{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:2rem;margin:2rem 0;
+}
+.q-text{font-size:0.98rem;font-weight:600;margin-bottom:1.4rem;line-height:1.5;}
+.q-opts{display:flex;flex-direction:column;gap:0.65rem;margin-bottom:1.4rem;}
+.q-opt{
+  padding:0.85rem 1.1rem;
+  border:1px solid var(--border);border-radius:10px;
+  cursor:pointer;font-size:0.87rem;
+  transition:all 0.2s;background:var(--surface2);
+}
+.q-opt:hover{border-color:var(--accent2);background:var(--surface3);}
+.q-opt.correct{border-color:var(--accent)!important;background:rgba(0,106,90,0.07)!important;color:var(--accent);}
+.q-opt.wrong{border-color:var(--danger)!important;background:rgba(160,32,32,0.06)!important;color:var(--danger);}
+.q-fb{padding:0.9rem 1.1rem;border-radius:10px;font-size:0.87rem;display:none;}
+.q-fb.show{display:block;}
+.q-fb.ok{background:rgba(0,106,90,0.07);color:var(--accent);border:1px solid rgba(0,106,90,0.2);}
+.q-fb.bad{background:rgba(160,32,32,0.06);color:var(--danger);border:1px solid rgba(160,32,32,0.18);}
+.q-nav{display:flex;gap:1rem;align-items:center;margin-top:1.4rem;}
+.q-ctr{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--muted);margin-left:auto;}
+.score-box{text-align:center;padding:2rem;}
+.score-big{font-family:'Fraunces',serif;font-size:4.5rem;color:var(--accent);display:block;line-height:1;}
+.score-label{font-size:1.1rem;font-weight:600;margin:0.75rem 0 0.4rem;}
+.score-sub{font-size:0.88rem;color:var(--muted2);}
+
+/* ─── BUTTONS ─── */
+.btn{
+  padding:0.65rem 1.4rem;border-radius:9px;
+  border:1px solid var(--border);background:transparent;
+  color:var(--text);font-family:'Instrument Sans',sans-serif;
+  font-size:0.85rem;font-weight:500;cursor:pointer;
+  transition:all 0.2s;
+}
+.btn:hover{background:var(--surface2);border-color:var(--accent);color:var(--accent);}
+.btn.primary{background:var(--accent);color:#ffffff;border-color:var(--accent);font-weight:600;}
+.btn.primary:hover{background:#00564a;}
+.btn:disabled{opacity:0.35;cursor:not-allowed;}
+
+/* ─── DIVIDER ─── */
+hr.div{border:none;border-top:1px solid var(--border);margin:3.5rem 0;}
+
+/* ─── FOOTER ─── */
+footer{
+  text-align:center;padding:3.5rem 2rem;
+  border-top:1px solid var(--border);
+  color:var(--muted);font-size:0.83rem;
+}
+footer strong{color:var(--accent);}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(18px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes slideD{
+  from{opacity:0;transform:translateY(-6px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:700px){
+  .nav-links{display:none;}
+  .handoff{flex-direction:column;}
+  .handoff-mid{width:100%;height:50px;flex-direction:row;writing-mode:initial;}
+  .handoff-left{border-right:none;border-bottom:1px solid var(--border);}
+  .osd-steps::before{left:20px;}
+  .osd-dot{width:42px;height:42px;font-size:0.65rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">◈ MES TRAINING</div>
+  <div class="nav-links">
+    <div class="nav-link active" onclick="gotoSection('what-is-erp')">What is ERP?</div>
+    <div class="nav-link" onclick="gotoSection('erp-to-mes')">ERP → MES</div>
+    <div class="nav-link" onclick="gotoSection('what-is-mes')">What is MES?</div>
+    <div class="nav-link" onclick="gotoSection('tablet-anatomy')">Tablet Anatomy</div>
+    <div class="nav-link" onclick="gotoSection('osd-process')">OSD Process</div>
+    <div class="nav-link" onclick="gotoSection('ipc-specs')">IPC & Specs</div>
+    <div class="nav-link" onclick="gotoSection('resources')">Resources</div>
+    <div class="nav-link" onclick="gotoSection('quiz')">Quiz</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="top">
+  <div class="hero-dots"></div>
+  <div class="hero-glow1"></div>
+  <div class="hero-glow2"></div>
+  <div style="position:relative;z-index:1;">
+    <div class="hero-badge">◈ ERP, MES &amp; OSD Manufacturing Guide</div>
+    <h1>From <em>ERP Order</em><br>to <span class="blue">Packaged Tablet</span></h1>
+    <p class="hero-sub">A complete visual guide to how ERP, MES, and pharmaceutical manufacturing connect — with a full walkthrough of OSD tablet manufacturing from raw material to release.</p>
+    <div class="hero-pills">
+      <div class="pill" onclick="gotoSection('what-is-erp')"><span class="pn">01</span> What is ERP?</div>
+      <div class="pill" onclick="gotoSection('erp-to-mes')"><span class="pn">02</span> ERP → MES Handoff</div>
+      <div class="pill" onclick="gotoSection('osd-process')"><span class="pn">03</span> OSD Tablet Process</div>
+      <div class="pill" onclick="gotoSection('quiz')"><span class="pn">04</span> Test Yourself</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     CHAPTER 1 — WHAT IS ERP
+════════════════════════════════════════════ -->
+<div id="what-is-erp"></div>
+<div class="wrap">
+  <div class="sticky"><span>Chapter 01</span> — What is ERP & Where Does Manufacturing Start?</div>
+
+  <div class="ch" data-n="01">
+    <div class="ch-label">The Starting Point</div>
+    <div class="ch-title">Every Tablet Starts With<br>an Order in ERP</div>
+    <p class="ch-sub">Before a single gram of powder is weighed, before any equipment starts — a customer order lands in an ERP system. Understanding ERP is understanding where pharmaceutical manufacturing truly begins.</p>
+  </div>
+
+  <div class="s-label">Definition</div>
+  <div class="s-title" style="font-size:1.7rem;">What is ERP?</div>
+
+  <div class="ibox">
+    <strong>ERP (Enterprise Resource Planning)</strong> is the central business software that runs the entire company — sales, procurement, inventory, finance, HR, and production planning. In pharma, systems like SAP or Oracle ERP receive customer orders and translate them into manufacturing instructions that eventually reach the factory floor.
+    <br><br>
+    <a class="dl v" href="https://www.youtube.com/watch?v=rCQlTs_S6bA" target="_blank">▶ SAP ERP Intro (Video)</a> &nbsp;&nbsp;
+    <a class="dl" href="https://www.sap.com/products/erp.html" target="_blank">↗ SAP ERP Overview</a>
+  </div>
+
+  <div class="grid g3" style="margin-top:2rem;">
+    <div class="card ca">
+      <div class="c-icon ia">🏢</div>
+      <h3>One System for the Whole Company</h3>
+      <p>ERP connects every department — Sales, Finance, Procurement, HR, Production — into a single unified platform. Everyone sees the same data in real time.</p>
+    </div>
+    <div class="card cb">
+      <div class="c-icon ib">📦</div>
+      <h3>Demand → Supply Chain</h3>
+      <p>When a customer order arrives, ERP automatically calculates what needs to be manufactured, what materials need to be ordered, and when everything must be ready.</p>
+    </div>
+    <div class="card cc">
+      <div class="c-icon ic">🏭</div>
+      <h3>Creates Work Orders for MES</h3>
+      <p>ERP creates a "Work Order" (WO) — essentially a production ticket — that flows down to MES. MES then guides the actual manufacturing step by step.</p>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <!-- ERP MODULES -->
+  <div class="s-label">ERP Architecture</div>
+  <div class="s-title" style="font-size:1.7rem;">Core ERP Modules in Pharma</div>
+  <p class="s-desc">A pharma ERP isn't one thing — it's a suite of modules. Each module owns a piece of the business. Here's what each one does and how it connects to manufacturing.</p>
+
+  <div class="erp-modules">
+    <div class="erp-mod">
+      <div class="em-icon">📋</div>
+      <div class="em-name">Sales & Distribution (SD)</div>
+      <div class="em-desc">Manages customer orders, pricing, delivery schedules. When a hospital orders 10,000 packs of Metformin, it starts here.</div>
+    </div>
+    <div class="erp-mod">
+      <div class="em-icon">⚙️</div>
+      <div class="em-name">Production Planning (PP)</div>
+      <div class="em-desc">Translates sales orders into production schedules. Creates Work Orders. Runs MRP (Material Requirements Planning) to figure out what needs to be made.</div>
+    </div>
+    <div class="erp-mod">
+      <div class="em-icon">🛒</div>
+      <div class="em-name">Materials Management (MM)</div>
+      <div class="em-desc">Manages procurement — raises purchase orders for raw materials (API, excipients), receives goods into inventory, manages stock levels.</div>
+    </div>
+    <div class="erp-mod">
+      <div class="em-icon">🧪</div>
+      <div class="em-name">Quality Management (QM)</div>
+      <div class="em-desc">Manages inspection lots, quality notifications, vendor certifications, and holds materials that have failed QC testing.</div>
+    </div>
+    <div class="erp-mod">
+      <div class="em-icon">💰</div>
+      <div class="em-name">Finance & Controlling (FI/CO)</div>
+      <div class="em-desc">Tracks cost of production, batch costing, accounts payable/receivable, and financial reporting. Captures yield losses and waste costs.</div>
+    </div>
+    <div class="erp-mod">
+      <div class="em-icon">🏬</div>
+      <div class="em-name">Warehouse Management (WM)</div>
+      <div class="em-desc">Manages storage locations, material movements, staging areas, and finished goods inventory ready for dispatch.</div>
+    </div>
+    <div class="erp-mod">
+      <div class="em-icon">🔬</div>
+      <div class="em-name">Recipe / BOM Management</div>
+      <div class="em-desc">Stores the Bill of Materials (BOM) and routing instructions — the master list of ingredients and process steps for each product.</div>
+    </div>
+    <div class="erp-mod">
+      <div class="em-icon">👥</div>
+      <div class="em-name">HR & Plant Maintenance (PM)</div>
+      <div class="em-desc">Manages equipment maintenance schedules, calibration records, and workforce planning for production shifts.</div>
+    </div>
+  </div>
+
+  <hr class="div">
+
+  <!-- WHO DOES WHAT -->
+  <div class="s-label">Roles & Responsibilities</div>
+  <div class="s-title" style="font-size:1.7rem;">Who Does What in ERP?</div>
+  <p class="s-desc">Different people in the organisation have specific roles in ERP. Understanding who touches ERP and what they do helps you see how a manufacturing batch gets initiated.</p>
+
+  <table class="who-table">
+    <thead>
+      <tr>
+        <th>Role</th>
+        <th>ERP Module</th>
+        <th>What They Do in ERP</th>
+        <th>Output to Manufacturing</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="role-chip rc-planner">Demand Planner</span></td>
+        <td>Sales / PP</td>
+        <td>Analyses sales forecast, creates demand plan for next quarter. Determines how many batches of each product to make.</td>
+        <td>Planned Orders (auto-created by MRP)</td>
+      </tr>
+      <tr>
+        <td><span class="role-chip rc-buyer">Procurement / Buyer</span></td>
+        <td>MM</td>
+        <td>Reviews material stock, raises Purchase Orders for API and excipients, coordinates delivery timelines with suppliers.</td>
+        <td>Raw material availability for production</td>
+      </tr>
+      <tr>
+        <td><span class="role-chip rc-prod">Production Planner</span></td>
+        <td>PP</td>
+        <td>Converts Planned Orders into Work Orders, schedules them to specific manufacturing lines, assigns batch numbers.</td>
+        <td>Work Orders sent to MES for execution</td>
+      </tr>
+      <tr>
+        <td><span class="role-chip rc-warehouse">Warehouse / Stores</span></td>
+        <td>WM / MM</td>
+        <td>Receives incoming raw materials, confirms receipt in ERP, stages dispensed materials for production, receives finished goods.</td>
+        <td>Material availability confirmed, goods movements posted</td>
+      </tr>
+      <tr>
+        <td><span class="role-chip rc-qa">QA / QC</span></td>
+        <td>QM</td>
+        <td>Releases or rejects raw material lots in ERP after QC testing. Reviews batch records, releases finished batches for sale.</td>
+        <td>Released material status; batch disposition</td>
+      </tr>
+      <tr>
+        <td><span class="role-chip rc-prod">Production Manager</span></td>
+        <td>PP / CO</td>
+        <td>Monitors production progress against the schedule, reviews yield reports, manages exceptions and escalations.</td>
+        <td>Confirmed batch completions, yield posted to ERP</td>
+      </tr>
+      <tr>
+        <td><span class="role-chip rc-finance">Finance Controller</span></td>
+        <td>FI / CO</td>
+        <td>Tracks batch production costs vs standard, posts goods issue (raw materials consumed) and goods receipt (finished goods created).</td>
+        <td>Financial settlement of production orders</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr class="div">
+
+  <!-- LIFECYCLE -->
+  <div class="s-label">End-to-End Flow</div>
+  <div class="s-title" style="font-size:1.7rem;">How a Batch Gets Created — From Order to Work Order</div>
+  <p class="s-desc">This is the journey inside ERP before manufacturing even touches the product. Every step happens in ERP before MES receives anything.</p>
+
+  <div class="lifecycle">
+    <div class="lc-step">
+      <div class="lc-num">STEP 01</div>
+      <div class="lc-icon">🛍️</div>
+      <div class="lc-name">Customer Order</div>
+      <div class="lc-who">Sales team / Customer portal</div>
+    </div>
+    <div class="lc-step">
+      <div class="lc-num">STEP 02</div>
+      <div class="lc-icon">📊</div>
+      <div class="lc-name">Demand Planning</div>
+      <div class="lc-who">Demand Planner</div>
+    </div>
+    <div class="lc-step">
+      <div class="lc-num">STEP 03</div>
+      <div class="lc-icon">🔄</div>
+      <div class="lc-name">MRP Run</div>
+      <div class="lc-who">ERP Auto-calculates</div>
+    </div>
+    <div class="lc-step">
+      <div class="lc-num">STEP 04</div>
+      <div class="lc-icon">🛒</div>
+      <div class="lc-name">Purchase Orders</div>
+      <div class="lc-who">Procurement / Buyer</div>
+    </div>
+    <div class="lc-step">
+      <div class="lc-num">STEP 05</div>
+      <div class="lc-icon">📥</div>
+      <div class="lc-name">Materials Received</div>
+      <div class="lc-who">Warehouse / Stores</div>
+    </div>
+    <div class="lc-step">
+      <div class="lc-num">STEP 06</div>
+      <div class="lc-icon">✅</div>
+      <div class="lc-name">QC Release</div>
+      <div class="lc-who">QA / QC Team</div>
+    </div>
+    <div class="lc-step" style="border-right:none;">
+      <div class="lc-num">STEP 07</div>
+      <div class="lc-icon">📋</div>
+      <div class="lc-name">Work Order → MES</div>
+      <div class="lc-who">Production Planner</div>
+    </div>
+  </div>
+
+  <div class="wbox" style="margin-top:1.5rem;">
+    <strong>Key insight:</strong> MES never creates a batch on its own. It always waits for a Work Order from ERP. ERP is the authority on <em>what to make</em> and <em>how many</em>. MES is the authority on <em>how to make it</em> and <em>recording proof it was made correctly</em>.
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     CHAPTER 2 — ERP TO MES HANDOFF
+════════════════════════════════════════════ -->
+<div id="erp-to-mes"></div>
+<div class="wrap">
+  <div class="sticky"><span>Chapter 02</span> — The ERP → MES Handoff</div>
+
+  <div class="ch" data-n="02">
+    <div class="ch-label">The Critical Bridge</div>
+    <div class="ch-title">How ERP Talks to MES —<br>The Work Order Handoff</div>
+    <p class="ch-sub">The moment a Work Order leaves ERP and arrives in MES is where business planning ends and physical manufacturing begins. This handoff is one of the most critical integrations in a pharma plant.</p>
+  </div>
+
+  <div class="handoff">
+    <div class="handoff-side handoff-left">
+      <div class="handoff-sys">ERP (SAP / Oracle) — L4</div>
+      <div class="handoff-name">What ERP sends to MES</div>
+      <div class="handoff-items">
+        <div class="h-item">Work Order number & batch number</div>
+        <div class="h-item">Product code and description</div>
+        <div class="h-item">Batch size (quantity to manufacture)</div>
+        <div class="h-item">Recipe / BOM reference (what ingredients, what steps)</div>
+        <div class="h-item">Scheduled start & end dates</div>
+        <div class="h-item">Manufacturing line / equipment assignment</div>
+        <div class="h-item">Released raw material lot numbers</div>
+        <div class="h-item">Required delivery date</div>
+      </div>
+    </div>
+    <div class="handoff-mid">
+      <div class="arr">⇄</div>
+      <div class="lbl">Integration</div>
+    </div>
+    <div class="handoff-side handoff-right">
+      <div class="handoff-sys">MES — L3</div>
+      <div class="handoff-name">What MES sends back to ERP</div>
+      <div class="handoff-items">
+        <div class="h-item">Batch completion confirmation</div>
+        <div class="h-item">Actual yield (finished tablets produced)</div>
+        <div class="h-item">Actual materials consumed (goods issue)</div>
+        <div class="h-item">Production start & end timestamps</div>
+        <div class="h-item">Batch status (Released / On Hold / Rejected)</div>
+        <div class="h-item">Deviation count & classification</div>
+        <div class="h-item">Equipment utilisation data</div>
+        <div class="h-item">Operator IDs and shift information</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="abox">
+    <strong>Why MES matters:</strong> MES sits at L3 and receives Work Orders from ERP. It translates those Work Orders into electronic batch records (eBR) that guide operators through every manufacturing step. When the batch is done, it sends completion data back to ERP so inventory, finance, and QA records are automatically updated.
+    <br><br>
+    <a class="dl v" href="https://www.youtube.com/watch?v=SIge-EAUXiI" target="_blank">▶ MES & ERP Integration Explained</a>
+  </div>
+
+  <hr class="div">
+
+  <!-- WHAT MES DOES WITH THE WORK ORDER -->
+  <div class="s-label">Inside MES</div>
+  <div class="s-title" style="font-size:1.7rem;">What Happens When MES Receives a Work Order</div>
+
+  <div class="grid g2">
+    <div class="card ca">
+      <div class="c-icon ia">📄</div>
+      <h3>1. eBR is Generated</h3>
+      <p>MES takes the Work Order and automatically creates an Electronic Batch Record — a step-by-step digital instruction set for operators, populated with the approved recipe parameters.</p>
+    </div>
+    <div class="card cb">
+      <div class="c-icon ib">🔍</div>
+      <h3>2. Materials are Verified</h3>
+      <p>MES checks that all required raw material lots have been released by QA and are physically available in the dispensing area. Production cannot start until all materials pass this check.</p>
+    </div>
+    <div class="card cc">
+      <div class="c-icon ic">🏭</div>
+      <h3>3. Equipment is Checked</h3>
+      <p>MES confirms each piece of required equipment has been cleaned (cleaning record checked), calibrated, and is available — not already running another batch.</p>
+    </div>
+    <div class="card cd">
+      <div class="c-icon id">👤</div>
+      <h3>4. Operators are Assigned</h3>
+      <p>Operators log into MES with their credentials. MES verifies they have the right training and qualifications to perform the required steps on this product.</p>
+    </div>
+    <div class="card ce">
+      <div class="c-icon ie">▶️</div>
+      <h3>5. Execution Begins</h3>
+      <p>With all checks passed, MES unlocks the first step of the eBR. The batch clock starts. Every action from this point — weights, parameters, signatures, times — is captured automatically.</p>
+    </div>
+    <div class="card ca">
+      <div class="c-icon ia">📤</div>
+      <h3>6. Completion Reported Back</h3>
+      <p>When the last step is signed off in MES, it automatically posts completion to ERP — updating inventory, triggering financial settlement, and flagging the batch for QA batch record review.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     CHAPTER 3 — WHAT IS MES
+════════════════════════════════════════════ -->
+<div id="what-is-mes"></div>
+<div class="wrap">
+  <div class="sticky"><span>Chapter 03</span> — What is MES?</div>
+
+  <div class="ch" data-n="03">
+    <div class="ch-label">Manufacturing Execution System</div>
+    <div class="ch-title">MES: The Digital Brain<br>of the Factory Floor</div>
+    <p class="ch-sub">If ERP is the brain of the business, MES is the brain of the factory. It takes business instructions from ERP and turns them into real-time shop floor control — guiding every operator, every machine, every step.</p>
+  </div>
+
+  <div class="ibox">
+    <strong>Simple definition:</strong> MES is the software layer that sits between the business (ERP) and the machines (SCADA/PLC). It tells operators exactly what to do, guides them through how to do it, captures proof they did it right, and records everything for GMP compliance and traceability.
+    <br><br>
+    <a class="dl v" href="https://www.youtube.com/watch?v=SIge-EAUXiI" target="_blank">▶ Intro to ERP Systems</a>&nbsp;&nbsp;
+    <a class="dl" href="https://www.mesa.org/what-is-mes/" target="_blank">↗ MESA International</a>
+  </div>
+
+  <div class="grid g3">
+    <div class="card ca"><div class="c-icon ia">🎯</div><h3>Execute</h3><p>Drives step-by-step execution of batch instructions. Operators follow the eBR on screen — no paper, no guessing.</p></div>
+    <div class="card cb"><div class="c-icon ib">📊</div><h3>Track & Trace</h3><p>Every action — who, what, when, which lot, which equipment — is logged with a timestamp creating a complete audit trail.</p></div>
+    <div class="card cc"><div class="c-icon ic">🔒</div><h3>Enforce Controls</h3><p>Steps cannot be skipped. Out-of-spec results automatically raise deviations. Electronic signatures enforce accountability.</p></div>
+    <div class="card cd"><div class="c-icon id">⚡</div><h3>Real-Time Visibility</h3><p>Supervisors see live batch status, IPC results, and equipment status on dashboards — enabling instant decisions.</p></div>
+    <div class="card ce"><div class="c-icon ie">🔗</div><h3>Integrate</h3><p>MES bridges ERP (L4) above with SCADA/PLC equipment (L1/L2) below — acting as the translation layer of the plant.</p></div>
+    <div class="card ca"><div class="c-icon ia">📋</div><h3>Comply</h3><p>Supports FDA 21 CFR Part 11, EU Annex 11, and GMP requirements. Replaces paper batch records with compliant eBRs.</p></div>
+  </div>
+
+  <hr class="div">
+
+  <!-- ISA-95 QUICK REFERENCE -->
+  <div class="s-label">Architecture</div>
+  <div class="s-title" style="font-size:1.7rem;">Where MES Sits — The ISA-95 Stack</div>
+
+  <div style="margin:2rem 0;display:flex;flex-direction:column;gap:0;max-width:860px;">
+
+    <div style="display:flex;align-items:stretch;gap:0;" onclick="toggleISA('isa4')" class="osd-step" style="padding:0;cursor:pointer;">
+      <div style="width:6px;background:var(--accent2);border-radius:6px 0 0 0;flex-shrink:0;"></div>
+      <div style="flex:1;background:rgba(0,95,163,0.04);border:1px solid rgba(0,95,163,0.18);border-left:none;padding:1.1rem 1.5rem;border-radius:0 10px 10px 0;cursor:pointer;transition:all 0.2s;" onmouseenter="this.style.background='rgba(0,95,163,0.07)'" onmouseleave="this.style.background='rgba(0,95,163,0.04)'">
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:600;color:var(--accent2);">L4</span>
+          <div><div style="font-weight:600;font-size:0.92rem;">Business / ERP Layer</div><div style="font-size:0.78rem;color:var(--muted2);">SAP, Oracle — orders, planning, finance, supply chain</div></div>
+          <div style="margin-left:auto;display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <a class="dl" href="https://www.youtube.com/watch?v=rCQlTs_S6bA" target="_blank" onclick="event.stopPropagation()">▶ ERP Video</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:center;height:20px;align-items:center;color:var(--accent);font-size:0.8rem;">⇅ Work Orders / Batch Confirmations</div>
+
+    <div style="display:flex;align-items:stretch;gap:0;cursor:pointer;" onclick="toggleISA('isa3')">
+      <div style="width:6px;background:var(--accent);border-radius:0;flex-shrink:0;"></div>
+      <div style="flex:1;background:rgba(0,106,90,0.07);border:2px solid rgba(0,106,90,0.28);border-left:none;padding:1.1rem 1.5rem;border-radius:0 10px 10px 0;cursor:pointer;transition:all 0.2s;position:relative;" onmouseenter="this.style.background='rgba(0,106,90,0.10)'" onmouseleave="this.style.background='rgba(0,106,90,0.07)'">
+        <div style="position:absolute;top:0.4rem;right:0.8rem;font-family:'JetBrains Mono',monospace;font-size:0.55rem;background:var(--accent);color:#ffffff;padding:0.15rem 0.5rem;border-radius:4px;font-weight:700;letter-spacing:0.06em;">MES LIVES HERE</div>
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:600;color:var(--accent);">L3</span>
+          <div><div style="font-weight:600;font-size:0.92rem;">Manufacturing Operations / MES</div><div style="font-size:0.78rem;color:var(--muted2);">MES — eBR, work orders, deviations, tracking, e-sig</div></div>
+          <div style="margin-left:auto;display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <a class="dl g" href="https://www.mesa.org/what-is-mes/" target="_blank" onclick="event.stopPropagation()">↗ MES Guide</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:center;height:20px;align-items:center;color:var(--muted);font-size:0.8rem;">⇅ Process Instructions / Real-time Data</div>
+
+    <div style="display:flex;align-items:stretch;gap:0;cursor:pointer;">
+      <div style="width:6px;background:var(--accent3);border-radius:0;flex-shrink:0;"></div>
+      <div style="flex:1;background:rgba(184,92,0,0.04);border:1px solid rgba(184,92,0,0.18);border-left:none;padding:1.1rem 1.5rem;border-radius:0 10px 10px 0;cursor:pointer;transition:all 0.2s;" onmouseenter="this.style.background='rgba(184,92,0,0.07)'" onmouseleave="this.style.background='rgba(184,92,0,0.04)'">
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:600;color:var(--accent3);">L2</span>
+          <div><div style="font-weight:600;font-size:0.92rem;">Control / SCADA Layer</div><div style="font-size:0.78rem;color:var(--muted2);">Rockwell FactoryTalk, Siemens WinCC — monitors and controls equipment</div></div>
+          <div style="margin-left:auto;">
+            <a class="dl v" href="https://www.youtube.com/watch?v=EPkC6UwjvqE" target="_blank">▶ ISA-95 Automation Pyramid</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:center;height:20px;align-items:center;color:var(--muted);font-size:0.8rem;">⇅ Sensor Signals / Control Commands</div>
+
+    <div style="display:flex;align-items:stretch;gap:0;cursor:pointer;">
+      <div style="width:6px;background:var(--accent4);flex-shrink:0;"></div>
+      <div style="flex:1;background:rgba(96,48,176,0.04);border:1px solid rgba(96,48,176,0.18);border-left:none;padding:1.1rem 1.5rem;border-radius:0 10px 10px 0;cursor:pointer;transition:all 0.2s;" onmouseenter="this.style.background='rgba(96,48,176,0.07)'" onmouseleave="this.style.background='rgba(96,48,176,0.04)'">
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:600;color:var(--accent4);">L1</span>
+          <div><div style="font-weight:600;font-size:0.92rem;">Device Control / PLC Layer</div><div style="font-size:0.78rem;color:var(--muted2);">Siemens S7, Allen-Bradley — directly controls motors, valves, equipment</div></div>
+          <div style="margin-left:auto;">
+            <a class="dl v" href="https://www.youtube.com/watch?v=3bwAZPTBPgs" target="_blank">▶ PLC / ISA-95 L1 Explained</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:center;height:20px;align-items:center;color:var(--muted);font-size:0.8rem;">⇅ Physical Signals</div>
+
+    <div style="display:flex;align-items:stretch;gap:0;cursor:pointer;">
+      <div style="width:6px;background:var(--accent5);border-radius:0 0 0 6px;flex-shrink:0;"></div>
+      <div style="flex:1;background:rgba(160,32,32,0.04);border:1px solid rgba(160,32,32,0.18);border-left:none;padding:1.1rem 1.5rem;border-radius:0 0 10px 10px;cursor:pointer;transition:all 0.2s;" onmouseenter="this.style.background='rgba(160,32,32,0.07)'" onmouseleave="this.style.background='rgba(160,32,32,0.04)'">
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:600;color:var(--accent5);">L0</span>
+          <div><div style="font-weight:600;font-size:0.92rem;">Physical / Equipment Layer</div><div style="font-size:0.78rem;color:var(--muted2);">Tablet press, granulator, FBD, blender, coating pan, sensors, instruments</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     CHAPTER 4 — TABLET ANATOMY
+════════════════════════════════════════════ -->
+<div id="tablet-anatomy"></div>
+<div class="wrap">
+  <div class="sticky"><span>Chapter 04</span> — What Are OSD Tablets? Anatomy & Components</div>
+
+  <div class="ch" data-n="04">
+    <div class="ch-label">OSD — Oral Solid Dosage</div>
+    <div class="ch-title">What's Inside a Tablet?<br>Understanding What We're Making</div>
+    <p class="ch-sub">Before we walk through how tablets are manufactured, you need to understand what a tablet actually is. Every component has a critical function — and MES ensures every single one is correctly accounted for.</p>
+  </div>
+
+  <div class="grid g2">
+    <div>
+      <div class="s-label">Tablet Composition</div>
+      <h3 style="font-size:1.1rem;margin-bottom:1.5rem;font-weight:600;">The Layers of a Tablet</h3>
+
+      <div class="tablet-anatomy">
+        <div class="layer-wrap">
+          <div class="t-layer tl1">
+            <div class="t-layer-name" style="color:var(--accent2);">🔵 Film Coating</div>
+            <div class="t-layer-desc">Outer protective layer — controls appearance, protects API, can control release rate. e.g. Opadry II</div>
+          </div>
+          <div class="t-layer tl2">
+            <div class="t-layer-name" style="color:var(--accent);">🟢 Lubricants & Glidants</div>
+            <div class="t-layer-desc">Prevents sticking to press punches (Mg Stearate) and improves powder flow (Colloidal Silica)</div>
+          </div>
+          <div class="t-layer tl3">
+            <div class="t-layer-name" style="color:var(--accent4);">🟣 Disintegrants & Binders</div>
+            <div class="t-layer-desc">Disintegrants help tablet break apart in gut (Croscarmellose). Binders hold granules together (PVP).</div>
+          </div>
+          <div class="t-layer tl4">
+            <div class="t-layer-name" style="color:var(--accent3);">🟠 Diluents / Fillers</div>
+            <div class="t-layer-desc">Add bulk to tablet — Microcrystalline Cellulose (MCC), Lactose. Makes tablet large enough to handle.</div>
+          </div>
+          <div class="t-layer tl5">
+            <div class="t-layer-name" style="color:var(--accent5);">🔴 API (Active Core)</div>
+            <div class="t-layer-desc">The drug molecule — Metformin HCl 500mg. This is what actually treats the patient.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="s-label">Critical Quality Attributes</div>
+      <h3 style="font-size:1.1rem;margin-bottom:1.5rem;font-weight:600;">What Makes a Good Tablet? (CQAs)</h3>
+      <div class="card" style="padding:1.2rem;">
+        <div class="cqa-row">
+          <div class="cqa-name">💊 Tablet Weight</div>
+          <div class="cqa-spec">500 mg ± 5%</div>
+          <div class="cqa-why">Ensures correct dose in every tablet</div>
+        </div>
+        <div class="cqa-row">
+          <div class="cqa-name">💪 Hardness</div>
+          <div class="cqa-spec">80–130 N</div>
+          <div class="cqa-why">Too soft = breaks; too hard = won't dissolve</div>
+        </div>
+        <div class="cqa-row">
+          <div class="cqa-name">📏 Thickness</div>
+          <div class="cqa-spec">4.5–5.0 mm</div>
+          <div class="cqa-why">Must fit blister pack tooling consistently</div>
+        </div>
+        <div class="cqa-row">
+          <div class="cqa-name">🕐 Disintegration</div>
+          <div class="cqa-spec">&lt; 15 min</div>
+          <div class="cqa-why">Tablet must break apart in stomach to release drug</div>
+        </div>
+        <div class="cqa-row">
+          <div class="cqa-name">💧 Dissolution</div>
+          <div class="cqa-spec">Q ≥ 80% @ 30 min</div>
+          <div class="cqa-why">80% of API must dissolve within 30 min in test media</div>
+        </div>
+        <div class="cqa-row">
+          <div class="cqa-name">🔬 Content Uniformity</div>
+          <div class="cqa-spec">95–105% label</div>
+          <div class="cqa-why">Every tablet must have the same amount of API</div>
+        </div>
+        <div class="cqa-row">
+          <div class="cqa-name">🧪 Friability</div>
+          <div class="cqa-spec">≤ 1.0%</div>
+          <div class="cqa-why">Must not crumble/chip during packaging & transport</div>
+        </div>
+        <div class="cqa-row" style="border-bottom:none;">
+          <div class="cqa-name">💧 Moisture (LOD)</div>
+          <div class="cqa-spec">1.5–3.0%</div>
+          <div class="cqa-why">Affects tablet stability and shelf life</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     CHAPTER 5 — OSD MANUFACTURING PROCESS
+════════════════════════════════════════════ -->
+<div id="osd-process"></div>
+<div class="wrap">
+  <div class="sticky"><span>Chapter 05</span> — OSD Tablet Manufacturing — Step by Step</div>
+
+  <div class="ch" data-n="05">
+    <div class="ch-label">Batch Manufacturing</div>
+    <div class="ch-title">Making Metformin 500mg Tablets<br>— Every Step, Every Control</div>
+    <p class="ch-sub">Walk through an actual batch from start to finish. Each step shows exactly what MES captures, what the IPC checks are, and what can go wrong. Click any step to expand full details.</p>
+  </div>
+
+  <div class="abox">
+    <strong>Example Batch:</strong> Metformin HCl 500mg IR Tablets &nbsp;|&nbsp; Batch No: MET-2024-089 &nbsp;|&nbsp; Batch Size: 200,000 tablets (100 kg) &nbsp;|&nbsp; Manufacturing Line: OSD Line 2
+    <br><br>
+    <a class="dl v" href="https://www.youtube.com/watch?v=soIkRbFxjII" target="_blank">▶ Complete Tablet Manufacturing</a>&nbsp;&nbsp;
+    <a class="dl v" href="https://www.youtube.com/watch?v=SPs30Lh8pH0" target="_blank">▶ Tablet Manufacturing Step-by-Step</a>&nbsp;&nbsp;
+    <a class="dl" href="https://www.ispe.org/publications/guidance-documents" target="_blank">↗ ISPE Pharma Guides</a>
+  </div>
+
+  <div class="osd-flow">
+    <div class="osd-steps">
+
+      <!-- STEP 1 -->
+      <div class="osd-step" onclick="toggleOSD('os1')">
+        <div class="osd-dot d1">01</div>
+        <div class="osd-body">
+          <div class="osd-head">
+            <div class="osd-title">📥 Raw Material Receipt & QC Release</div>
+            <div class="tag-row"><span class="tag tqa">QA</span><span class="tag tcrit">CRITICAL</span></div>
+          </div>
+          <div class="osd-desc">All raw materials must be received, tested, and formally released by QA before any manufacturing can begin. MES blocks dispensing until this is confirmed.</div>
+          <div class="osd-detail" id="os1">
+            <div class="detail-grid">
+              <div class="df"><label>MES Action</label><div class="v">Material lot receipt, sampling request creation, status change: Quarantine → Approved</div></div>
+              <div class="df"><label>QC Tests Performed</label><div class="v hi">Identity (IR/HPLC), Assay, Purity, Particle size, Microbial limits</div></div>
+              <div class="df"><label>Material Status Flow</label><div class="v wa">Quarantine → Sampled → Testing → Approved / Rejected</div></div>
+              <div class="df"><label>CoA Check</label><div class="v">Supplier Certificate of Analysis verified against internal specs</div></div>
+              <div class="df"><label>MES Lock</label><div class="v da">Dispensing step BLOCKED until all materials are in Approved status</div></div>
+              <div class="df"><label>Duration</label><div class="v">1–3 working days (depending on QC test turnaround)</div></div>
+            </div>
+            <div class="step-links">
+              <a class="dl v" href="https://www.youtube.com/watch?v=9F8ELolBaVE" target="_blank">▶ GMP &amp; cGMP History Explained</a>
+              <a class="dl" href="https://www.fda.gov/drugs/pharmaceutical-quality-resources" target="_blank">↗ FDA Pharma Quality</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="osd-step" onclick="toggleOSD('os2')">
+        <div class="osd-dot d2">02</div>
+        <div class="osd-body">
+          <div class="osd-head">
+            <div class="osd-title">⚖️ Dispensing & Weighing</div>
+            <div class="tag-row"><span class="tag tcrit">CRITICAL</span><span class="tag tqa">QA</span></div>
+          </div>
+          <div class="osd-desc">Precise quantities of every ingredient are weighed in the dispensing area. MES reads the balance directly — no manual entry. Dual verification required for the API.</div>
+          <div class="osd-detail" id="os2">
+            <div class="detail-grid">
+              <div class="df"><label>API</label><div class="v hi">Metformin HCl: 72,500 g</div></div>
+              <div class="df"><label>MCC (Filler)</label><div class="v">Avicel PH-102: 18,000 g</div></div>
+              <div class="df"><label>PVP (Binder)</label><div class="v">Povidone K30: 3,000 g</div></div>
+              <div class="df"><label>Croscarmellose (Disint.)</label><div class="v">2,500 g</div></div>
+              <div class="df"><label>Mg Stearate (Lubricant)</label><div class="v">800 g</div></div>
+              <div class="df"><label>Weight Tolerance</label><div class="v wa">±0.5% on API; ±1% on excipients</div></div>
+              <div class="df"><label>Balance Interface</label><div class="v hi">MES reads electronic balance directly — no manual typing</div></div>
+              <div class="df"><label>Dual Verification</label><div class="v da">2-person check required for API weighing — 2nd operator must sign in MES</div></div>
+              <div class="df"><label>Label Printing</label><div class="v">MES auto-prints dispensed material labels with lot, weight, and batch number</div></div>
+              <div class="df"><label>OOS Action</label><div class="v da">If weight outside tolerance → auto-deviation raised, weighing locked</div></div>
+            </div>
+            <div class="step-links">
+              <a class="dl v" href="https://www.youtube.com/watch?v=H9pqEAWvyBE" target="_blank">▶ Pharma Tablet Mfg Part 1: Dispensing</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="osd-step" onclick="toggleOSD('os3')">
+        <div class="osd-dot d3">03</div>
+        <div class="osd-body">
+          <div class="osd-head">
+            <div class="osd-title">🌀 Wet Granulation (High-Shear Granulator)</div>
+            <div class="tag-row"><span class="tag tauto">AUTOMATED</span><span class="tag tipc">IPC</span></div>
+          </div>
+          <div class="osd-desc">API and excipients are mixed and granulated with purified water to create uniform granules. MES auto-loads recipe parameters to the PLC — impeller speed, chopper speed, liquid addition rate.</div>
+          <div class="osd-detail" id="os3">
+            <div class="detail-grid">
+              <div class="df"><label>Equipment</label><div class="v hi">HSGR-001 — High Shear Granulator (200L bowl)</div></div>
+              <div class="df"><label>Dry Mix Time</label><div class="v">5 minutes at 200 RPM (impeller)</div></div>
+              <div class="df"><label>Granulation Liquid</label><div class="v">12.0 L Purified Water (USP)</div></div>
+              <div class="df"><label>Liquid Addition Rate</label><div class="v wa">~100 mL/min (controlled pump)</div></div>
+              <div class="df"><label>Wet Mix Time</label><div class="v">8 minutes at 350 RPM (impeller) + 1500 RPM (chopper)</div></div>
+              <div class="df"><label>End Point</label><div class="v hi">Motor amperage rise + visual granule check</div></div>
+              <div class="df"><label>IPC</label><div class="v">Granule appearance (consistency check) — operator records result in MES</div></div>
+              <div class="df"><label>PLC → MES Data</label><div class="v">Impeller RPM, chopper RPM, bowl temp logged every 10 sec</div></div>
+            </div>
+            <div class="step-links">
+              <a class="dl v" href="https://www.youtube.com/watch?v=GQL07ss1_ds" target="_blank">▶ Wet Granulation Process</a>
+              <a class="dl v" href="https://www.youtube.com/watch?v=grRhrXp8Kdg" target="_blank">▶ Wet Granulation in Pharma Industry</a>
+              <a class="dl" href="https://www.pharmtech.com/view/understanding-wet-granulation" target="_blank">↗ PharmTech: Wet Granulation</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="osd-step" onclick="toggleOSD('os4')">
+        <div class="osd-dot d4">04</div>
+        <div class="osd-body">
+          <div class="osd-head">
+            <div class="osd-title">🔥 Drying (Fluid Bed Dryer)</div>
+            <div class="tag-row"><span class="tag tauto">AUTOMATED</span><span class="tag tipc">IPC</span></div>
+          </div>
+          <div class="osd-desc">Wet granules are transferred to the Fluid Bed Dryer. Heated air fluidises the granules and removes moisture. MES logs temperature continuously and flags if limits are exceeded.</div>
+          <div class="osd-detail" id="os4">
+            <div class="detail-grid">
+              <div class="df"><label>Equipment</label><div class="v hi">FBD-002 — Fluid Bed Dryer (150 kg capacity)</div></div>
+              <div class="df"><label>Inlet Air Temperature</label><div class="v wa">60–70°C (logged every 30 sec by PLC)</div></div>
+              <div class="df"><label>Outlet Air Temperature</label><div class="v">40–45°C (indicates drying progress)</div></div>
+              <div class="df"><label>Air Volume</label><div class="v">2,800–3,200 m³/hr</div></div>
+              <div class="df"><label>Target LOD</label><div class="v hi">1.5–3.0% (Loss on Drying)</div></div>
+              <div class="df"><label>IPC Schedule</label><div class="v">LOD test every 20 min — sample taken, tested on Moisture Analyser</div></div>
+              <div class="df"><label>IPC Entry</label><div class="v">Operator enters LOD result in MES — out-of-spec triggers deviation</div></div>
+              <div class="df"><label>Total Drying Time</label><div class="v">45–75 minutes depending on moisture profile</div></div>
+              <div class="df"><label>Deviation Trigger</label><div class="v da">LOD &lt;1.5% or &gt;3.0% → auto deviation, batch hold</div></div>
+            </div>
+            <div class="step-links">
+              <a class="dl v" href="https://www.youtube.com/watch?v=dwHFKyf_ZLc" target="_blank">▶ FBD Animation — Working Principle</a>
+              <a class="dl" href="https://www.usp.org/harmonization-standards/pdg/general-chapters/loss-on-drying" target="_blank">↗ USP LOD Standard</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="osd-step" onclick="toggleOSD('os5')">
+        <div class="osd-dot d5">05</div>
+        <div class="osd-body">
+          <div class="osd-head">
+            <div class="osd-title">🔩 Milling & Sieving</div>
+            <div class="tag-row"><span class="tag tauto">AUTOMATED</span></div>
+          </div>
+          <div class="osd-desc">Dried granules are milled through a controlled screen size to achieve a uniform particle size distribution. This directly impacts tablet compressibility and dissolution.</div>
+          <div class="osd-detail" id="os5">
+            <div class="detail-grid">
+              <div class="df"><label>Equipment</label><div class="v hi">MILL-003 — Oscillating Granulator</div></div>
+              <div class="df"><label>Screen Size</label><div class="v">1.0 mm stainless steel screen</div></div>
+              <div class="df"><label>Speed</label><div class="v">300 oscillations/min</div></div>
+              <div class="df"><label>IPC</label><div class="v wa">Particle size distribution (d50 target: 200–400 µm)</div></div>
+              <div class="df"><label>MES Records</label><div class="v">Equipment ID, screen size, batch weight before/after milling</div></div>
+              <div class="df"><label>Yield Check</label><div class="v hi">Weight after milling recorded — any significant loss triggers investigation</div></div>
+            </div>
+            <div class="step-links">
+              <a class="dl v" href="https://www.youtube.com/watch?v=GQL07ss1_ds" target="_blank">▶ Granulation & Milling Process</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="osd-step" onclick="toggleOSD('os6')">
+        <div class="osd-dot d6">06</div>
+        <div class="osd-body">
+          <div class="osd-head">
+            <div class="osd-title">🔄 Blending (Bin Blender)</div>
+            <div class="tag-row"><span class="tag tauto">AUTOMATED</span><span class="tag tipc">IPC</span><span class="tag tcrit">CRITICAL</span></div>
+          </div>
+          <div class="osd-desc">Milled granules are blended with external phase (disintegrant, lubricant) in a bin blender. Blend uniformity is critical — poor blending means inconsistent API content tablet to tablet.</div>
+          <div class="osd-detail" id="os6">
+            <div class="detail-grid">
+              <div class="df"><label>Equipment</label><div class="v hi">BIN-004 — Bin Blender (300L IBC)</div></div>
+              <div class="df"><label>Main Blend</label><div class="v">12 min at 12 RPM — granules + croscarmellose</div></div>
+              <div class="df"><label>Lubrication</label><div class="v wa">Mg Stearate added at 12 min — blend for 3 more min only</div></div>
+              <div class="df"><label>Why 3 min max?</label><div class="v da">Over-lubrication with Mg Stearate damages tablet dissolution — MES timer enforces this</div></div>
+              <div class="df"><label>IPC — Blend Uniformity</label><div class="v hi">RSD ≤ 5% (10 samples tested for API content by HPLC)</div></div>
+              <div class="df"><label>MES Controls</label><div class="v">Rotation count, RPM, bin ID, all operator IDs logged</div></div>
+              <div class="df"><label>Failure Action</label><div class="v da">RSD &gt; 5% → deviation raised, batch hold, re-blend evaluation needed</div></div>
+            </div>
+            <div class="step-links">
+              <a class="dl v" href="https://www.youtube.com/watch?v=wbuC6bpWQM8" target="_blank">▶ Granulation &amp; Tableting Overview</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="osd-step" onclick="toggleOSD('os7')">
+        <div class="osd-dot d7">07</div>
+        <div class="osd-body">
+          <div class="osd-head">
+            <div class="osd-title">💊 Tablet Compression (Rotary Tablet Press)</div>
+            <div class="tag-row"><span class="tag tcrit">CRITICAL</span><span class="tag tauto">AUTOMATED</span><span class="tag tipc">IPC</span></div>
+          </div>
+          <div class="osd-desc">Blended granules are compressed into tablets using a rotary tablet press. Weight, hardness, thickness, and disintegration are monitored every 30 minutes. This is where most IPC happens.</div>
+          <div class="osd-detail" id="os7">
+            <div class="detail-grid">
+              <div class="df"><label>Equipment</label><div class="v hi">PRESS-001 — Rotary Tablet Press (36-station)</div></div>
+              <div class="df"><label>Tablet Weight Target</label><div class="v">500 mg ± 25 mg (±5%)</div></div>
+              <div class="df"><label>Compression Force</label><div class="v wa">12–16 kN (recipe parameter — auto-loaded from MES)</div></div>
+              <div class="df"><label>Hardness Target</label><div class="v">80–130 N</div></div>
+              <div class="df"><label>Thickness</label><div class="v">4.5–5.0 mm</div></div>
+              <div class="df"><label>Disintegration</label><div class="v hi">&lt; 15 minutes (USP method)</div></div>
+              <div class="df"><label>Friability</label><div class="v">≤ 1.0%</div></div>
+              <div class="df"><label>IPC Frequency</label><div class="v wa">Every 30 min — 20 tablets sampled and tested</div></div>
+              <div class="df"><label>Auto-Reject</label><div class="v da">Press rejects off-weight tablets automatically via force sensor</div></div>
+              <div class="df"><label>Production Rate</label><div class="v">~120,000 tablets/hour</div></div>
+              <div class="df"><label>PLC Data → MES</label><div class="v">Pre-compression force, main compression force, tablet weight trend — logged every 30 sec</div></div>
+              <div class="df"><label>Line Clearance</label><div class="v hi">MES enforces line clearance sign-off before compression can start</div></div>
+            </div>
+            <div class="step-links">
+              <a class="dl v" href="https://www.youtube.com/watch?v=knZGhdNK8P8" target="_blank">▶ Rotary Tablet Press Components</a>
+              <a class="dl v" href="https://www.youtube.com/watch?v=Ls6YEw0I7QY" target="_blank">▶ Tablet Manufacturing Stages</a>
+              <a class="dl" href="https://www.usp.org/harmonization-standards/pdg/general-chapters/tablet-friability" target="_blank">↗ USP Friability Standard</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 8 -->
+      <div class="osd-step" onclick="toggleOSD('os8')">
+        <div class="osd-dot d8">08</div>
+        <div class="osd-body">
+          <div class="osd-head">
+            <div class="osd-title">👁️ Tablet Deduster & Metal Detection</div>
+            <div class="tag-row"><span class="tag tcrit">CRITICAL</span><span class="tag tauto">AUTOMATED</span></div>
+          </div>
+          <div class="osd-desc">Tablets pass through a deduster (removes dust and fines from edges) then a metal detector. Any tablets that fail metal detection are automatically rejected and quarantined.</div>
+          <div class="osd-detail" id="os8">
+            <div class="detail-grid">
+              <div class="df"><label>Equipment</label><div class="v hi">DEDU-001 + MDET-001</div></div>
+              <div class="df"><label>Metal Detector Challenge</label><div class="v wa">Tested every 30 min with Fe 1.5mm, SS 2.0mm, Non-Fe 2.0mm standards</div></div>
+              <div class="df"><label>MES Enforcement</label><div class="v da">Production STOPS if metal detector challenge fails — deviation auto-raised</div></div>
+              <div class="df"><label>MES Records</label><div class="v">Challenge test results, pass/fail, operator, timestamp every 30 min</div></div>
+              <div class="df"><label>Auto-Reject Bin</label><div class="v">Metal-detected rejects quarantined and counted — reconciled against total yield</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 9 -->
+      <div class="osd-step" onclick="toggleOSD('os9')">
+        <div class="osd-dot d9">09</div>
+        <div class="osd-body">
+          <div class="osd-head">
+            <div class="osd-title">🎨 Film Coating (Perforated Pan Coater)</div>
+            <div class="tag-row"><span class="tag tauto">AUTOMATED</span><span class="tag tipc">IPC</span></div>
+          </div>
+          <div class="osd-desc">Core tablets are coated in a perforated coating pan. A polymer film is applied to protect the API, improve appearance, and optionally control release. Weight gain is monitored throughout.</div>
+          <div class="osd-detail" id="os9">
+            <div class="detail-grid">
+              <div class="df"><label>Equipment</label><div class="v hi">COAT-001 — Perforated Pan Coater (150 kg batch size)</div></div>
+              <div class="df"><label>Coating System</label><div class="v">Opadry II White (HPMC-based, 15% w/w suspension)</div></div>
+              <div class="df"><label>Target Weight Gain</label><div class="v hi">3–4% (15–20 mg per 500 mg core tablet)</div></div>
+              <div class="df"><label>Inlet Air Temperature</label><div class="v wa">62°C ± 3°C</div></div>
+              <div class="df"><label>Pan Speed</label><div class="v">10 ± 2 RPM</div></div>
+              <div class="df"><label>Spray Rate</label><div class="v">30 ± 5 g/min per gun</div></div>
+              <div class="df"><label>IPC — Weight Gain</label><div class="v">Every 30 min — weigh 20 tablets, calculate average coating % gain</div></div>
+              <div class="df"><label>Visual IPC</label><div class="v da">Appearance check: no twin tablets, no picking, no sticking, uniform colour</div></div>
+              <div class="df"><label>PLC → MES</label><div class="v">Inlet/outlet air temp, pan speed, spray rate — logged every 30 sec</div></div>
+            </div>
+            <div class="step-links">
+              <a class="dl v" href="https://www.youtube.com/watch?v=2cr7uGVbebE" target="_blank">▶ Tablet Coating 3D Animation</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 10 -->
+      <div class="osd-step" onclick="toggleOSD('os10')">
+        <div class="osd-dot d10">10</div>
+        <div class="osd-body">
+          <div class="osd-head">
+            <div class="osd-title">📦 Packaging, Yield & QA Batch Release</div>
+            <div class="tag-row"><span class="tag tqa">QA RELEASE</span><span class="tag tcrit">CRITICAL</span></div>
+          </div>
+          <div class="osd-desc">Coated tablets are blistered, labeled, and quarantined. QA reviews the complete eBR from MES — all steps, all IPC results, all deviations — before issuing a Certificate of Analysis and releasing the batch for sale. Final batch data is posted back to ERP.</div>
+          <div class="osd-detail" id="os10">
+            <div class="detail-grid">
+              <div class="df"><label>Packaging Type</label><div class="v hi">Alu-Alu blister — 10 tablets/blister × 3 blisters/carton</div></div>
+              <div class="df"><label>Line Clearance</label><div class="v wa">Previous product cleared and documented before start</div></div>
+              <div class="df"><label>Online Camera System</label><div class="v">Vision system checks: empty pockets, broken/chipped tablets, print legibility</div></div>
+              <div class="df"><label>Theoretical Yield</label><div class="v">200,000 tablets</div></div>
+              <div class="df"><label>Acceptable Yield Range</label><div class="v hi">97.0 – 100.5%</div></div>
+              <div class="df"><label>Yield Calculation</label><div class="v">MES auto-calculates: (packed tablets / theoretical) × 100%</div></div>
+              <div class="df"><label>QA Batch Record Review</label><div class="v">QA reviews full eBR in MES — all steps, all IPC, all deviations, all e-sigs</div></div>
+              <div class="df"><label>Batch Disposition</label><div class="v hi">Approved → Released | Hold → Investigation needed | Rejected → Destruction</div></div>
+              <div class="df"><label>CoA Generation</label><div class="v">Auto-generated from MES + LIMS data — sent to customer with batch</div></div>
+              <div class="df"><label>ERP Posting</label><div class="v hi">MES posts batch completion to ERP → inventory updated → financial settlement triggered</div></div>
+            </div>
+            <div class="step-links">
+              <a class="dl v" href="https://www.youtube.com/watch?v=H9pqEAWvyBE" target="_blank">▶ Pharma Tablet Mfg Part 1: Dispensing</a>
+              <a class="dl" href="https://www.fda.gov/drugs/pharmaceutical-quality-resources" target="_blank">↗ FDA Batch Release Guidance</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <p style="text-align:center;color:var(--muted);font-size:0.75rem;font-family:'JetBrains Mono',monospace;margin-top:1rem;">↑ Click any step to expand full MES fields and deep-dive links</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     CHAPTER 6 — IPC & SPECIFICATIONS
+════════════════════════════════════════════ -->
+<div id="ipc-specs"></div>
+<div class="wrap">
+  <div class="sticky"><span>Chapter 06</span> — IPC Schedule & Full Batch Specifications</div>
+
+  <div class="ch" data-n="06">
+    <div class="ch-label">In-Process Controls</div>
+    <div class="ch-title">IPC Schedule: What Gets<br>Tested, When, and Why</div>
+    <p class="ch-sub">In-Process Controls are the quality checks built into every stage of manufacturing. They catch problems early — before the entire batch is compromised. MES enforces every IPC; you cannot proceed without completing them.</p>
+  </div>
+
+  <table class="osd-table">
+    <thead>
+      <tr>
+        <th>Step</th>
+        <th>IPC Test</th>
+        <th>Specification</th>
+        <th>Frequency</th>
+        <th>What Fails Looks Like</th>
+        <th>MES Action if OOS</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Dispensing</td>
+        <td>Weight verification</td>
+        <td>API ±0.5%; Excip. ±1%</td>
+        <td>Every material, every weigh</td>
+        <td>Wrong dose in batch — critical patient risk</td>
+        <td><span class="sc sc-pend">Auto-deviation + weighing locked</span></td>
+      </tr>
+      <tr>
+        <td>Granulation</td>
+        <td>Granule appearance, moisture</td>
+        <td>LOD ≤5% post-granulation</td>
+        <td>End of granulation</td>
+        <td>Over-wet: poor drying; Under-mixed: poor uniformity</td>
+        <td><span class="sc sc-pend">Deviation if moisture OOS</span></td>
+      </tr>
+      <tr>
+        <td>Drying</td>
+        <td>LOD (Loss on Drying)</td>
+        <td>1.5–3.0%</td>
+        <td>Every 20 min + at end</td>
+        <td>Too dry = brittle tablets; Too wet = poor compression, instability</td>
+        <td><span class="sc sc-pend">Batch hold + QA review</span></td>
+      </tr>
+      <tr>
+        <td>Milling</td>
+        <td>Particle size (d50)</td>
+        <td>200–400 µm</td>
+        <td>Post-milling</td>
+        <td>Too coarse = poor compressibility; too fine = flow problems</td>
+        <td><span class="sc sc-pend">Deviation, re-mill evaluation</span></td>
+      </tr>
+      <tr>
+        <td>Blending</td>
+        <td>Blend uniformity (BU)</td>
+        <td>RSD ≤ 5%</td>
+        <td>Post-blend (10 samples)</td>
+        <td>Non-uniform blend = tablets with too much or too little API</td>
+        <td><span class="sc sc-pend">Batch hold + re-blend assessment</span></td>
+      </tr>
+      <tr>
+        <td>Compression</td>
+        <td>Weight, hardness, thickness</td>
+        <td>500mg±5%, 80–130N, 4.5–5mm</td>
+        <td>Every 30 min (20 tablets)</td>
+        <td>Variable weight = variable dose; low hardness = friable tablets</td>
+        <td><span class="sc sc-pend">Auto-deviation, press adjustment</span></td>
+      </tr>
+      <tr>
+        <td>Compression</td>
+        <td>Disintegration</td>
+        <td>&lt; 15 min</td>
+        <td>Every 2 hrs (6 tablets)</td>
+        <td>Tablet doesn't dissolve → drug not absorbed by patient</td>
+        <td><span class="sc sc-pend">Major deviation + QA review</span></td>
+      </tr>
+      <tr>
+        <td>Metal Detection</td>
+        <td>Challenge test (Fe/SS/Non-Fe)</td>
+        <td>Pass all standards</td>
+        <td>Every 30 min</td>
+        <td>Metal contamination in tablets → patient injury risk</td>
+        <td><span class="sc" style="background:rgba(160,32,32,0.08);color:var(--danger);border:1px solid rgba(160,32,32,0.2);">Production STOP</span></td>
+      </tr>
+      <tr>
+        <td>Coating</td>
+        <td>Weight gain, appearance</td>
+        <td>3–4% weight gain</td>
+        <td>Every 30 min</td>
+        <td>Under-coat = poor protection; over-coat = slow dissolution</td>
+        <td><span class="sc sc-pend">Deviation, coating extension</span></td>
+      </tr>
+      <tr>
+        <td>Packaging</td>
+        <td>Seal integrity, print check</td>
+        <td>No empty pockets, clear print</td>
+        <td>Every 30 min + start/end</td>
+        <td>Empty blister shipped to patient; illegible label → dispensing error</td>
+        <td><span class="sc sc-pend">Line stop, investigate</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="wbox">
+    <strong>Why MES is essential for IPC:</strong> In a paper-based system, operators manually record IPC results on paper forms — it's easy to skip, misrecord, or falsify. MES makes every IPC test mandatory — the batch record cannot advance to the next step until the IPC is entered and within specification. This is what GMP compliance looks like in practice.
+    <br><br>
+    <a class="dl v" href="https://www.youtube.com/watch?v=Ls6YEw0I7QY" target="_blank">▶ Tablet Manufacturing Stages (IPC)</a>&nbsp;&nbsp;
+    <a class="dl" href="https://www.ich.org/page/quality-guidelines" target="_blank">↗ ICH Q6A — Specifications & IPC</a>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     CHAPTER 7 — RESOURCES
+════════════════════════════════════════════ -->
+<div id="resources"></div>
+<div class="wrap">
+  <div class="sticky"><span>Chapter 07</span> — Curated Learning Resources</div>
+
+  <div class="ch" data-n="07">
+    <div class="ch-label">Go Deeper</div>
+    <div class="ch-title">Curated Resources by Topic</div>
+    <p class="ch-sub">Handpicked videos, official docs, and standards for every topic in this guide. Each card tells you what type it is and how long it takes.</p>
+  </div>
+
+  <div class="res-cat">🏢 ERP Fundamentals</div>
+  <div class="res-grid">
+    <a class="res-card rv" href="https://www.youtube.com/watch?v=rCQlTs_S6bA" target="_blank"><span class="res-arr">↗</span><div class="res-badge">▶ VIDEO</div><div class="res-title">What is ERP? SAP for Beginners</div><div class="res-desc">Clear intro to ERP and SAP — what ERP is, what SAP does, and how it connects business processes in a manufacturing company.</div><div class="res-meta"><span>YouTube</span><span>~14 min</span></div></a>
+    <a class="res-card ra" href="https://www.sap.com/products/erp/what-is-erp.html" target="_blank"><span class="res-arr">↗</span><div class="res-badge">↗ ARTICLE</div><div class="res-title">SAP: What is ERP?</div><div class="res-desc">SAP's own explanation of ERP — what it is, its modules, and how it works in a manufacturing company.</div><div class="res-meta"><span>sap.com</span><span>Vendor Reference</span></div></a>
+    <a class="res-card rv" href="https://www.youtube.com/watch?v=q_6kNEEhXss" target="_blank"><span class="res-arr">↗</span><div class="res-badge">▶ VIDEO</div><div class="res-title">SAP PP — Material Requirements Planning (MRP) Step by Step</div><div class="res-desc">How MRP works in SAP PP — the logic behind planned orders, work order creation, and how production planning flows to the shop floor.</div><div class="res-meta"><span>YouTube</span><span>~20 min</span></div></a>
+    <a class="res-card rv" href="https://www.youtube.com/watch?v=ysze4133LCc" target="_blank"><span class="res-arr">↗</span><div class="res-badge">▶ VIDEO</div><div class="res-title">What is MRP? Material Requirements Planning</div><div class="res-desc">Explains Material Requirements Planning — how ERP calculates what to buy and produce, and when. Foundational concept for pharma manufacturing.</div><div class="res-meta"><span>YouTube</span><span>~18 min</span></div></a>
+  </div>
+
+  <div class="res-cat">🏭 MES & ISA-95</div>
+  <div class="res-grid">
+    <a class="res-card rv" href="https://www.youtube.com/watch?v=SIge-EAUXiI" target="_blank"><span class="res-arr">↗</span><div class="res-badge">▶ VIDEO</div><div class="res-title">Introduction to ERP Systems</div><div class="res-desc">Foundational introduction to ERP — how it works, key terminology, and how it integrates with manufacturing operations systems like MES.</div><div class="res-meta"><span>YouTube</span><span>~12 min</span></div></a>
+    <a class="res-card ra" href="https://www.mesa.org/what-is-mes/" target="_blank"><span class="res-arr">↗</span><div class="res-badge">↗ ARTICLE</div><div class="res-title">MESA International: What is MES?</div><div class="res-desc">The industry body's definitive guide to MES scope, benefits, and implementation considerations.</div><div class="res-meta"><span>mesa.org</span><span>Official Body</span></div></a>
+    <a class="res-card rs" href="https://www.isa.org/standards-and-publications/isa-standards/isa-standards-committees/isa95" target="_blank"><span class="res-arr">↗</span><div class="res-badge">◈ STANDARD</div><div class="res-title">ISA-95 Official Standard</div><div class="res-desc">The international standard defining the five-layer manufacturing architecture (L0–L4).</div><div class="res-meta"><span>isa.org</span><span>International Standard</span></div></a>
+    <a class="res-card rv" href="https://www.youtube.com/watch?v=cuwa59KqtO0" target="_blank"><span class="res-arr">↗</span><div class="res-badge">▶ VIDEO</div><div class="res-title">ISA-95 — Unlocking Manufacturing Integration Standards</div><div class="res-desc">Clear visual walkthrough of the ISA-95 manufacturing integration standard — layers, data flow, and how MES fits in the architecture.</div><div class="res-meta"><span>YouTube</span><span>~15 min</span></div></a>
+  </div>
+
+  <div class="res-cat">📋 Pharma Regulations</div>
+  <div class="res-grid">
+    <a class="res-card rs" href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/part-11-electronic-records-electronic-signatures-scope-and-application" target="_blank"><span class="res-arr">↗</span><div class="res-badge">◈ STANDARD</div><div class="res-title">FDA: 21 CFR Part 11 — E-Records & E-Signatures</div><div class="res-desc">Official FDA guidance on electronic records and signatures. The compliance foundation for any pharma MES.</div><div class="res-meta"><span>fda.gov</span><span>Official FDA</span></div></a>
+    <a class="res-card rs" href="https://www.ema.europa.eu/en/documents/regulatory-procedural-guideline/annex-11-computerised-systems_en.pdf" target="_blank"><span class="res-arr">↗</span><div class="res-badge">◈ STANDARD</div><div class="res-title">EU GMP Annex 11 — Computerised Systems</div><div class="res-desc">EU equivalent of 21 CFR Part 11. Covers validation, audit trails, and access controls.</div><div class="res-meta"><span>ema.europa.eu</span><span>EU Regulatory PDF</span></div></a>
+    <a class="res-card rv" href="https://www.youtube.com/watch?v=9F8ELolBaVE" target="_blank"><span class="res-arr">↗</span><div class="res-badge">▶ VIDEO</div><div class="res-title">GMP — 21 CFR Part 211 History &amp; Introduction</div><div class="res-desc">Covers the history and purpose of GMP regulations in pharma, including 21 CFR Part 211, ICH Q7, and EU GMP. Essential context for anyone in pharma manufacturing.</div><div class="res-meta"><span>YouTube</span><span>~12 min</span></div></a>
+    <a class="res-card rv" href="https://www.youtube.com/watch?v=AfCSrIN-QQs" target="_blank"><span class="res-arr">↗</span><div class="res-badge">▶ VIDEO</div><div class="res-title">21 CFR Part 11 — Electronic Records &amp; Signatures Guide</div><div class="res-desc">Ultimate guide to 21 CFR Part 11 — electronic records, e-signatures, and GxP requirements that underpin every pharma MES implementation.</div><div class="res-meta"><span>YouTube</span><span>~9 min</span></div></a>
+  </div>
+
+  <div class="res-cat">💊 OSD Tablet Manufacturing</div>
+  <div class="res-grid">
+    <a class="res-card rv" href="https://www.youtube.com/watch?v=soIkRbFxjII" target="_blank"><span class="res-arr">↗</span><div class="res-badge">▶ VIDEO</div><div class="res-title">Complete Tablet Manufacturing — Granulation to Packaging</div><div class="res-desc">Full walkthrough of OSD tablet manufacturing — granulation, compression, coating, blistering, and packaging. One of the most comprehensive pharma production videos available.</div><div class="res-meta"><span>YouTube</span><span>~20 min</span></div></a>
+    <a class="res-card rv" href="https://www.youtube.com/watch?v=GQL07ss1_ds" target="_blank"><span class="res-arr">↗</span><div class="res-badge">▶ VIDEO</div><div class="res-title">Wet Granulation — Why, How & Critical Parameters</div><div class="res-desc">Visual explanation of wet granulation — mechanism, equipment, end-point determination.</div><div class="res-meta"><span>YouTube</span><span>~14 min</span></div></a>
+    <a class="res-card rv" href="https://www.youtube.com/watch?v=knZGhdNK8P8" target="_blank"><span class="res-arr">↗</span><div class="res-badge">▶ VIDEO</div><div class="res-title">Rotary Tablet Press — Components &amp; Working Principle</div><div class="res-desc">3D animation explaining the components of a rotary tablet press — tooling stations, turret, punches, dies, and how compression force is controlled.</div><div class="res-meta"><span>YouTube</span><span>~11 min</span></div></a>
+    <a class="res-card rv" href="https://www.youtube.com/watch?v=dwHFKyf_ZLc" target="_blank"><span class="res-arr">↗</span><div class="res-badge">▶ VIDEO</div><div class="res-title">Fluid Bed Dryer (FBD) Animation — Pharma Machinery</div><div class="res-desc">Animation showing how a Fluid Bed Dryer works in pharmaceutical manufacturing — air distribution, fluidisation, drying mechanism, and temperature control.</div><div class="res-meta"><span>YouTube</span><span>~8 min</span></div></a>
+    <a class="res-card ra" href="https://www.pharmtech.com/view/understanding-wet-granulation" target="_blank"><span class="res-arr">↗</span><div class="res-badge">↗ ARTICLE</div><div class="res-title">PharmTech: Understanding Wet Granulation</div><div class="res-desc">Technical deep-dive into wet granulation science, scale-up challenges, and best practices.</div><div class="res-meta"><span>pharmtech.com</span><span>Technical Article</span></div></a>
+    <a class="res-card rs" href="https://www.usp.org/harmonization-standards/pdg/general-chapters/tablet-friability" target="_blank"><span class="res-arr">↗</span><div class="res-badge">◈ STANDARD</div><div class="res-title">USP Tablet Friability — Official Standard</div><div class="res-desc">The pharmacopoeial method for tablet friability testing that all IPC results are measured against.</div><div class="res-meta"><span>usp.org</span><span>USP Standard</span></div></a>
+  </div>
+
+  <div class="res-cat">🎓 Free Courses</div>
+  <div class="res-grid">
+    <a class="res-card rc" href="https://www.coursera.org/learn/pharmaceutical-manufacturing" target="_blank"><span class="res-arr">↗</span><div class="res-badge">🎓 COURSE</div><div class="res-title">Pharmaceutical Manufacturing — Coursera</div><div class="res-desc">University-level course covering pharma manufacturing fundamentals, GMP, and quality systems. Free to audit.</div><div class="res-meta"><span>coursera.org</span><span>Free audit</span></div></a>
+    <a class="res-card rc" href="https://www.plcacademy.com/" target="_blank"><span class="res-arr">↗</span><div class="res-badge">🎓 COURSE</div><div class="res-title">PLC Academy — Free PLC & Automation Training</div><div class="res-desc">Structured learning path for understanding PLC and industrial automation (ISA-95 L1).</div><div class="res-meta"><span>plcacademy.com</span><span>Free</span></div></a>
+    <a class="res-card rc" href="https://www.inductiveautomation.com/resources/video" target="_blank"><span class="res-arr">↗</span><div class="res-badge">🎓 COURSE</div><div class="res-title">Inductive Automation — MES & SCADA Video Library</div><div class="res-desc">Free video library from Ignition SCADA — excellent for understanding industrial software.</div><div class="res-meta"><span>inductiveautomation.com</span><span>Free Videos</span></div></a>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     CHAPTER 8 — QUIZ
+════════════════════════════════════════════ -->
+<div id="quiz"></div>
+<div class="wrap">
+  <div class="sticky"><span>Chapter 08</span> — Knowledge Check</div>
+  <div class="s-label">Test Yourself</div>
+  <div class="s-title">Quick Knowledge Quiz</div>
+  <p class="s-desc">10 questions covering ERP, MES, OSD manufacturing, and IPC. Let's see how much you've absorbed!</p>
+
+  <div class="quiz-wrap" id="quiz-container">
+    <div id="qa">
+      <div class="q-text" id="qt"></div>
+      <div class="q-opts" id="qo"></div>
+      <div class="q-fb" id="qf"></div>
+      <div class="q-nav">
+        <button class="btn primary" id="qnext" onclick="qNext()" style="display:none;">Next →</button>
+        <div class="q-ctr" id="qc"></div>
+      </div>
+    </div>
+    <div id="qs" style="display:none;" class="score-box">
+      <span class="score-big" id="sn"></span>
+      <div class="score-label" id="sl"></div>
+      <div class="score-sub" id="sd"></div>
+      <div style="margin-top:1.5rem;">
+        <button class="btn primary" onclick="qReset()">↺ Try Again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;color:var(--accent);margin-bottom:0.75rem;">◈ ERP, MES &amp; OSD MANUFACTURING REFERENCE</div>
+  <div>ERP, MES &amp; OSD Manufacturing — Reference Guide</div>
+  <div style="margin-top:0.4rem;font-size:0.78rem;color:var(--muted);"></div>
+</footer>
+
+<script>
+// ─── NAV SCROLL SPY ───
+function gotoSection(id){
+  document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});
+}
+window.addEventListener('scroll',()=>{
+  const secs=['what-is-erp','erp-to-mes','what-is-mes','tablet-anatomy','osd-process','ipc-specs','resources','quiz'];
+  const links=document.querySelectorAll('.nav-link');
+  let cur=0;
+  secs.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el&&el.getBoundingClientRect().top<=100)cur=i;
+  });
+  links.forEach((l,i)=>l.classList.toggle('active',i===cur));
+});
+
+// ─── OSD STEP TOGGLE ───
+function toggleOSD(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// ─── QUIZ DATA ───
+const Qs=[
+  {
+    q:"In a pharma company, which system creates the Work Order that starts a manufacturing batch?",
+    opts:["MES","SCADA (Rockwell)","ERP (SAP/Oracle)","QC Laboratory System"],
+    ans:2,
+    exp:"ERP creates Work Orders based on demand planning and customer orders. MES receives the Work Order from ERP and then guides the actual execution on the factory floor."
+  },
+  {
+    q:"What does MRP stand for, and what does it do in ERP?",
+    opts:["Manufacturing Record Process — archives batch records","Material Requirements Planning — calculates what materials need to be ordered and when","MES Routing Protocol — connects ERP to MES","Material Release Procedure — QA sign-off process"],
+    ans:1,
+    exp:"MRP (Material Requirements Planning) is an ERP function that automatically calculates what raw materials need to be procured and when, based on the production plan and current stock levels."
+  },
+  {
+    q:"In ISA-95 architecture, where does MES sit?",
+    opts:["L0 — Physical equipment layer","L1 — PLC/device control layer","L2 — SCADA/control layer","L3 — Manufacturing operations layer"],
+    ans:3,
+    exp:"MES sits at L3 — the Manufacturing Operations Management layer. It bridges the shop floor (L0–L2) with business systems (L4 ERP). L3 is responsible for executing and recording manufacturing operations."
+  },
+  {
+    q:"In the dispensing step, why does MES require two-person verification for the API?",
+    opts:["To speed up the process","The API is the most expensive ingredient","The API determines the drug dose — any error directly impacts patient safety","Because the API weighs more than other materials"],
+    ans:2,
+    exp:"The API (Active Pharmaceutical Ingredient) is what gives the medicine its therapeutic effect. An incorrect weight means wrong doses in every tablet — a critical patient safety risk. Dual verification is required by GMP to catch errors."
+  },
+  {
+    q:"During drying in the Fluid Bed Dryer, what does LOD measure?",
+    opts:["Level of Disintegration — how fast the tablet breaks apart","Loss on Drying — the percentage of moisture removed from granules","Limit of Detection — the minimum API detectable","Lot Outgoing Disposition — QA batch decision"],
+    ans:1,
+    exp:"LOD stands for Loss on Drying — it measures the % moisture content in granules. Target for Metformin tablets is 1.5–3.0%. Too high causes compression and stability issues; too low causes brittle tablets."
+  },
+  {
+    q:"Why is there a strict 3-minute maximum for blending after adding Magnesium Stearate?",
+    opts:["3 minutes is the equipment cycle time","Over-lubrication with Mg Stearate causes tablet dissolution failure — the drug won't dissolve in the patient's body","The lubricant is flammable above 3 minutes","3 minutes is an FDA regulation for all lubricants"],
+    ans:1,
+    exp:"Magnesium Stearate is a hydrophobic lubricant. Over-blending causes it to coat the granule surfaces excessively, which slows tablet dissolution — meaning the drug won't release properly when a patient takes it. MES enforces this time limit automatically."
+  },
+  {
+    q:"What does 'Content Uniformity' measure and why does MES track it?",
+    opts:["Uniformity of the coating colour across all tablets","That every tablet contains the same amount of API — within 95–105% of label claim","That all tablets have the same thickness","That the batch was made by a certified operator"],
+    ans:1,
+    exp:"Content Uniformity ensures every single tablet has the same amount of active drug. Poor blending or process variation could mean some tablets have 130% of the dose (toxic) and others have 70% (ineffective). MES tracks blend uniformity and compression data to ensure this."
+  },
+  {
+    q:"What happens in MES when a metal detection challenge test FAILS during packaging?",
+    opts:["The line slows down but continues","A note is added to the paper batch record","Production stops immediately — MES raises a critical deviation and the line cannot resume until QA approves","The operator can override the failure and continue"],
+    ans:2,
+    exp:"Metal detection failure is a critical patient safety event. MES immediately stops the packaging line, raises a deviation, and prevents the line from restarting without QA review and approval. All tablets produced since the last passing challenge are quarantined."
+  },
+  {
+    q:"After a batch is manufactured, what does MES post back to ERP?",
+    opts:["Only the batch number and date","Batch completion, actual yield, materials consumed, timestamps, and batch status — which updates ERP inventory and triggers financial settlement","Only deviations and quality events","Nothing — MES and ERP are separate systems that don't communicate"],
+    ans:1,
+    exp:"MES sends comprehensive completion data back to ERP: batch status, actual yield (tablets produced), actual materials consumed (goods issue), production timestamps, and operator info. This updates ERP inventory automatically and triggers financial batch costing."
+  },
+  {
+    q:"What is a CQA in pharmaceutical manufacturing?",
+    opts:["Certified Quality Auditor — a QA professional role","Computer Quality Assurance — software testing process","Critical Quality Attribute — a measurable property (e.g. tablet weight, dissolution) that must be within spec for patient safety","Continuous Quality Assessment — ongoing monitoring program"],
+    ans:2,
+    exp:"CQA stands for Critical Quality Attribute — a physical, chemical, biological, or microbiological property that must be within a defined range to ensure the product is safe, effective, and consistent. Examples: tablet weight, hardness, dissolution, content uniformity. MES monitors and enforces CQAs through IPC."
+  }
+];
+
+let qIdx=0,qScore=0,qDone=false;
+
+function qRender(){
+  const q=Qs[qIdx];
+  document.getElementById('qt').textContent=`Q${qIdx+1}. ${q.q}`;
+  document.getElementById('qc').textContent=`${qIdx+1} / ${Qs.length}`;
+  const o=document.getElementById('qo');
+  o.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const d=document.createElement('div');
+    d.className='q-opt';d.textContent=opt;
+    d.onclick=()=>qAnswer(i,d);
+    o.appendChild(d);
+  });
+  document.getElementById('qf').className='q-fb';
+  document.getElementById('qf').textContent='';
+  document.getElementById('qnext').style.display='none';
+  qDone=false;
+}
+
+function qAnswer(i,el){
+  if(qDone)return;
+  qDone=true;
+  const q=Qs[qIdx];
+  document.querySelectorAll('.q-opt').forEach((o,idx)=>{
+    if(idx===q.ans)o.classList.add('correct');
+    else if(idx===i&&i!==q.ans)o.classList.add('wrong');
+  });
+  const fb=document.getElementById('qf');
+  if(i===q.ans){
+    qScore++;
+    fb.className='q-fb show ok';
+    fb.textContent='✓ Correct! '+q.exp;
+  }else{
+    fb.className='q-fb show bad';
+    fb.textContent='✗ Not quite. '+q.exp;
+  }
+  const nb=document.getElementById('qnext');
+  nb.style.display='block';
+  nb.textContent=qIdx<Qs.length-1?'Next Question →':'See My Score →';
+}
+
+function qNext(){
+  qIdx++;
+  if(qIdx>=Qs.length)qShowScore();
+  else qRender();
+}
+
+function qShowScore(){
+  document.getElementById('qa').style.display='none';
+  document.getElementById('qs').style.display='block';
+  const pct=Math.round((qScore/Qs.length)*100);
+  document.getElementById('sn').textContent=`${qScore}/${Qs.length}`;
+  let lbl,dsc;
+  if(pct>=90){lbl='🏆 Outstanding!';dsc='You have an excellent grasp of ERP, MES and OSD manufacturing. You are ready for deeper discussions with customers!';}
+  else if(pct>=70){lbl='👍 Good Work!';dsc='Solid foundation! Review any areas you missed — especially the ERP → MES handoff and IPC topics.';}
+  else if(pct>=50){lbl='📚 Keep Going!';dsc='You are getting there! Re-read the ERP and OSD chapters, then try again. The concepts will click with repetition.';}
+  else{lbl='🔄 Let\'s Review';dsc='No worries at all — there\'s a lot to absorb here. Go back through the chapters at your own pace and try the quiz again.';}
+  document.getElementById('sl').textContent=lbl;
+  document.getElementById('sd').textContent=dsc;
+}
+
+function qReset(){
+  qIdx=0;qScore=0;qDone=false;
+  document.getElementById('qa').style.display='block';
+  document.getElementById('qs').style.display='none';
+  qRender();
+}
+
+qRender();
+</script>
+</body>
+</html>
