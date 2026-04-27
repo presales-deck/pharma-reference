@@ -1,0 +1,3204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OOS Investigation Workflow · Celestara AI Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg-0: #04080f;
+  --bg-1: #080f1c;
+
+  --teal:    #22d3ee;
+  --green:   #34d399;
+  --violet:  #a78bfa;
+  --violet-hi:#c4b5fd;
+  --amber:   #fbbf24;
+  --rose:    #fb7185;
+  --sky:     #0ea5e9;
+  --orange:  #f97316;
+  --indigo:  #818cf8;
+
+  --txt-1: #f0f8ff;
+  --txt-2: #8aafc8;
+  --txt-3: #4a7090;
+  --txt-4: #2e5068;
+
+  --border: rgba(255,255,255,0.07);
+
+  --font:   'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-h: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-m: 'JetBrains Mono', 'Menlo', monospace;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+
+  /* Spacing rhythm (8px base) */
+  --s-1: 8px;
+  --s-2: 16px;
+  --s-3: 24px;
+  --s-4: 32px;
+  --s-5: 40px;
+  --s-6: 48px;
+  --s-7: 64px;
+  --s-8: 80px;
+
+  /* Connector colors */
+  --flow-dim: rgba(138, 175, 200, 0.15);
+  --flow-bright: rgba(34, 211, 238, 0.9);
+}
+
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+
+body {
+  font-family: var(--font);
+  background: #030b1a;
+  color: var(--txt-1);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(ellipse 70% 50% at 10% 20%,  rgba(34,211,238,0.05)  0%, transparent 65%),
+    radial-gradient(ellipse 50% 70% at 90% 5%,   rgba(167,139,250,0.05) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 40% at 50% 95%,  rgba(52,211,153,0.03)  0%, transparent 60%),
+    radial-gradient(circle, rgba(34,211,238,0.035) 1px, transparent 1px);
+  background-size: auto, auto, 30px 30px;
+}
+
+/* ═══ HEADER ═══ */
+.hdr {
+  padding: var(--s-4) var(--s-5) var(--s-3);
+  border-bottom:1px solid var(--border);
+  position:relative; overflow:hidden; isolation:isolate;
+}
+.hdr::before {
+  content:''; position:absolute; inset:0; z-index:-1;
+  background:
+    radial-gradient(ellipse 80% 100% at -5% 50%, rgba(34,211,238,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 105% -10%, rgba(167,139,250,0.07) 0%, transparent 60%);
+}
+.hdr-inner {
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap: var(--s-3); flex-wrap:wrap;
+  max-width: 1400px; margin: 0 auto;
+}
+.hdr-left { flex:1; min-width:0; }
+.eyebrow {
+  display:inline-flex; align-items:center; gap: var(--s-1);
+  margin-bottom: var(--s-2); padding:5px 13px 5px 10px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.14) 0%, rgba(139,92,246,0.10) 100%);
+  border:1px solid rgba(96,165,250,0.28);
+  border-radius:20px;
+}
+.eyebrow-dot {
+  width:6px; height:6px; border-radius:50%; background:#3b82f6;
+  box-shadow: 0 0 0 0 rgba(59,130,246,0.6);
+  animation: ping 2s cubic-bezier(0,0,.2,1) infinite;
+}
+@keyframes ping {
+  0%,100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.6); }
+  70%     { box-shadow: 0 0 0 8px rgba(59,130,246,0); }
+}
+.eyebrow-txt {
+  font-family:var(--font-m); font-size:10px; font-weight:600;
+  color:#60a5fa; letter-spacing:.08em; text-transform:uppercase;
+}
+.hdr h1 {
+  font-family:var(--font-h); font-size:28px; font-weight:800;
+  color:#fff; letter-spacing:-0.8px; line-height:1.1;
+  margin-bottom: var(--s-2);
+}
+.h1-grad {
+  background: linear-gradient(90deg, #60a5fa 0%, #a78bfa 55%, #67e8f9 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.hdr-sub { font-size:13px; color:var(--txt-2); line-height:1.6; max-width:580px; font-weight:400; }
+.hdr-right {
+  display:flex; flex-direction:column; align-items:flex-end;
+  gap: var(--s-2); padding-top:2px; flex-shrink:0;
+}
+.sop-badge {
+  display:inline-flex; align-items:center; gap: var(--s-1);
+  padding:8px 14px; border-radius:10px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.14) 0%, rgba(139,92,246,0.10) 100%);
+  border:1px solid rgba(96,165,250,0.28);
+  color:#bfdbfe; font-size:11px; font-weight:600;
+}
+.meta-row { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+.meta-pill {
+  padding:4px 10px; border-radius:6px;
+  background: rgba(255,255,255,0.035);
+  border:1px solid var(--border);
+  color:var(--txt-3); font-size:10.5px; font-weight:600;
+  transition:all .2s;
+}
+.meta-pill:hover { border-color:rgba(34,211,238,0.3); color:var(--teal); }
+
+/* ═══ LEGEND ═══ */
+.legend {
+  display:flex; padding: 0 var(--s-6);
+  background:rgba(5,10,20,0.85);
+  border-bottom:1px solid var(--border);
+  overflow-x:auto; scrollbar-width:none;
+  max-width: 1400px; margin: 0 auto;
+}
+.legend::-webkit-scrollbar { display:none; }
+.lg-grp {
+  display:flex; align-items:center; gap: var(--s-2);
+  padding: 14px var(--s-3) 14px 0; margin-right: var(--s-3);
+  border-right:1px solid var(--border);
+}
+.lg-grp:last-child { border-right:none; margin-right:0; padding-right:0; }
+.lg-lbl {
+  font-family:var(--font-m); font-size:9px; font-weight:500;
+  color:var(--txt-4); letter-spacing:.1em; text-transform:uppercase;
+  white-space:nowrap;
+}
+.lg-item { display:flex; align-items:center; gap:6px; white-space:nowrap; }
+.lg-item span { font-size:11px; color:#5a7a98; }
+.lg-box  { width:11px; height:11px; border-radius:3px; flex-shrink:0; }
+.lg-dia  { width:9px;  height:9px;  transform:rotate(45deg); border-radius:1px; flex-shrink:0; }
+.lg-line { width:22px; height:2.5px; border-radius:2px; flex-shrink:0; }
+.lg-dash { width:22px; border-top:2.5px dashed; flex-shrink:0; }
+
+/* ═══ STAGGERED REVEAL ON LOAD ═══
+   Each flow element fades in from slightly below with a cascading
+   delay (set inline via JS). Total duration ~1.2s for full sequence.
+   Only applies when the .is-revealing class is set on flow-inner by
+   JavaScript; if JS fails or reduced-motion is requested, the page
+   renders immediately with no animation. */
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes reveal-in-subtle {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.flow-inner.is-revealing .node,
+.flow-inner.is-revealing .pill-node,
+.flow-inner.is-revealing .diamond,
+.flow-inner.is-revealing .outcome-a-join {
+  opacity: 0;
+  animation: reveal-in 0.52s cubic-bezier(.2,.8,.2,1) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+.flow-inner.is-revealing .conn,
+.flow-inner.is-revealing .converge,
+.flow-inner.is-revealing .skill-grp,
+.flow-inner.is-revealing .path-lbl,
+.flow-inner.is-revealing .split-header {
+  opacity: 0;
+  animation: reveal-in-subtle 0.52s ease-out both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+/* SVG paths fade in after the node cascade */
+.flow-inner.is-revealing ~ * .flow-svg path,
+.flow-inner.is-revealing .flow-svg path {
+  animation: reveal-in-subtle 0.4s ease-out both;
+  animation-delay: var(--svg-reveal-delay, 800ms);
+}
+/* Respect user's reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .flow-inner.is-revealing * {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ═══ SKILL PROGRESS STRIP ═══
+   Persistent 5-skill orientation bar below the legend.
+   Light up active segments on node hover. */
+.progress-strip {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 18px var(--s-6) 20px;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  background: rgba(5, 10, 20, 0.55);
+}
+.ps-step {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px 9px 13px;
+  border-radius: 7px;
+  background: rgba(255,255,255,0.015);
+  border: 1px solid transparent;
+  transition: all .28s cubic-bezier(.4,0,.2,1);
+  cursor: default;
+  min-width: 0;
+}
+.ps-step:not(:last-child) {
+  margin-right: 10px;
+}
+.ps-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0; height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 6px solid rgba(255,255,255,0.08);
+  transition: border-left-color .28s;
+}
+.ps-num {
+  font-family: var(--font-m);
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: .05em;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.04);
+  color: var(--txt-3);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all .28s;
+}
+.ps-body { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ps-label {
+  font-family: var(--font-h);
+  font-size: 11.5px; font-weight: 700;
+  color: var(--txt-2);
+  letter-spacing: -0.005em;
+  line-height: 1.15;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color .28s;
+}
+.ps-sublabel {
+  font-size: 9.5px; font-weight: 500;
+  color: var(--txt-4);
+  letter-spacing: .04em;
+  line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color .28s;
+}
+/* Per-skill accent colors when lit */
+.ps-step[data-ps="1"].is-lit { background: rgba(34,211,238,0.08); border-color: rgba(34,211,238,0.35); }
+.ps-step[data-ps="1"].is-lit .ps-num { background: rgba(34,211,238,0.18); color: #67e8f9; }
+.ps-step[data-ps="1"].is-lit .ps-label { color: #bae6fd; }
+.ps-step[data-ps="1"].is-lit::after { border-left-color: rgba(34,211,238,0.5); }
+
+.ps-step[data-ps="2"].is-lit { background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.35); }
+.ps-step[data-ps="2"].is-lit .ps-num { background: rgba(167,139,250,0.2); color: #c4b5fd; }
+.ps-step[data-ps="2"].is-lit .ps-label { color: #ddd6fe; }
+.ps-step[data-ps="2"].is-lit::after { border-left-color: rgba(167,139,250,0.5); }
+
+.ps-step[data-ps="3"].is-lit { background: rgba(196,181,253,0.08); border-color: rgba(196,181,253,0.45); }
+.ps-step[data-ps="3"].is-lit .ps-num { background: rgba(196,181,253,0.22); color: #ddd6fe; }
+.ps-step[data-ps="3"].is-lit .ps-label { color: #ede9fe; }
+.ps-step[data-ps="3"].is-lit::after { border-left-color: rgba(196,181,253,0.55); }
+
+.ps-step[data-ps="4"].is-lit { background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.4); }
+.ps-step[data-ps="4"].is-lit .ps-num { background: rgba(52,211,153,0.2); color: #6ee7b7; }
+.ps-step[data-ps="4"].is-lit .ps-label { color: #a7f3d0; }
+.ps-step[data-ps="4"].is-lit::after { border-left-color: rgba(52,211,153,0.5); }
+
+.ps-step[data-ps="5"].is-lit { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.4); }
+.ps-step[data-ps="5"].is-lit .ps-num { background: rgba(251,191,36,0.2); color: #fcd34d; }
+.ps-step[data-ps="5"].is-lit .ps-label { color: #fde68a; }
+
+/* The "ACTIVE" step — the step directly containing the hovered node */
+.ps-step.is-active {
+  transform: translateY(-1px);
+}
+.ps-step.is-active .ps-num {
+  box-shadow: 0 0 0 2px currentColor;
+}
+
+/* ═══ FLOW CANVAS ═══ */
+.flow {
+  padding: var(--s-6) var(--s-3) var(--s-8);
+  display:flex; flex-direction:column; align-items:center;
+  position: relative;
+}
+.flow-inner {
+  width:100%; max-width:900px;
+  display:flex; flex-direction:column; align-items:center;
+  gap:0;
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══ CONNECTOR (arrow between rows) ═══ */
+.conn {
+  position:relative;
+  width:2px;
+  height: var(--s-3);
+  background: linear-gradient(180deg, rgba(34,211,238,0.35) 0%, rgba(34,211,238,0.75) 100%);
+  pointer-events:none;
+  transition: opacity .3s, background .3s;
+}
+.conn::after {
+  content:''; position:absolute;
+  bottom:-1px; left:50%; transform:translateX(-50%);
+  width:0; height:0;
+  border-left:5px solid transparent;
+  border-right:5px solid transparent;
+  border-top:7px solid rgba(34,211,238,0.75);
+  transition: border-top-color .3s;
+}
+.conn.green { background: linear-gradient(180deg, rgba(52,211,153,0.35), rgba(52,211,153,0.75)); }
+.conn.green::after  { border-top-color: rgba(52,211,153,0.75); }
+.conn.violet { background: linear-gradient(180deg, rgba(167,139,250,0.35), rgba(167,139,250,0.75)); }
+.conn.violet::after { border-top-color: rgba(167,139,250,0.75); }
+/* Bigger connector gap between skills (phase transition) */
+.conn.lg { height: var(--s-5); }
+
+/* ═══ SKILL GROUP ═══ */
+.skill-grp {
+  width:100%;
+  position:relative;
+  padding: var(--s-4) var(--s-2) var(--s-3);
+  border:1.2px dashed;
+  border-radius:var(--r-lg);
+  display:flex; flex-direction:column; align-items:center;
+  gap: 0;
+  transition: opacity .3s, filter .3s;
+}
+/* Internal step gaps — consistent tight rhythm */
+.skill-grp > .node + .conn,
+.skill-grp > .node {
+  /* spacing handled via conn height */
+}
+.skill-grp.s1 { border-color:rgba(34,211,238,0.18);  background: radial-gradient(ellipse 100% 80% at 50% 0%, rgba(34,211,238,0.05) 0%, transparent 70%); }
+.skill-grp.s2 { border-color:rgba(167,139,250,0.18); background: radial-gradient(ellipse 100% 80% at 50% 0%, rgba(167,139,250,0.05) 0%, transparent 70%); }
+.skill-grp.s3 { border-color:rgba(167,139,250,0.28); border-width:1.4px; background: radial-gradient(ellipse 100% 80% at 50% 0%, rgba(167,139,250,0.05) 0%, transparent 70%); }
+.skill-grp.s4 { border-color:rgba(52,211,153,0.26); border-width:1.4px;  background: radial-gradient(ellipse 100% 80% at 50% 0%, rgba(52,211,153,0.04) 0%, transparent 70%); }
+.skill-grp.s5 { border-color:rgba(251,191,36,0.20);  background: radial-gradient(ellipse 100% 80% at 50% 0%, rgba(251,191,36,0.04) 0%, transparent 70%); }
+
+.skill-tag {
+  position:absolute;
+  top:-13px; left: var(--s-3);
+  padding: 5px 14px; border-radius:7px;
+  font-family:var(--font-m); font-size:10px; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase;
+  z-index:2;
+  display: inline-flex; align-items: center; gap: 9px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+.skill-tag .skill-tag-num {
+  font-weight: 800;
+  opacity: 0.95;
+}
+.skill-tag .skill-tag-sep {
+  width: 1px; height: 11px;
+  background: currentColor;
+  opacity: 0.35;
+}
+.skill-tag .skill-tag-desc {
+  font-weight: 500;
+  opacity: 0.85;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  font-size: 10.5px;
+}
+.skill-grp.s1 .skill-tag { background:#1d4ed8; color:#dbeafe; }
+.skill-grp.s2 .skill-tag { background:#6d28d9; color:#ede9fe; }
+.skill-grp.s3 .skill-tag { background:#6d28d9; color:#ede9fe; }
+.skill-grp.s4 .skill-tag { background:#047857; color:#d1fae5; }
+.skill-grp.s5 .skill-tag { background:#b45309; color:#fef3c7; }
+
+/* ═══ NODE CARDS ═══ */
+.node {
+  width:100%;
+  max-width:600px;
+  position:relative;
+  border-radius:var(--r-md);
+  border:1.3px solid transparent;
+  cursor:pointer;
+  overflow:hidden;
+  transition: transform .2s, box-shadow .2s, border-color .2s, opacity .3s, filter .3s;
+  background: linear-gradient(135deg, var(--node-bg-1, #0a2240) 0%, var(--node-bg-2, #061528) 100%);
+  border-color: var(--node-border, rgba(34,211,238,0.28));
+  display:block;
+}
+.node:hover,
+.node:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--node-border-hi, rgba(34,211,238,0.5));
+  box-shadow: 0 8px 28px rgba(0,0,0,0.5), 0 0 0 1px var(--node-glow-1, rgba(34,211,238,0.2)), 0 4px 20px var(--node-glow-2, rgba(34,211,238,0.15));
+  outline: none;
+}
+.node::before {
+  content:''; position:absolute; pointer-events:none;
+  top:0; left:0; right:0; height:24px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%);
+  z-index:0;
+}
+.node-accent {
+  position:absolute; left:0; top:0; bottom:0;
+  width:4px; border-radius:4px 0 0 4px;
+  pointer-events:none;
+  background: var(--node-accent, var(--teal));
+  box-shadow: 0 0 10px var(--node-accent-glow, rgba(34,211,238,0.5));
+  z-index:1;
+}
+.node-body {
+  padding: 14px 48px 14px var(--s-3);
+  position:relative;
+  z-index:2;
+}
+.node-tag {
+  font-family:var(--font-m);
+  font-size:9.5px; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase;
+  margin-bottom: 6px;
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  color: var(--node-tag, rgba(34,211,238,0.75));
+}
+.node-title {
+  font-family:var(--font-h);
+  font-size:15.5px; font-weight:700; color:var(--txt-1);
+  line-height:1.3; margin-bottom: 5px;
+  letter-spacing:-0.01em;
+}
+/* Short descriptive line — the lede. Followed by a chip row. */
+.node-desc {
+  font-size: 12px; color: var(--txt-2);
+  line-height: 1.55; font-weight: 400;
+  margin-bottom: 8px;
+}
+/* Row of small chips summarising key sub-activities. These make the
+   node scannable instead of middot-paragraph-soup. */
+.node-chips {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  margin-top: 2px;
+}
+.node-chip {
+  display: inline-flex; align-items: center;
+  font-family: var(--font-m);
+  font-size: 9.5px; font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(255,255,255,0.065);
+  color: var(--txt-2);
+  white-space: nowrap;
+  transition: background .18s, border-color .18s, color .18s;
+}
+.node:hover .node-chip,
+.node:focus-visible .node-chip {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  color: var(--txt-1);
+}
+/* Chip variant: highlights mandatory/gating items */
+.node-chip.is-gate {
+  background: rgba(251,191,36,0.08);
+  border-color: rgba(251,191,36,0.28);
+  color: #fbbf24;
+}
+.chev {
+  position:absolute; right:14px; top:50%;
+  transform:translateY(-50%);
+  width:24px; height:24px; border-radius:50%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--txt-3); font-size:13px; font-weight:300;
+  transition: all .2s;
+  pointer-events:none;
+  z-index:1;
+}
+.node:hover .chev,
+.node:focus-visible .chev { background:rgba(255,255,255,0.1); color:var(--txt-2); transform: translateY(-50%) translateX(2px); }
+
+/* Color variants — set via CSS custom properties */
+.n-blue   { --node-bg-1:#0a2240; --node-bg-2:#061528;
+            --node-border:rgba(34,211,238,0.28); --node-border-hi:rgba(34,211,238,0.55);
+            --node-accent:var(--teal); --node-accent-glow:rgba(34,211,238,0.55);
+            --node-tag:rgba(34,211,238,0.8);
+            --node-glow-1:rgba(34,211,238,0.2); --node-glow-2:rgba(34,211,238,0.18); }
+.n-rose   { --node-bg-1:#2a0818; --node-bg-2:#180410;
+            --node-border:rgba(251,113,133,0.32); --node-border-hi:rgba(251,113,133,0.6);
+            --node-accent:var(--rose); --node-accent-glow:rgba(251,113,133,0.55);
+            --node-tag:rgba(251,113,133,0.85);
+            --node-glow-1:rgba(251,113,133,0.22); --node-glow-2:rgba(251,113,133,0.18); }
+.n-violet { --node-bg-1:#180a45; --node-bg-2:#0e0530;
+            --node-border:rgba(167,139,250,0.32); --node-border-hi:rgba(167,139,250,0.6);
+            --node-accent:var(--violet); --node-accent-glow:rgba(167,139,250,0.55);
+            --node-tag:rgba(167,139,250,0.85);
+            --node-glow-1:rgba(167,139,250,0.2); --node-glow-2:rgba(167,139,250,0.18); }
+.n-green  { --node-bg-1:#063020; --node-bg-2:#031c10;
+            --node-border:rgba(52,211,153,0.35); --node-border-hi:rgba(52,211,153,0.6);
+            --node-accent:var(--green); --node-accent-glow:rgba(52,211,153,0.55);
+            --node-tag:rgba(52,211,153,0.85);
+            --node-glow-1:rgba(52,211,153,0.2); --node-glow-2:rgba(52,211,153,0.18); }
+.n-sky    { --node-bg-1:#031c28; --node-bg-2:#011018;
+            --node-border:rgba(14,165,233,0.35); --node-border-hi:rgba(14,165,233,0.6);
+            --node-accent:var(--sky); --node-accent-glow:rgba(14,165,233,0.55);
+            --node-tag:rgba(14,165,233,0.9);
+            --node-glow-1:rgba(14,165,233,0.22); --node-glow-2:rgba(14,165,233,0.18); }
+.n-orange { --node-bg-1:#1e0800; --node-bg-2:#120500;
+            --node-border:rgba(249,115,22,0.35); --node-border-hi:rgba(249,115,22,0.6);
+            --node-accent:var(--orange); --node-accent-glow:rgba(249,115,22,0.55);
+            --node-tag:rgba(249,115,22,0.9);
+            --node-glow-1:rgba(249,115,22,0.22); --node-glow-2:rgba(249,115,22,0.18); }
+.n-indigo { --node-bg-1:#0c0828; --node-bg-2:#070518;
+            --node-border:rgba(129,140,248,0.35); --node-border-hi:rgba(129,140,248,0.6);
+            --node-accent:var(--indigo); --node-accent-glow:rgba(129,140,248,0.55);
+            --node-tag:rgba(129,140,248,0.9);
+            --node-glow-1:rgba(129,140,248,0.22); --node-glow-2:rgba(129,140,248,0.18); }
+
+/* Phase 1B highlighted node */
+.n-violet-hi {
+  --node-bg-1:#1a0c52; --node-bg-2:#110738;
+  --node-border:rgba(196,181,253,0.6); --node-border-hi:rgba(196,181,253,0.9);
+  --node-accent:var(--violet-hi); --node-accent-glow:rgba(196,181,253,0.65);
+  --node-tag:#b3a5cc;
+  --node-glow-1:rgba(196,181,253,0.3); --node-glow-2:rgba(167,139,250,0.25);
+  border-width:2px;
+  box-shadow: 0 0 0 1px rgba(196,181,253,0.15), 0 4px 24px rgba(167,139,250,0.2);
+}
+.n-violet-hi .node-accent { width:5px; }
+.n-violet-hi::after {
+  content:''; position:absolute;
+  top:-7px; left:-7px; right:-7px; bottom:-7px;
+  border:1.5px dashed rgba(196,181,253,0.4);
+  border-radius:calc(var(--r-md) + 7px);
+  pointer-events:none;
+  animation: pulse-ring 3s ease-in-out infinite;
+}
+@keyframes pulse-ring {
+  0%,100% { opacity:0.65; transform:scale(1); }
+  50%     { opacity:0.3;  transform:scale(1.015); }
+}
+.phase-1b-pill {
+  background: rgba(196,181,253,0.18);
+  border:1px solid rgba(196,181,253,0.5);
+  color:var(--violet-hi);
+  padding:1.5px 9px; border-radius:10px;
+  font-size:8.5px; font-weight:800; letter-spacing:.08em;
+}
+
+/* Phase 2 — strong green */
+.n-green-strong {
+  --node-bg-1:#07401f; --node-bg-2:#04270f;
+  --node-border:rgba(52,211,153,0.5); --node-border-hi:rgba(52,211,153,0.8);
+  --node-accent:var(--green); --node-accent-glow:rgba(52,211,153,0.65);
+  --node-tag:rgba(52,211,153,0.95);
+  --node-glow-1:rgba(52,211,153,0.25); --node-glow-2:rgba(52,211,153,0.2);
+  border-width:1.8px;
+}
+.n-green-strong .node-accent { width:5px; }
+
+.phase-2-pill {
+  background: rgba(52,211,153,0.18);
+  border:1px solid rgba(52,211,153,0.5);
+  color:var(--green);
+  padding:1.5px 9px; border-radius:10px;
+  font-size:8.5px; font-weight:800; letter-spacing:.08em;
+}
+
+/* ═══ PILL NODES (start/end) ═══ */
+.pill-node {
+  position:relative;
+  width:100%; max-width:540px;
+  padding: 16px 28px;
+  border-radius:40px;
+  text-align:center;
+  cursor:pointer;
+  border:1.8px solid rgba(251,191,36,0.5);
+  background: linear-gradient(135deg, #241000 0%, #160900 100%);
+  box-shadow: 0 0 30px rgba(251,191,36,0.12);
+  transition: transform .2s, box-shadow .2s, opacity .3s, filter .3s;
+  overflow:hidden;
+}
+.pill-node::before {
+  content:''; position:absolute; pointer-events:none;
+  top:0; left:0; right:0; height:50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
+}
+.pill-node:hover,
+.pill-node:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(251,191,36,0.2);
+  outline: none;
+}
+.pill-tag {
+  font-family:var(--font-m); font-size:9.5px; font-weight:600;
+  color:var(--amber); letter-spacing:.14em; text-transform:uppercase;
+  margin-bottom: 6px;
+}
+.pill-title {
+  font-family:var(--font-h); font-size:17px; font-weight:700; letter-spacing:-0.01em;
+  color:#e4dcd0; margin-bottom: 5px;
+}
+.pill-sub { font-size:11.5px; color:#8a6628; font-weight:400; line-height: 1.5; }
+.pill-hint { font-size:8.5px; color:rgba(255,255,255,0.2); font-style:italic; margin-top: 6px; }
+
+/* ═══ DECISION DIAMOND ═══ */
+.decision-row {
+  width:100%;
+  display:flex; justify-content:center; align-items:center;
+  gap: var(--s-2); padding: var(--s-1) 0;
+  flex-wrap:wrap;
+}
+.diamond {
+  position:relative;
+  width:195px; height:68px;
+  background: linear-gradient(135deg, #241000 0%, #160900 100%);
+  border: 1.8px solid rgba(251,191,36,0.6);
+  transform: skewX(-18deg);
+  border-radius:6px;
+  box-shadow: 0 0 24px rgba(251,191,36,0.15);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  transition: border-color .2s, box-shadow .2s, opacity .3s, filter .3s;
+  flex-shrink:0;
+}
+.diamond::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, transparent 50%);
+}
+.diamond::after {
+  content:''; position:absolute; pointer-events:none;
+  top:-5px; left:-5px; right:-5px; bottom:-5px;
+  border:1px solid rgba(251,191,36,0.3);
+  border-radius:8px;
+  animation: d-pulse 2.5s ease-in-out infinite;
+}
+@keyframes d-pulse {
+  0%,100% { opacity:.5; transform:scale(1); }
+  50%     { opacity:0;  transform:scale(1.04); }
+}
+.diamond:hover,
+.diamond:focus-visible {
+  border-color: rgba(251,191,36,0.9);
+  box-shadow: 0 0 36px rgba(251,191,36,0.3);
+  outline: none;
+}
+.diamond-inner { transform: skewX(18deg); text-align:center; padding:0 10px; }
+.diamond-title {
+  font-family:var(--font-h); font-size:13px; font-weight:700; letter-spacing:-0.005em;
+  color:#fff4c2; line-height:1.2;
+}
+.diamond-sub {
+  font-size:9.5px; color:rgba(251,191,36,0.75);
+  margin-top: 4px; font-weight:500;
+}
+.path-lbl {
+  padding: 7px 13px; border-radius:20px;
+  font-size:10.5px; font-weight:700;
+  white-space:nowrap;
+  transition: opacity .3s, filter .3s, border-color .3s, background .3s;
+}
+.path-lbl.yes { background: rgba(52,211,153,0.12); color:var(--green); border:1px solid rgba(52,211,153,0.35); }
+.path-lbl.no  { background: rgba(167,139,250,0.12); color:var(--violet); border:1px solid rgba(167,139,250,0.35); }
+
+/* ═══ SPLIT LAYOUT ═══ */
+.split {
+  display:grid;
+  grid-template-columns: 1fr 40px 1.3fr;
+  width:100%;
+  align-items:stretch;
+  gap:0;
+}
+.split-col {
+  display:flex; flex-direction:column; align-items:center;
+  gap:0;
+}
+.split-divider { position:relative; }
+.split-divider::before {
+  content:''; position:absolute;
+  top:16px; bottom:16px; left:50%;
+  width:1px; transform:translateX(-50%);
+  background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.06) 15%, rgba(255,255,255,0.06) 85%, transparent 100%);
+}
+/* ═══ ABBREVIATED COLUMN SPACERS ═══
+   Flex-grow spacers push Root Cause Documentation to ~60% of the
+   column height so it aligns vertically with Hypothesis Generation
+   on the full-path side. Both columns are doing the "identify root
+   cause" work at the same depth. Ratios auto-adjust if the right
+   column height changes. */
+.abbr-spacer-top {
+  flex-grow: 3;
+  min-height: 36px;
+  width: 1px;
+}
+.abbr-spacer-bot {
+  flex-grow: 2;
+  min-height: 28px;
+  width: 1px;
+}
+
+/* ═══ NESTED CARD ═══ */
+.nested {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius:var(--r-sm);
+  background: rgba(167,139,250,0.08);
+  border:1px dashed rgba(167,139,250,0.35);
+  position:relative;
+  cursor:pointer;
+  transition:background .2s, border-color .2s;
+}
+.nested:hover {
+  background: rgba(167,139,250,0.14);
+  border-color: rgba(167,139,250,0.6);
+}
+.nested::before {
+  content:'↳ INCLUDES';
+  position:absolute; top:-7px; left:14px;
+  padding:1px 7px;
+  background:#110738;
+  font-family:var(--font-m); font-size:8px; font-weight:600;
+  letter-spacing:.1em;
+  color:rgba(167,139,250,0.75);
+  border-radius:3px;
+}
+.nested-title {
+  font-family:var(--font-h); font-size:13px; font-weight:700;
+  color:var(--violet-hi); margin-bottom: 4px; letter-spacing:-0.005em;
+}
+.nested-sub { font-size:10.5px; color:rgba(167,139,250,0.7); line-height:1.55; font-weight:400; }
+
+/* ═══ CONVERGENCE BAR ═══ */
+.converge {
+  width:100%;
+  display:flex; align-items:center; gap: var(--s-2);
+  padding: 12px var(--s-3);
+  border-radius:10px;
+  background: rgba(8,15,28,0.7);
+  border:1px solid rgba(34,211,238,0.15);
+  margin: var(--s-1) 0 0;
+  transition: opacity .3s, filter .3s, border-color .3s, background .3s;
+}
+.converge-line {
+  flex:1; height:1px;
+  background: linear-gradient(90deg, rgba(52,211,153,0.4) 0%, rgba(34,211,238,0.4) 50%, rgba(167,139,250,0.4) 100%);
+}
+.converge-txt {
+  font-family:var(--font-m); font-size:10px; font-weight:600;
+  color:var(--teal); letter-spacing:.14em; text-transform:uppercase;
+  white-space:nowrap;
+}
+
+/* ═══ OUTCOME A JOIN BOX ═══ */
+.outcome-a-join {
+  width:100%; max-width:720px;
+  padding: 15px 18px;
+  border-radius:var(--r-sm);
+  background: rgba(52,211,153,0.05);
+  border:1.2px dashed rgba(52,211,153,0.3);
+  text-align:center;
+  cursor:pointer;
+  transition:background .2s, border-color .2s, opacity .3s, filter .3s;
+}
+.outcome-a-join:hover,
+.outcome-a-join:focus-visible {
+  background: rgba(52,211,153,0.1);
+  border-color: rgba(52,211,153,0.55);
+  outline: none;
+}
+.outcome-a-line1 { font-size:11px; font-weight:600; color:var(--green); margin-bottom: 4px; }
+.outcome-a-line2 { font-size:11.5px; font-weight:700; color:var(--green); }
+
+/* ═══ INTERACTIVITY: FLOW CONNECTIVITY STATES ═══
+   When the user hovers or focuses a node, we mark:
+   - the hovered/pinned node as `is-active`
+   - its upstream prerequisites as `is-upstream`
+   - its downstream consequences as `is-downstream`
+   - everything else as `is-dim`
+   This makes the flow of data explicit.
+*/
+
+.flow-inner.has-focus .node,
+.flow-inner.has-focus .pill-node,
+.flow-inner.has-focus .diamond,
+.flow-inner.has-focus .outcome-a-join,
+.flow-inner.has-focus .nested,
+.flow-inner.has-focus .path-lbl,
+.flow-inner.has-focus .converge,
+.flow-inner.has-focus .split-header,
+.flow-inner.has-focus .conn,
+.flow-inner.has-focus .skill-grp {
+  opacity: 0.28;
+  filter: saturate(0.55);
+}
+.flow-inner.has-focus .node.is-active,
+.flow-inner.has-focus .pill-node.is-active,
+.flow-inner.has-focus .diamond.is-active,
+.flow-inner.has-focus .outcome-a-join.is-active,
+.flow-inner.has-focus .nested.is-active {
+  opacity: 1;
+  filter: none;
+  z-index: 3;
+}
+.flow-inner.has-focus .node.is-upstream,
+.flow-inner.has-focus .node.is-downstream,
+.flow-inner.has-focus .pill-node.is-upstream,
+.flow-inner.has-focus .pill-node.is-downstream,
+.flow-inner.has-focus .diamond.is-upstream,
+.flow-inner.has-focus .diamond.is-downstream,
+.flow-inner.has-focus .outcome-a-join.is-upstream,
+.flow-inner.has-focus .outcome-a-join.is-downstream,
+.flow-inner.has-focus .nested.is-upstream,
+.flow-inner.has-focus .nested.is-downstream {
+  opacity: 0.95;
+  filter: none;
+}
+.flow-inner.has-focus .conn.is-lit,
+.flow-inner.has-focus .path-lbl.is-lit,
+.flow-inner.has-focus .split-header.is-lit,
+.flow-inner.has-focus .converge.is-lit {
+  opacity: 1;
+  filter: none;
+}
+.flow-inner.has-focus .skill-grp.is-lit {
+  opacity: 0.75;
+  filter: none;
+}
+
+/* Active node pulse */
+.flow-inner.has-focus .node.is-active::after,
+.flow-inner.has-focus .pill-node.is-active::after {
+  content: ''; position: absolute; inset: -6px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px var(--node-accent, var(--teal)),
+              0 0 32px 2px var(--node-glow-2, rgba(34,211,238,0.4));
+  pointer-events: none;
+  animation: active-pulse 1.6s ease-in-out infinite;
+}
+.flow-inner.has-focus .pill-node.is-active::after {
+  box-shadow: 0 0 0 2px rgba(251,191,36,0.8),
+              0 0 32px 2px rgba(251,191,36,0.4);
+}
+@keyframes active-pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Upstream = blue tint ring; Downstream = cyan tint ring */
+.flow-inner.has-focus .is-upstream {
+  box-shadow: 0 0 0 2px rgba(96,165,250,0.55),
+              0 4px 18px rgba(96,165,250,0.2) !important;
+}
+.flow-inner.has-focus .is-downstream {
+  box-shadow: 0 0 0 2px rgba(103, 232, 249, 0.55),
+              0 4px 18px rgba(103, 232, 249, 0.2) !important;
+}
+
+/* ═══ FLUID FLOW OVERLAY ═══ */
+.flow-section {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.flow-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+.flow-svg path {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity .3s, stroke-width .3s;
+}
+/* Dark halo underneath every arrow — guarantees arrows read as a
+   separate layer against any background. Rendered first, below the
+   colored stroke. */
+.flow-svg path.path-halo {
+  stroke: #030b1a;
+  stroke-width: 7;
+  opacity: 1;
+}
+.flow-svg .path-yes       { stroke: var(--green);  stroke-width: 2.5; }
+.flow-svg .path-no        { stroke: var(--violet); stroke-width: 2.5; }
+.flow-svg .path-abbr      { stroke: var(--green);  stroke-width: 2.2; stroke-dasharray: 7 5; }
+.flow-svg .path-outcomeA  { stroke: var(--green);  stroke-width: 2;   stroke-dasharray: 5 4; opacity: 0.85; }
+.flow-svg .path-conv-green{ stroke: var(--green);  stroke-width: 2.2; stroke-dasharray: 7 5; }
+.flow-svg .path-conv-violet{ stroke: var(--violet); stroke-width: 2.5; }
+
+/* SVG paths dim when something is focused UNLESS they are lit */
+.flow-inner.has-focus .flow-svg path {
+  opacity: 0.14;
+}
+.flow-inner.has-focus .flow-svg path.path-halo {
+  opacity: 0.14;
+}
+.flow-inner.has-focus .flow-svg path.is-lit {
+  opacity: 1;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+.flow-inner.has-focus .flow-svg path.path-halo.is-lit {
+  opacity: 1;
+  stroke-width: 8;
+  filter: none;
+}
+
+/* Hide the split-divider line — SVG provides visual separation via curves */
+.flow-section .split-divider::before { display: none; }
+
+.flow-section > .decision-row > .path-lbl {
+  position: relative;
+  z-index: 2;
+  background: rgba(8,15,28,0.85);
+  backdrop-filter: blur(4px);
+}
+
+.flow-section .node,
+.flow-section .pill-node,
+.flow-section .diamond,
+.flow-section .outcome-a-join,
+.flow-section .skill-grp,
+.flow-section .split-header,
+.flow-section .converge,
+.flow-section .decision-row {
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══ DETAIL PANEL ═══ */
+.overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.7); backdrop-filter:blur(3px);
+  z-index:199;
+}
+.overlay.show { display:block; }
+.dp {
+  position:fixed; right:-480px; top:0;
+  width:460px; height:100vh;
+  background: linear-gradient(180deg, #060d1a 0%, #04090f 100%);
+  border-left:1px solid rgba(34,211,238,0.1);
+  box-shadow:-24px 0 80px rgba(0,0,0,0.7);
+  transition:right .38s cubic-bezier(.4,0,.2,1);
+  z-index:200;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.dp.open { right:0; }
+.dp-stripe { height:3px; flex-shrink:0; transition:background .3s; }
+.dp-head {
+  padding: var(--s-3) var(--s-3) var(--s-2);
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  flex-shrink:0; position:relative;
+}
+.dp-x {
+  position:absolute; top:18px; right:18px;
+  width:30px; height:30px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;
+  color:var(--txt-3); font-size:17px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .15s;
+}
+.dp-x:hover { background:rgba(255,255,255,0.1); color:#d0e4f8; }
+.dp-badge {
+  display:inline-flex; padding:3px 10px;
+  border-radius:20px; font-family:var(--font-m);
+  font-size:9.5px; font-weight:600;
+  letter-spacing:.05em; text-transform:uppercase;
+  margin-bottom: 12px;
+}
+.dp-title {
+  font-family:var(--font-h); font-size:18px; font-weight:700;
+  color:#eef4ff; line-height:1.3; padding-right:38px; letter-spacing:-0.01em;
+}
+.dp-body {
+  flex:1; overflow-y:auto;
+  padding: var(--s-3) var(--s-3) var(--s-5);
+  scrollbar-width:thin;
+  scrollbar-color:rgba(34,211,238,0.3) transparent;
+}
+.dp-body::-webkit-scrollbar { width:4px; }
+.dp-body::-webkit-scrollbar-thumb { background:rgba(34,211,238,0.3); border-radius:4px; }
+.dp-sec { margin-bottom: var(--s-3); }
+.dp-sec-lbl {
+  font-family:var(--font-m); font-size:9.5px; font-weight:600;
+  color:#1a6878; letter-spacing:.14em; text-transform:uppercase;
+  margin-bottom: 11px;
+  padding-bottom: 7px;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.dp-desc { font-size:13px; color:#8aa8c8; line-height:1.7; }
+.dp-list { list-style:none; display:flex; flex-direction:column; gap:6px; }
+.dp-list li {
+  font-size:12px; color:#7a9cbd; padding: 10px 14px 10px 28px;
+  position:relative;
+  background: linear-gradient(135deg, rgba(255,255,255,0.028) 0%, rgba(255,255,255,0.01) 100%);
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:var(--r-sm); line-height:1.6;
+  transition: all .2s;
+}
+.dp-list li:hover {
+  background: linear-gradient(135deg, rgba(34,211,238,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  border-color:rgba(34,211,238,0.2);
+  transform:translateX(2px);
+}
+.dp-list li::before {
+  content:''; position:absolute;
+  left:12px; top:14px;
+  width:6px; height:6px;
+  border-radius:50%;
+  background: var(--teal);
+  box-shadow: 0 0 8px rgba(34,211,238,0.5);
+}
+.oc-grid { display:flex; flex-direction:column; gap: 10px; }
+.oc-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.028) 0%, rgba(255,255,255,0.012) 100%);
+  border:1px solid rgba(255,255,255,0.06);
+  border-left-width:3px;
+  border-radius:var(--r-sm);
+  padding: 13px 15px;
+}
+.oc-lbl {
+  font-size:10.5px; font-weight:800;
+  letter-spacing:.1em; text-transform:uppercase;
+  margin-bottom: 6px;
+}
+.oc-desc { font-size:12px; color:#7a9cbd; line-height:1.65; }
+
+/* Related nodes section in detail panel */
+.dp-related {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.dp-rel-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 11px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  font-size: 10.5px; font-weight: 600;
+  color: var(--txt-2);
+  cursor: pointer;
+  transition: all .2s;
+  font-family: var(--font);
+}
+.dp-rel-chip:hover {
+  background: rgba(34,211,238,0.1);
+  border-color: rgba(34,211,238,0.4);
+  color: var(--teal);
+  transform: translateY(-1px);
+}
+.dp-rel-chip .dp-rel-dir {
+  font-family: var(--font-m); font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.06);
+  color: var(--txt-3);
+  letter-spacing: .06em;
+}
+.dp-rel-chip[data-dir="up"] .dp-rel-dir { background: rgba(96,165,250,0.18); color: #93c5fd; }
+.dp-rel-chip[data-dir="down"] .dp-rel-dir { background: rgba(103,232,249,0.18); color: #67e8f9; }
+
+/* Next-step CTA(s) — prominent button at the bottom of the detail panel
+   for walking through the flow linearly. Renders as one large button if
+   there's a single downstream step, or multiple smaller buttons if the
+   current node is a fork (decision point). */
+.dp-next {
+  margin-top: var(--s-3);
+  padding-top: var(--s-3);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.dp-next-lbl {
+  font-family: var(--font-m); font-size: 9px; font-weight: 600;
+  color: var(--txt-4); letter-spacing: .16em; text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.dp-next-btn {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(103,232,249,0.08) 0%, rgba(167,139,250,0.04) 100%);
+  border: 1px solid rgba(103,232,249,0.25);
+  color: var(--txt-1);
+  cursor: pointer;
+  font-family: var(--font);
+  text-align: left;
+  transition: all .22s cubic-bezier(.4,0,.2,1);
+  position: relative;
+  overflow: hidden;
+}
+.dp-next-btn:hover {
+  background: linear-gradient(135deg, rgba(103,232,249,0.14) 0%, rgba(167,139,250,0.08) 100%);
+  border-color: rgba(103,232,249,0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(103,232,249,0.15);
+}
+.dp-next-btn-body { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.dp-next-btn-eyebrow {
+  font-family: var(--font-m); font-size: 9px; font-weight: 600;
+  color: #67e8f9; letter-spacing: .12em; text-transform: uppercase;
+}
+.dp-next-btn-title {
+  font-family: var(--font-h); font-size: 13.5px; font-weight: 700;
+  color: #eef4ff; line-height: 1.25; letter-spacing: -0.005em;
+}
+.dp-next-btn-arrow {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(103,232,249,0.12);
+  border: 1px solid rgba(103,232,249,0.3);
+  display: flex; align-items: center; justify-content: center;
+  color: #67e8f9;
+  font-size: 13px; font-weight: 600;
+  flex-shrink: 0;
+  transition: all .22s;
+}
+.dp-next-btn:hover .dp-next-btn-arrow {
+  background: rgba(103,232,249,0.2);
+  transform: translateX(3px);
+}
+/* Smaller variant used when there are 2+ downstream options (decision) */
+.dp-next-btn.compact { padding: 11px 13px; }
+.dp-next-btn.compact .dp-next-btn-title { font-size: 12.5px; }
+.dp-next-btn.compact .dp-next-btn-arrow { width: 24px; height: 24px; font-size: 11px; }
+/* End-of-flow card */
+.dp-next-end {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(251,191,36,0.05);
+  border: 1px dashed rgba(251,191,36,0.3);
+  font-size: 12px; color: #fcd34d;
+  display: flex; align-items: center; gap: 10px;
+}
+.dp-next-end::before {
+  content: '✓';
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(251,191,36,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ═══ WALKTHROUGH MODE ═══
+   Floating control bar at the bottom of the viewport that appears
+   when the user clicks "Play sample investigation" in the header.
+   Coordinates a scripted tour through the WALKTHROUGH array. */
+
+/* Trigger button in the header */
+.play-walkthrough-btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 8px 15px 8px 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(34,211,238,0.16) 0%, rgba(103,232,249,0.10) 100%);
+  border: 1px solid rgba(103,232,249,0.38);
+  color: #67e8f9;
+  font-family: var(--font);
+  font-size: 11.5px; font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all .22s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 0 0 0 rgba(103,232,249,0);
+}
+.play-walkthrough-btn:hover {
+  background: linear-gradient(135deg, rgba(34,211,238,0.26) 0%, rgba(103,232,249,0.16) 100%);
+  border-color: rgba(103,232,249,0.6);
+  color: #a5f3fc;
+  box-shadow: 0 4px 18px rgba(103,232,249,0.22);
+  transform: translateY(-1px);
+}
+.play-walkthrough-btn .play-triangle {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(103,232,249,0.22);
+  border: 1px solid rgba(103,232,249,0.45);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+  flex-shrink: 0;
+  padding-left: 2px; /* optically center triangle glyph */
+  transition: background .22s;
+}
+.play-walkthrough-btn:hover .play-triangle {
+  background: rgba(103,232,249,0.38);
+}
+
+/* Floating walkthrough bar — narrative-first layout. Two stacked
+   sections: (1) main content with header + narrative text, (2)
+   footer row with progress + controls. Wider on desktop (840px)
+   because narrative text needs comfortable reading width. */
+.walkthrough-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translate(-50%, 140%);
+  width: min(94vw, 840px);
+  background: linear-gradient(180deg, #0a1528 0%, #060d1a 100%);
+  border: 1px solid rgba(103,232,249,0.28);
+  border-radius: 16px;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.7),
+    0 0 0 1px rgba(103,232,249,0.08),
+    0 4px 36px rgba(103,232,249,0.18);
+  padding: 0;
+  display: flex; flex-direction: column;
+  z-index: 220;
+  transition: transform .45s cubic-bezier(.4,0,.2,1), opacity .3s;
+  opacity: 0;
+  pointer-events: none;
+  font-family: var(--font);
+  overflow: hidden;
+}
+.walkthrough-bar.is-open {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.walkthrough-bar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(103,232,249,0.7) 20%,
+    rgba(167,139,250,0.7) 80%,
+    transparent 100%);
+}
+
+/* Top section: narrative + header */
+.wt-main {
+  padding: 16px 20px 14px;
+}
+.wt-main-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 11px;
+}
+.wt-title-group {
+  min-width: 0;
+  flex: 1;
+}
+.wt-eyebrow {
+  font-family: var(--font-m);
+  font-size: 9px; font-weight: 700;
+  color: #67e8f9;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+.wt-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--txt-1);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Stage badge — shows the current node's title next to the header,
+   so the user knows which diagram element is being narrated. */
+.wt-stage-badge {
+  font-family: var(--font-m);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 5px 11px;
+  border-radius: 6px;
+  background: rgba(103,232,249,0.12);
+  border: 1px solid rgba(103,232,249,0.3);
+  color: #a5f3fc;
+  white-space: nowrap;
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity .18s;
+  flex-shrink: 0;
+}
+.wt-narrative {
+  font-size: 13px;
+  line-height: 1.65;
+  color: #c5d8ea;
+  font-weight: 400;
+  min-height: 3.2em; /* Reserves space so text changes don't jump layout */
+  padding-left: 14px;
+  border-left: 2px solid rgba(103,232,249,0.35);
+  transition: opacity .18s;
+}
+/* Brief fade-out when narrative changes, then fade-in */
+.wt-narrative.is-swapping,
+.wt-stage-badge.is-swapping {
+  opacity: 0;
+}
+
+/* Bottom section: progress + controls */
+.wt-footer {
+  display: flex; align-items: center; gap: 18px;
+  padding: 11px 20px 14px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  background: rgba(0,0,0,0.15);
+}
+.wt-progress {
+  flex: 1; min-width: 140px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.wt-progress-track {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+  position: relative;
+}
+.wt-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #34d399 0%, #67e8f9 50%, #a78bfa 100%);
+  border-radius: 2px;
+  transition: width .4s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 0 12px rgba(103,232,249,0.55);
+}
+.wt-progress-label {
+  font-family: var(--font-m);
+  font-size: 10px; font-weight: 600;
+  color: var(--txt-3);
+  letter-spacing: 0.05em;
+  text-align: left;
+}
+.wt-progress-label span {
+  color: var(--txt-1);
+  font-weight: 700;
+}
+
+.wt-controls {
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+}
+.wt-btn {
+  border: none;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: all .2s;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.wt-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.wt-btn-icon {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--txt-2);
+  font-size: 15px; font-weight: 600;
+}
+.wt-btn-icon:hover:not(:disabled) {
+  background: rgba(255,255,255,0.1);
+  color: var(--txt-1);
+  border-color: rgba(255,255,255,0.18);
+}
+.wt-btn-exit {
+  font-size: 18px;
+}
+.wt-btn-exit:hover:not(:disabled) {
+  background: rgba(251,113,133,0.15);
+  border-color: rgba(251,113,133,0.4);
+  color: #fb7185;
+}
+.wt-btn-primary {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, rgba(103,232,249,0.25) 0%, rgba(167,139,250,0.18) 100%);
+  border: 1px solid rgba(103,232,249,0.5);
+  color: #a5f3fc;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.wt-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(103,232,249,0.38) 0%, rgba(167,139,250,0.28) 100%);
+  border-color: rgba(103,232,249,0.7);
+  color: #cffafe;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(103,232,249,0.3);
+}
+
+/* Node highlight state when it's the current walkthrough step.
+   Two visual layers, both OUTSIDE the node's border:
+     (1) A crisp 3px solid cyan ring flush against the border edge.
+     (2) A soft blurred cyan glow extending ~24px further out.
+   The node's interior (its gradient background, text, chips) is
+   never touched — we only draw OUTSIDE the border. */
+.wt-active-node {
+  box-shadow:
+    /* Crisp solid border ring */
+    0 0 0 3px #67e8f9,
+    /* Soft outer glow — spread=0, blur=24 produces a diffuse halo */
+    0 0 24px 2px rgba(103,232,249,0.45) !important;
+  animation: wt-border-pulse 2.2s ease-in-out infinite;
+}
+@keyframes wt-border-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 3px #67e8f9,
+      0 0 24px 2px rgba(103,232,249,0.45);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px #a5f3fc,
+      0 0 32px 4px rgba(103,232,249,0.65);
+  }
+}
+/* Suppress the generic .is-active::after pulse ring when walkthrough
+   spotlight is active — the crisp border above is enough. */
+.flow-inner.has-focus .node.is-active.wt-active-node::after,
+.flow-inner.has-focus .pill-node.is-active.wt-active-node::after {
+  display: none;
+}
+
+/* Responsive tweaks */
+@media (max-width: 760px) {
+  .hdr { padding: var(--s-3) var(--s-3) var(--s-3); }
+  .hdr h1 { font-size: 22px; }
+  .flow { padding: var(--s-4) var(--s-2) var(--s-6); }
+  .legend { padding: 0 var(--s-3); }
+  .dp { width: 90vw; right: -92vw; }
+  .split { grid-template-columns: 1fr; gap: var(--s-3); }
+  .split-divider { display: none; }
+  .split-col.abbr-col { margin-bottom: var(--s-2); position: relative; }
+  /* On mobile the column auto-heights to content, so flex-grow is
+     meaningless — collapse the spacers. */
+  .abbr-spacer-top { flex-grow: 0; height: 0; min-height: 0; }
+  .abbr-spacer-bot { flex-grow: 0; height: 36px; min-height: 36px; }
+
+  /* Hide all SVG curves — they're positioned absolutely using
+     the desktop layout and will be wildly wrong once the columns
+     collapse to a single vertical stack. */
+  .flow-svg { display: none; }
+
+  /* Replace the missing SVG arrows with a CSS vertical connector
+     dropping from the abbreviated column into the full column area
+     so the mobile-stacked flow reads as one continuous stream. */
+  .split-col.abbr-col::after {
+    content: '';
+    display: block;
+    width: 2px; height: 26px;
+    margin: 14px auto 0;
+    background: linear-gradient(180deg,
+      rgba(52,211,153,0.3) 0%,
+      rgba(52,211,153,0.6) 100%);
+    border-radius: 2px;
+  }
+  /* Progress strip stacks vertically on mobile with no arrows */
+  .progress-strip {
+    padding: 14px var(--s-3);
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ps-step:not(:last-child) { margin-right: 0; margin-bottom: 0; }
+  .ps-step:not(:last-child)::after { display: none; }
+  /* Compact mobile header — hide extra pills */
+  .hdr-right .meta-row { display: none; }
+  /* Decision row chips stack */
+  .decision-row { gap: 10px; }
+  /* Node card spacing tighter */
+  .node-body { padding: 12px 40px 12px 20px; }
+  .node-chips { gap: 4px; }
+  .node-chip { font-size: 9px; padding: 2px 6px; }
+
+  /* Walkthrough bar — tighter spacing on mobile */
+  .walkthrough-bar {
+    bottom: 8px;
+    width: calc(100vw - 12px);
+    border-radius: 12px;
+  }
+  .wt-main { padding: 12px 14px 10px; }
+  .wt-main-header { flex-direction: column; gap: 8px; margin-bottom: 8px; }
+  .wt-stage-badge { max-width: none; align-self: flex-start; }
+  .wt-title { font-size: 11.5px; }
+  .wt-narrative { font-size: 12px; line-height: 1.55; padding-left: 11px; }
+  .wt-footer { padding: 9px 14px 11px; gap: 12px; }
+  .wt-progress { min-width: 0; gap: 4px; }
+  .wt-btn-primary { padding: 0 12px; font-size: 11.5px; }
+
+  /* Play button hides its text on mobile to save space */
+  .play-walkthrough-btn .play-label { display: none; }
+  .play-walkthrough-btn { padding: 7px 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-left">
+      <div class="eyebrow">
+        <div class="eyebrow-dot"></div>
+        <span class="eyebrow-txt">Celestara AI Agent · Automated Investigation System</span>
+      </div>
+      <h1>OOS Investigation <span class="h1-grad">Workflow</span></h1>
+      <p class="hdr-sub">5-skill sequential process for Out-of-Specification investigation · Aligned to site OOS SOP &amp; 21 CFR 211.192 · <strong style="color:#67e8f9;font-weight:600;">Hover any node to trace its data flow · Click for details</strong></p>
+    </div>
+    <div class="hdr-right">
+      <button class="play-walkthrough-btn" id="playWalkthroughBtn" type="button">
+        <span class="play-triangle">▶</span>
+        <span class="play-label">Play Sample Investigation</span>
+      </button>
+      <div class="sop-badge">⚖&nbsp;&nbsp;Site OOS SOP · 21 CFR 211.192</div>
+      <div class="meta-row">
+        <div class="meta-pill">5 Connected Skills</div>
+        <div class="meta-pill">Dual Investigation Paths</div>
+        <div class="meta-pill">Human-in-the-Loop</div>
+        <div class="meta-pill">16-Category KB Search</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ LEGEND ═══ -->
+<nav class="legend">
+  <div class="lg-grp">
+    <span class="lg-lbl">Nodes</span>
+    <div class="lg-item"><div class="lg-box" style="background:#7b9cb8"></div><span>Common</span></div>
+    <div class="lg-item"><div class="lg-box" style="background:#8ab89a"></div><span>Abbreviated path</span></div>
+    <div class="lg-item"><div class="lg-box" style="background:#9a8cb8"></div><span>Full path</span></div>
+    <div class="lg-item"><div class="lg-box" style="background:#c88879"></div><span>Action-required</span></div>
+    <div class="lg-item"><div class="lg-dia" style="background:#c4a775"></div><span>Decision point</span></div>
+  </div>
+  <div class="lg-grp">
+    <span class="lg-lbl">Flow</span>
+    <div class="lg-item"><div class="lg-line" style="background:#8ab89a"></div><span>Abbreviated</span></div>
+    <div class="lg-item"><div class="lg-line" style="background:#9a8cb8"></div><span>Full path</span></div>
+    <div class="lg-item"><div class="lg-dash" style="border-color:#8ab89a"></div><span>Dashed (skips phases)</span></div>
+  </div>
+</nav>
+
+<!-- ═══ 5-SKILL PROGRESS STRIP ═══ -->
+<div class="progress-strip" id="progressStrip">
+  <div class="ps-step" data-ps="1">
+    <div class="ps-num">01</div>
+    <div class="ps-body">
+      <div class="ps-label">Framing &amp; History</div>
+      <div class="ps-sublabel">Problem statement · Risk scoring</div>
+    </div>
+  </div>
+  <div class="ps-step" data-ps="2">
+    <div class="ps-num">02</div>
+    <div class="ps-body">
+      <div class="ps-label">Lab Error Assessment</div>
+      <div class="ps-sublabel">Phase 1A · 5 categories</div>
+    </div>
+  </div>
+  <div class="ps-step" data-ps="3">
+    <div class="ps-num">03</div>
+    <div class="ps-body">
+      <div class="ps-label">Extended &amp; Hypothesis</div>
+      <div class="ps-sublabel">Phase 1B · BMR · RCA</div>
+    </div>
+  </div>
+  <div class="ps-step" data-ps="4">
+    <div class="ps-num">04</div>
+    <div class="ps-body">
+      <div class="ps-label">Manufacturing &amp; Closure</div>
+      <div class="ps-sublabel">Phase 2 · Impact · CAPA · Disposition</div>
+    </div>
+  </div>
+  <div class="ps-step" data-ps="5">
+    <div class="ps-num">05</div>
+    <div class="ps-body">
+      <div class="ps-label">Report Generation</div>
+      <div class="ps-sublabel">Investigation Record · QA approval</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FLOW ═══ -->
+<div class="flow">
+<div class="flow-inner" id="flowInner">
+
+  <!-- OOS Trigger -->
+  <div class="pill-node" data-node-id="oos-trigger" onclick="showD('oos-trigger')" tabindex="0">
+    <div class="pill-tag">⚠ &nbsp;OOS Event Detected</div>
+    <div class="pill-title">Out-of-Specification Result Reported</div>
+    <div class="pill-sub">Investigation clock starts · PR number assigned · 30-day window opens</div>
+    <div class="pill-hint">click for details · hover to trace flow</div>
+  </div>
+
+  <div class="conn lg" data-conn="oos-trigger→initial-setup"></div>
+
+  <!-- Skill 1 -->
+  <div class="skill-grp s1" data-skill="s1">
+    <div class="skill-tag"><span class="skill-tag-num">01</span><span class="skill-tag-sep"></span><span>Skill 1</span><span class="skill-tag-sep"></span><span class="skill-tag-desc">Framing &amp; Historical Context</span></div>
+
+    <div class="node n-blue" data-node-id="initial-setup" onclick="showD('initial-setup')" tabindex="0">
+      <div class="node-accent"></div>
+      <div class="node-body">
+        <div class="node-tag">Step 1 · Problem Statement Analysis</div>
+        <div class="node-title">Problem Statement Analysis</div>
+        <div class="node-desc">The structured foundation for every downstream phase — captures each 4W1H dimension in the Investigation Record.</div>
+        <div class="node-chips">
+          <span class="node-chip">4W1H breakdown</span>
+          <span class="node-chip">Batch &amp; product</span>
+          <span class="node-chip">Analyst · Instrument</span>
+          <span class="node-chip">STP · AR#</span>
+          <span class="node-chip is-gate">Day 1 of 30</span>
+        </div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+
+    <div class="conn" data-conn="initial-setup→initial-impact"></div>
+
+    <div class="node n-rose" data-node-id="initial-impact" onclick="showD('initial-impact')" tabindex="0">
+      <div class="node-accent"></div>
+      <div class="node-body">
+        <div class="node-tag">Step 1B · Initial Impact Assessment &amp; Immediate Actions</div>
+        <div class="node-title">Initial Impact Assessment &amp; Immediate Actions</div>
+        <div class="node-desc">Rapid containment decisions before formal investigation — protects patient safety and product integrity from the outset.</div>
+        <div class="node-chips">
+          <span class="node-chip is-gate">Quarantine decision</span>
+          <span class="node-chip">Equipment hold</span>
+          <span class="node-chip">Companion batch hold</span>
+          <span class="node-chip">Patient risk triage</span>
+          <span class="node-chip">QA notification</span>
+          <span class="node-chip">Interim controls</span>
+        </div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+
+    <div class="conn" data-conn="initial-impact→historical-review"></div>
+
+    <div class="node n-blue" data-node-id="historical-review" onclick="showD('historical-review')" tabindex="0">
+      <div class="node-accent"></div>
+      <div class="node-body">
+        <div class="node-tag">Step 2 · Historical Recurrence Analysis &amp; Risk Scoring</div>
+        <div class="node-title">Historical Recurrence Analysis &amp; Risk Scoring</div>
+        <div class="node-desc">Detects whether this failure has occurred before and sets the investigation's risk level, shaping the strategy used downstream.</div>
+        <div class="node-chips">
+          <span class="node-chip">16-category KB search</span>
+          <span class="node-chip">Pattern detection</span>
+          <span class="node-chip">Document classification</span>
+          <span class="node-chip">4-Factor risk score</span>
+          <span class="node-chip is-gate">Escalation routing</span>
+        </div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+  </div>
+
+  <div class="conn lg" data-conn="historical-review→phase-1a"></div>
+
+  <!-- Skill 2 -->
+  <div class="skill-grp s2" data-skill="s2">
+    <div class="skill-tag"><span class="skill-tag-num">02</span><span class="skill-tag-sep"></span><span>Skill 2</span><span class="skill-tag-sep"></span><span class="skill-tag-desc">Lab Error Assessment</span></div>
+
+    <div class="node n-violet" data-node-id="phase-1a" onclick="showD('phase-1a')" tabindex="0">
+      <div class="node-accent"></div>
+      <div class="node-body">
+        <div class="node-tag">Phase 1A · Laboratory Error Assessment</div>
+        <div class="node-title">Phase 1A: Lab Error Assessment</div>
+        <div class="node-desc">Systematic 5-category assessment of whether the OOS can be attributed to laboratory error, per site OOS SOP.</div>
+        <div class="node-chips">
+          <span class="node-chip is-gate">PPQ batch check</span>
+          <span class="node-chip">Document inventory</span>
+          <span class="node-chip">5-category review</span>
+          <span class="node-chip">Calculation verification</span>
+          <span class="node-chip">Concurrent cross-ref</span>
+          <span class="node-chip is-gate">User confirms path</span>
+        </div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+  </div>
+
+  <div class="conn lg" data-conn="phase-1a→decision-1"></div>
+
+  <!-- Flow section with SVG overlay for fluid curved connections -->
+  <div class="flow-section" id="flowSection">
+
+    <svg class="flow-svg" id="flowSvg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ah-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#34d399"/>
+        </marker>
+        <marker id="ah-violet" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#a78bfa"/>
+        </marker>
+      </defs>
+    </svg>
+
+  <!-- Decision 1 -->
+  <div class="decision-row">
+    <div class="path-lbl yes" data-path="yes">✓&nbsp; YES — Lab Error Confirmed</div>
+    <div class="diamond" id="anchor-decision1" data-node-id="decision-1" onclick="showD('decision-1')" tabindex="0">
+      <div class="diamond-inner">
+        <div class="diamond-title">Lab Error<br>Confirmed?</div>
+        <div class="diamond-sub">User must confirm path</div>
+      </div>
+    </div>
+    <div class="path-lbl no" data-path="no">✗&nbsp; NO — Extend Investigation</div>
+  </div>
+
+  <div style="height:56px;"></div>
+
+  <!-- Split: Abbreviated (left) / Full (right) -->
+  <div class="split">
+
+    <!-- LEFT: Abbreviated
+         Root Cause Documentation is deliberately positioned at ~55%
+         of the column height so it visually aligns with Hypothesis
+         Generation on the full-path side — both columns are doing
+         the "identify root cause" work at the same depth. Flex-grow
+         spacers auto-adjust if the right column changes height. -->
+    <!-- LEFT: Abbreviated Path
+         Root Cause Documentation is positioned at ~60% of the column
+         height via a flex-grow spacer so it visually aligns with
+         Hypothesis Generation on the full-path side. -->
+    <div class="split-col abbr-col">
+      <div class="abbr-spacer-top"></div>
+
+      <div class="node n-green" id="anchor-rootcause" data-node-id="root-cause-abbr" onclick="showD('root-cause-abbr')" tabindex="0" style="max-width:none;">
+        <div class="node-accent"></div>
+        <div class="node-body">
+          <div class="node-tag">Abbreviated Path · Skill 4</div>
+          <div class="node-title">Root Cause Documentation</div>
+          <div class="node-desc">Lab error confirmed — simplified RCA with evidence chain. Bypasses Phase 1B, BMR retrieval, hypothesis gen &amp; Phase 2.</div>
+          <div class="node-chips">
+            <span class="node-chip">Simplified RCA</span>
+            <span class="node-chip">Evidence chain</span>
+            <span class="node-chip">→ Impact Assessment</span>
+          </div>
+        </div>
+        <div class="chev">›</div>
+      </div>
+
+      <div class="abbr-spacer-bot"></div>
+
+      <div class="outcome-a-join" id="anchor-outcomeA" data-node-id="abbr-outcome-a" onclick="showD('abbr-outcome-a')" tabindex="0">
+        <div class="outcome-a-line1">↪ Phase 1B Outcome A joins here</div>
+        <div class="outcome-a-line2">↓ Continues to Impact Assessment</div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="split-divider"></div>
+
+    <!-- RIGHT: Full path -->
+    <div class="split-col">
+      <!-- Skill 3 subgroup -->
+      <div class="skill-grp s3" data-skill="s3" style="width:100%;">
+        <div class="skill-tag"><span class="skill-tag-num">03</span><span class="skill-tag-sep"></span><span>Skill 3</span><span class="skill-tag-sep"></span><span class="skill-tag-desc">Extended Lab &amp; Hypothesis</span></div>
+
+        <div class="node n-violet-hi" id="anchor-phase1b" data-node-id="phase-1b" onclick="showD('phase-1b')" tabindex="0" style="max-width:none;">
+          <div class="node-accent"></div>
+          <div class="node-body">
+            <div class="node-tag"><span>Phase 1B · Extended Lab Assessment</span></div>
+            <div class="node-title">Extended Laboratory Assessment</div>
+            <div class="node-desc">Deeper 7-category review conducted by a second qualified analyst when Phase 1A doesn't confirm lab error.</div>
+            <div class="node-chips">
+              <span class="node-chip is-gate">2nd analyst retest</span>
+              <span class="node-chip">7-category review</span>
+              <span class="node-chip">Method suitability</span>
+              <span class="node-chip">Reagent &amp; standard</span>
+              <span class="node-chip">Data integrity</span>
+              <span class="node-chip">STP extraction</span>
+            </div>
+          </div>
+          <div class="chev">›</div>
+        </div>
+
+        <div class="conn violet" data-conn="phase-1b→decision-2"></div>
+
+        <div class="decision-row">
+          <div class="diamond" id="anchor-decision2" data-node-id="decision-2" onclick="showD('decision-2')" tabindex="0" style="width:170px;height:58px;">
+            <div class="diamond-inner">
+              <div class="diamond-title" style="font-size:11.5px;">Phase 1B Outcome?</div>
+              <div class="diamond-sub">A / B / C / D</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="conn violet" data-conn="decision-2→hypothesis-gen"></div>
+
+        <div class="node n-violet" data-node-id="hypothesis-gen" onclick="showD('hypothesis-gen')" tabindex="0" style="max-width:none;">
+          <div class="node-accent"></div>
+          <div class="node-body">
+            <div class="node-tag">Evidence-Based Hypothesis Generation · Part 3A</div>
+            <div class="node-title">Evidence-Based Hypothesis Generation</div>
+            <div class="node-desc">Comprehensive, evidence-ranked set of testable root cause hypotheses. No verdicts assigned here — those come in Phase 2.</div>
+            <div class="node-chips">
+              <span class="node-chip">6M analysis</span>
+              <span class="node-chip">Procedure decomposition</span>
+              <span class="node-chip">Physicochemical</span>
+              <span class="node-chip">FDA precedents</span>
+              <span class="node-chip is-gate">Plausibility filter</span>
+              <span class="node-chip is-gate">Completeness gate</span>
+            </div>
+            <div class="nested" data-node-id="bmr-bpr" onclick="event.stopPropagation();showD('bmr-bpr')" tabindex="0">
+              <div class="nested-title">Batch Record Retrieval (BMR/BPR)</div>
+              <div class="nested-sub">Mandatory before hypothesis generation — enriched search terms feed directly into document retrieval.</div>
+              <div class="node-chips" style="margin-top:7px;">
+                <span class="node-chip" style="background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.22);color:rgba(196,181,253,0.85);">7-pass search</span>
+                <span class="node-chip" style="background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.22);color:rgba(196,181,253,0.85);">Part enumeration</span>
+                <span class="node-chip is-gate">Coverage gate</span>
+                <span class="node-chip" style="background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.22);color:rgba(196,181,253,0.85);">Search enrichment</span>
+              </div>
+            </div>
+          </div>
+          <div class="chev">›</div>
+        </div>
+      </div>
+
+      <div class="conn violet lg" data-conn="hypothesis-gen→phase-2"></div>
+
+      <!-- Skill 4: Phase 2 (right column) -->
+      <div class="skill-grp s4" data-skill="s4-phase2" style="width:100%;">
+        <div class="skill-tag"><span class="skill-tag-num">04a</span><span class="skill-tag-sep"></span><span>Skill 4</span><span class="skill-tag-sep"></span><span class="skill-tag-desc">Manufacturing Investigation</span></div>
+
+        <div class="node n-green-strong" id="anchor-phase2" data-node-id="phase-2" onclick="showD('phase-2')" tabindex="0" style="max-width:none;">
+          <div class="node-accent"></div>
+          <div class="node-body">
+            <div class="node-tag"><span>Phase 2 · Full-Scale Manufacturing Investigation</span></div>
+            <div class="node-title">Phase 2: Manufacturing Investigation</div>
+            <div class="node-desc">Systematic testing of every hypothesis against manufacturing evidence. Root cause verdicts are assigned here.</div>
+            <div class="node-chips">
+              <span class="node-chip">BMR/BPR deep review</span>
+              <span class="node-chip">Sampling error</span>
+              <span class="node-chip">Hypothesis testing</span>
+              <span class="node-chip">5 Whys · FMEA · Fishbone</span>
+              <span class="node-chip is-gate">Verdicts assigned</span>
+            </div>
+          </div>
+          <div class="chev">›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:52px;"></div>
+
+  <!-- Convergence -->
+  <div class="converge" id="anchor-converge" data-node-id="converge">
+    <div class="converge-line"></div>
+    <div class="converge-txt">All Paths Converge</div>
+    <div class="converge-line"></div>
+  </div>
+
+  </div><!-- /.flow-section -->
+
+  <div class="conn lg" data-conn="phase-2→impact-assessment" data-conn-alt="abbr-outcome-a→impact-assessment"></div>
+
+  <!-- Skill 4 cont: Post-determination -->
+  <div class="skill-grp s4" data-skill="s4-post">
+    <div class="skill-tag"><span class="skill-tag-num">04b</span><span class="skill-tag-sep"></span><span>Skill 4 cont.</span><span class="skill-tag-sep"></span><span class="skill-tag-desc">Post-Determination Phases</span></div>
+
+    <div class="node n-sky" data-node-id="impact-assessment" onclick="showD('impact-assessment')" tabindex="0">
+      <div class="node-accent"></div>
+      <div class="node-body">
+        <div class="node-tag">Post-Determination · All Paths</div>
+        <div class="node-title">Impact Assessment</div>
+        <div class="node-desc">All paths converge here. Evaluates the full scope of the identified root cause across batches, markets, and patients.</div>
+        <div class="node-chips">
+          <span class="node-chip">Affected batches</span>
+          <span class="node-chip">Same campaign / lots</span>
+          <span class="node-chip">Market distribution</span>
+          <span class="node-chip">Patient safety</span>
+          <span class="node-chip">Regulatory thresholds</span>
+        </div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+
+    <div class="conn" data-conn="impact-assessment→risk-assessment"></div>
+
+    <div class="node n-orange" data-node-id="risk-assessment" onclick="showD('risk-assessment')" tabindex="0">
+      <div class="node-accent"></div>
+      <div class="node-body">
+        <div class="node-tag">Risk Quantification</div>
+        <div class="node-title">Risk Assessment (RPN)</div>
+        <div class="node-desc">Quantitative risk scoring using Risk Priority Number methodology to prioritize response and CAPA resources.</div>
+        <div class="node-chips">
+          <span class="node-chip">Severity</span>
+          <span class="node-chip">Occurrence</span>
+          <span class="node-chip">Detectability</span>
+          <span class="node-chip is-gate">Critical / High / Med / Low</span>
+        </div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+
+    <div class="conn" data-conn="risk-assessment→regulatory"></div>
+
+    <div class="node n-rose" data-node-id="regulatory" onclick="showD('regulatory')" tabindex="0">
+      <div class="node-accent"></div>
+      <div class="node-body">
+        <div class="node-tag">Compliance Review</div>
+        <div class="node-title">Regulatory Considerations</div>
+        <div class="node-desc">Assessment of all regulatory obligations arising from the investigation, cross-referenced against specific CFR sub-sections.</div>
+        <div class="node-chips">
+          <span class="node-chip">21 CFR 211.192</span>
+          <span class="node-chip">21 CFR 211.194(a)</span>
+          <span class="node-chip">21 CFR Part 11</span>
+          <span class="node-chip">APQR flagging</span>
+          <span class="node-chip is-gate">FDA Field Alert</span>
+          <span class="node-chip">Recall assessment</span>
+        </div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+
+    <div class="conn" data-conn="regulatory→capa-design"></div>
+
+    <div class="node n-green" data-node-id="capa-design" onclick="showD('capa-design')" tabindex="0">
+      <div class="node-accent"></div>
+      <div class="node-body">
+        <div class="node-tag">Corrective Actions</div>
+        <div class="node-title">CAPA Design</div>
+        <div class="node-desc">Design of Corrective and Preventive Actions. Prior CAPA effectiveness is cross-referenced to avoid repeating failures.</div>
+        <div class="node-chips">
+          <span class="node-chip">Corrective action</span>
+          <span class="node-chip">Preventive action</span>
+          <span class="node-chip">Prior CAPA history</span>
+          <span class="node-chip">Effectiveness plan</span>
+          <span class="node-chip">Ownership</span>
+        </div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+
+    <div class="conn" data-conn="capa-design→batch-disposition"></div>
+
+    <div class="node n-indigo" data-node-id="batch-disposition" onclick="showD('batch-disposition')" tabindex="0">
+      <div class="node-accent"></div>
+      <div class="node-body">
+        <div class="node-tag">Final Batch Decision</div>
+        <div class="node-title">Batch Disposition</div>
+        <div class="node-desc">Final disposition decision for the affected batch and related batches, consistent with confirmed root cause and regulations.</div>
+        <div class="node-chips">
+          <span class="node-chip">Release</span>
+          <span class="node-chip">Reject</span>
+          <span class="node-chip">Retest</span>
+          <span class="node-chip">Quarantine</span>
+          <span class="node-chip is-gate">PPQ batch review</span>
+        </div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+  </div>
+
+  <div class="conn lg" data-conn="batch-disposition→report-gen"></div>
+
+  <!-- Skill 5: Report -->
+  <div class="skill-grp s5" data-skill="s5">
+    <div class="skill-tag"><span class="skill-tag-num">05</span><span class="skill-tag-sep"></span><span>Skill 5</span><span class="skill-tag-sep"></span><span class="skill-tag-desc">Report Generation</span></div>
+
+    <div class="pill-node" data-node-id="report-gen" onclick="showD('report-gen')" tabindex="0" style="max-width:540px;">
+      <div class="pill-tag">✓&nbsp; Investigation Complete</div>
+      <div class="pill-title">Report Generation</div>
+      <div class="pill-sub">Full investigation report · QA review &amp; approval · Document management filing</div>
+      <div class="pill-hint">click for details · hover to trace flow</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══ OVERLAY + DETAIL PANEL ═══ -->
+<div class="overlay" id="overlay" onclick="closeD()"></div>
+
+<!-- ═══ WALKTHROUGH CONTROL BAR ═══
+     Hidden by default; shown when user clicks "Play sample
+     investigation" from the header. Narrates a scripted real-world
+     OOS case step-by-step, spotlighting each node IN THE DIAGRAM —
+     no detail panel is opened. Users read the narrative here while
+     watching the highlighted node in the flow above. -->
+<div class="walkthrough-bar" id="walkthroughBar" aria-hidden="true">
+  <div class="wt-main">
+    <div class="wt-main-header">
+      <div class="wt-title-group">
+        <div class="wt-eyebrow">Sample Investigation</div>
+        <div class="wt-title">Imipenem/Cilastatin · Batch DFF2080A</div>
+      </div>
+      <div class="wt-stage-badge" id="wtStageBadge">—</div>
+    </div>
+    <div class="wt-narrative" id="wtNarrative">—</div>
+  </div>
+  <div class="wt-footer">
+    <div class="wt-progress">
+      <div class="wt-progress-track">
+        <div class="wt-progress-fill" id="wtProgressFill"></div>
+      </div>
+      <div class="wt-progress-label">
+        Step <span id="wtStepNum">1</span> of <span id="wtStepTotal">17</span>
+      </div>
+    </div>
+    <div class="wt-controls">
+      <button class="wt-btn wt-btn-icon" id="wtBack" aria-label="Previous step" type="button">←</button>
+      <button class="wt-btn wt-btn-primary" id="wtNext" type="button">Next Step →</button>
+      <button class="wt-btn wt-btn-icon wt-btn-exit" id="wtExit" aria-label="Exit walkthrough" type="button">×</button>
+    </div>
+  </div>
+</div>
+
+<aside class="dp" id="dp">
+  <div class="dp-stripe" id="dp-stripe"></div>
+  <div class="dp-head">
+    <div id="dp-badge"></div>
+    <div class="dp-title" id="dp-title">—</div>
+    <button class="dp-x" onclick="closeD()" aria-label="Close">×</button>
+  </div>
+  <div class="dp-body" id="dp-body"></div>
+</aside>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   DATA: node content for detail panel
+   ═══════════════════════════════════════════════════════════ */
+const DATA = {
+  'oos-trigger': {
+    title: 'OOS Event Detected',
+    color: '#c4a775',
+    desc: 'An analytical result falls outside the approved specification limit. The investigation clock starts the moment the result is confirmed as OOS — not when testing was run. Discovery timestamp and test timestamp are both recorded separately, as any gap between them may trigger timeline governance review.',
+    steps: [
+      'Analyst identifies result outside specification limit',
+      'Immediate notification to QA per site SOP',
+      '"Do Not Use" hold placed on affected sample and batch',
+      'Investigation record opened — unique PR number assigned',
+      'Discovery vs. test timestamps both recorded (gap may trigger governance review)'
+    ]
+  },
+  'initial-setup': {
+    title: 'Problem Statement Analysis',
+    skill: 'Skill 1 — Step 1', color: '#7b9cb8',
+    desc: 'The AI agent constructs a thorough, structured problem statement — the foundation all subsequent analysis builds upon. A weak problem statement leads to missed root causes. The agent ensures every dimension is captured in the Investigation Record.',
+    steps: [
+      'Short Description of Problem: one-to-two sentence plain-language summary — what failed, what product, when detected (used in executive summaries and report headers)',
+      'Detailed Description of Problem Statement: full narrative — OOS result value, specification limit, direction and magnitude of failure, all individual replicate values, concurrent test context, test conditions',
+      'Problem Statement 4W1H Breakdown — What: exact test, parameter and value that failed · Who: analyst, reviewer, QA notifier · When: test date/time and discovery date/time (gap tracked) · Where: instrument, lab, site and method · How: how the failure was detected (routine release, stability, audit, etc.)',
+      'Investigation ID / PR number assigned',
+      'Batch number and product details (name, strength, dosage form, market)',
+      'OOS result: actual value, specification limit, direction of failure, individual replicate values',
+      'Analyst name and qualification status',
+      'Instrument ID(s) used',
+      'Method reference: STP number and version',
+      'Analysis Request (AR) number (links all concurrent tests)',
+      'Stability condition and timepoint (if applicable)',
+      'Cross-references: related deviations, CAPAs, change controls',
+      '30-day investigation timeline clock starts (Day 1)'
+    ]
+  },
+  'initial-impact': {
+    title: 'Initial Impact Assessment & Immediate Actions',
+    skill: 'Skill 1 — Step 1B', color: '#c88879',
+    desc: 'Immediately after the problem statement is defined, a rapid initial impact assessment determines whether urgent containment actions are required before the formal investigation proceeds. Protects patient safety and product integrity from the outset.',
+    steps: [
+      'Quarantine decision — MANDATORY first question: should the batch, equipment, or materials be placed on immediate hold?',
+      'Equipment quarantine: is the instrument/equipment that produced the OOS result still in active service? If yes, quarantine pending investigation',
+      'Companion batch hold: are any batches from the same campaign, equipment run, or material lot currently being processed or released? Place on hold',
+      'Patient risk triage: has any potentially affected product already reached patients? Document distribution status',
+      'Notification chain: immediate verbal notification to QA manager; documented within 24 hours',
+      'Stability sample assessment: are ongoing stability samples from this batch at risk? Place on hold if required',
+      'Regulatory alert threshold check: does the initial scope suggest mandatory regulatory notification may be required?',
+      'Interim controls: document any immediate corrective steps taken (e.g. instrument taken offline, analyst removed from active testing)',
+      'All decisions and rationale documented in the Investigation Record — reviewed again at Phase 2 scope assessment'
+    ]
+  },
+  'historical-review': {
+    title: 'Historical Recurrence Analysis & Risk Scoring',
+    skill: 'Skill 1 — Step 2', color: '#7b9cb8',
+    desc: 'Comprehensive 16-category search of the knowledge base to detect whether this failure has occurred before. Results determine the investigation\'s risk level and directly shape the strategy used in later phases.',
+    steps: [
+      'Step 1: Problem statement decomposition (4W1H — What, How, When, Where, Which Method)',
+      'Step 1B: 16-category KB search — same test failure, same suspected cause, same pattern, same symptom, similar severity, product family, specific product, batch level, root cause history, material/supplier, manufacturing step, CAPA history, related quality events, analyst/equipment patterns, facility/environment, FDA/industry precedents',
+      'Step 2: Cross-reference pattern detection — targeted combination searches justified by Step 1 findings',
+      'Step 3A: Document classification → Confirmed OOS Events / Confirmed Lab Errors / Unclassified',
+      'Step 3B: Recurrence analysis — frequency, trends, pattern strength by category',
+      '4-Factor Risk Score: Historical Frequency × Pattern Strength × Scope Impact × CAPA Effectiveness',
+      'Risk routing: Low → Standard | Medium → Enhanced + QA notification | High → Expedited + management | Critical → Immediate Head of QA escalation',
+      'PAUSE — agent presents risk level and awaits user confirmation before proceeding'
+    ]
+  },
+  'phase-1a': {
+    title: 'Phase 1A: Laboratory Error Assessment',
+    skill: 'Skill 2 — Part 2', color: '#9a8cb8',
+    desc: 'Systematic assessment of whether the OOS result can be attributed to a laboratory error, using document inventory, pre-fill integrity checks, and five structured categories per the site OOS SOP.',
+    steps: [
+      'PPQ/Validation batch detection — MANDATORY first check (flags persist throughout if triggered)',
+      'Document Inventory: retrieve failing test ROA, concurrent test ROA(s), Phase 1A checklist (PR# verified), LIMS worksheet, method STP, Certificate of Analysis',
+      'Multi-identifier search: PR number → batch number → AR number → product+test type → analyst+date',
+      'Pre-Fill Check: document completeness and integrity assessed before assessment begins',
+      'Category 1: Calculation Verification — 4-step: reconstruct formula · verify every input · scan for unlikely defaults (0, 1, blank) · back-calculate error factor',
+      'Category 2: Power Outage / Failure Assessment',
+      'Category 3: Equipment Failure — calibration status, qualification status, maintenance logs, error logs',
+      'Category 4: Sample Handling Review — receipt through testing',
+      'Category 5: Instrument Parameter Verification — configured per method?',
+      'Concurrent test cross-reference: same analyst, instrument, reference standard?',
+      'Historical Review patterns integrated (findings carried forward from Skill 1)',
+      'Assignable-cause standard: lab error requires simulation study, written testimony, or documentary proof — pattern alone is NOT sufficient to close investigation',
+      'PAUSE — agent presents decision context; user selects YES or NO path'
+    ]
+  },
+  'decision-1': {
+    title: 'Decision Point 1: Lab Error Confirmed?',
+    color: '#c4a775',
+    desc: 'The agent presents Phase 1A findings and structured decision context to the QA investigator. The user must explicitly choose the path — the agent does not auto-proceed. Decision context includes: evidence strength, assignable-cause confirmation status, historical risk level, and batch type.',
+    outcomes: [
+      { label: 'YES — Abbreviated Path', color: '#8ab89a', text: 'Lab error confirmed with qualifying evidence (simulation study, written witness testimony, or documentary proof). Investigation takes the abbreviated path: Root Cause Documentation → Impact → Risk → Regulatory → CAPA → Batch Disposition → Report. Phase 1B, BMR retrieval, hypothesis generation, and Phase 2 are all skipped.' },
+      { label: 'NO — Full Path', color: '#9a8cb8', text: 'Lab error not confirmed, or evidence inconclusive. Investigation proceeds to Phase 1B Extended Laboratory Assessment. All assignable-cause evidence, risk level, and batch type context is carried forward to Phase 1B.' }
+    ]
+  },
+  'root-cause-abbr': {
+    title: 'Root Cause Documentation (Abbreviated Path)',
+    skill: 'Skill 4 — Part 3B', color: '#8ab89a',
+    desc: 'When a lab error is confirmed in Phase 1A (or Phase 1B Outcome A), the investigation bypasses Phase 1B, BMR retrieval, hypothesis generation, and Phase 2. Root cause is documented in simplified form since the assignable cause is already established.',
+    steps: [
+      'Document the confirmed laboratory error with full evidence chain',
+      'Identify the specific error type and mechanism (calculation error, equipment failure, sample prep error, etc.)',
+      'Link to the assignable-cause confirmation method: (a) simulation study · (b) written witness testimony · (c) documentary proof from audit trail/instrument logs',
+      'Causal chain documented: error → explains OOS data → controlled retest produces conforming results',
+      'Interim controls and immediate corrective actions documented',
+      'Investigation Record updated — all Phase 1A data carried forward',
+      'Proceeds directly to Impact Assessment (post-determination phases)'
+    ]
+  },
+  'abbr-outcome-a': {
+    title: 'Phase 1B Outcome A — Joins Abbreviated Path',
+    color: '#8ab89a',
+    desc: 'If Phase 1B confirms a specific laboratory error (Outcome A), the investigation joins the abbreviated path at this point. Phase 2 manufacturing investigation is skipped.',
+    steps: [
+      'Evidence chain documented: specific error identified → explains original OOS data → retest under controlled conditions produces conforming results',
+      'Root Cause Classification completed in simplified form',
+      'Investigation proceeds to Impact Assessment alongside Phase 1A abbreviated path investigations'
+    ]
+  },
+  'phase-1b': {
+    title: 'Phase 1B: Extended Laboratory Assessment',
+    skill: 'Skill 3 — Part 3A', color: '#9a8cb8',
+    desc: 'Extended assessment when Phase 1A does not confirm a lab error. Involves retesting by a second qualified analyst and deeper analytical review across 7 categories. Per the site OOS SOP, Phase 1B must be conducted by a second analyst and reviewed by QA.',
+    steps: [
+      'Pre-Fill Check for Phase 1B documents — Phase 1A document inventory carried forward and re-checked',
+      'Category 1: Retest by second qualified analyst — individual replicate values, mean, %RSD, statistical comparison, human factors assessment',
+      'Category 2: Method Suitability — validation reference, SST side-by-side comparison, method robustness from historical review',
+      'MANDATORY: Method of Analysis Review — extract exact calculation formula, every input variable, SST acceptance criteria, STP version on date of OOS vs. current version',
+      'Category 3: Reagent & Standard Review — lot numbers, expiry, prep dates for both runs; MANDATORY concurrent ROA cross-reference for standard details if blank in failing test ROA',
+      'Category 4: Sample Integrity — storage conditions, sample age, homogeneity, remaining quantity',
+      'Category 5: Environmental Conditions — temperature, humidity logs for original and retest periods',
+      'Category 6: Data Integrity — 21 CFR Part 11 audit trail review, electronic records metadata, blank standard fields = data integrity flag',
+      'Category 7: Supervisor / QA Review — reviewer conclusion, Phase 1A vs. 1B comparison'
+    ]
+  },
+  'decision-2': {
+    title: 'Decision Point 2: Phase 1B Outcome',
+    color: '#c4a775',
+    desc: 'Four possible outcomes from Phase 1B, each routing differently. Outcomes B, C, and D all require proceeding to manufacturing-level investigation regardless of retest results.',
+    outcomes: [
+      { label: 'Outcome A — Lab Error Confirmed', color: '#8ab89a', text: 'Specific laboratory error identified in Phase 1B with qualifying assignable-cause evidence. Routes to Abbreviated Path: Root Cause Documentation → post-determination phases. Phase 2 manufacturing investigation is skipped.' },
+      { label: 'Outcome B — Retest Also Fails', color: '#ef4444', text: 'Retest results also OOS. Original OOS confirmed. No assignable lab cause in Phase 1A or 1B. Per 21 CFR 211.192, the original OOS stands. MUST proceed to BMR/BPR Retrieval and Phase 2.' },
+      { label: 'Outcome C — Retest Passes, No Cause', color: '#c49878', text: 'HIGH REGULATORY RISK. Retest passes but no specific lab error was identified to explain the original failure. The original OOS result still stands per 21 CFR 211.192. FDA has specifically cited investigations that dismiss original OOS results based on passing retests without root cause identification. MUST proceed to Phase 2.' },
+      { label: 'Outcome D — Inconclusive', color: '#d97706', text: 'Phase 1B did not definitively confirm or rule out lab error. Specific gaps documented. Investigation must proceed to manufacturing-level investigation via BMR/BPR Retrieval.' }
+    ]
+  },
+  'bmr-bpr': {
+    title: 'BMR/BPR Retrieval & Search Term Enrichment',
+    skill: 'Skill 3 — Part 3A', color: '#9a8cb8',
+    desc: 'Retrieval of the executed Batch Manufacturing and Packaging Records. MANDATORY before hypothesis generation — manufacturing evidence directly determines which hypotheses are generated. The agent always uses content search (not filename search), since BMRs frequently have system-generated non-descriptive filenames.',
+    steps: [
+      '7-pass search: (1) full batch number → (2) truncated batch number → (3) batch + product name → (4) product code/recipe group → (5) BMR form number + batch → (6) PR number → (7) fallback: product + BMR keywords',
+      'Document type disambiguation: verify executed BMR vs. master template (batch number filled, dates present, operator signatures, correct product)',
+      'BMR Part Enumeration: identify all parts of multi-part records (Part 1–N) for injectable/aseptic products',
+      'BMR Part Coverage Gate: every enumerated part retrieved or explicitly marked inaccessible with impact documented — gate must PASS before proceeding',
+      'Companion batch searches executed independently for each batch (primary batch retrieval does not satisfy companion)',
+      'Search Term Enrichment — extract from ALL retrieved BMR parts: Equipment IDs · Material/API lot numbers · Operator names · Deviation reference numbers · Change control numbers · Manufacturing area/room numbers · Campaign position',
+      'Enriched search terms feed directly into Hypothesis Generation document retrieval'
+    ]
+  },
+  'hypothesis-gen': {
+    title: 'Hypothesis Generation',
+    skill: 'Skill 3 — Part 3A', color: '#9a8cb8',
+    desc: 'Comprehensive, evidence-ranked set of testable root cause hypotheses using multiple RCA methods. Every hypothesis is a testable proposition — no verdicts assigned here. All verdicts are assigned in Phase 2 only.',
+    steps: [
+      'Step 1A: Analytical Procedure Decomposition — every discrete step extracted from STP/ATP (instrument setup → standard prep → sample prep → analytical run → data processing)',
+      'Step 1A.2.5: Instrument Parameter Extraction — standard vs. sample parameter comparison; asymmetric parameters without formula correction = mandatory hypothesis candidate',
+      'Step 1B: Diagnostic Constraint Cascade — classify each procedure step as Shared / Unique to failing test; Unique steps become MANDATORY hypothesis candidates',
+      'Step 1B.4: Parameter Cascade — Method-Asymmetric parameters become mandatory Layer 0 hypotheses in 6M Method category',
+      'Step 1C: Physicochemical Analysis — API/excipient sensitivity (thermal, pH, light, solubility, adsorption, hygroscopicity) cross-referenced against procedure steps; risk combinations elevated to mandatory candidates',
+      'Evidence Consolidation (7 sections): problem statement · historical patterns · lab assessment summary · data pattern analysis · open questions · manufacturing documents + BMR findings · mandatory hypothesis candidates consolidated',
+      'Step 2: 6M Analysis — People / Method/Measurement (3 layers) / Equipment / Materials / Environment / Process — with FDA precedent conversion for each Category 16 finding',
+      'Step 2.5: Magnitude Plausibility Filter — does the hypothesized error mechanistically account for the observed OOS magnitude?',
+      'Step 3: Five Whys, Cause & Effect, FMEA, Fishbone integration',
+      'Step 3.5: Completeness Verification Gate — all mandatory candidates from Steps 1A–1C and Historical Review MUST appear'
+    ]
+  },
+  'phase-2': {
+    title: 'Phase 2: Full-Scale Manufacturing Investigation',
+    skill: 'Skill 4 — Part 3B', color: '#8ab89a',
+    desc: 'Systematic testing and verification of all hypotheses from Part 3A. Each hypothesis is investigated against manufacturing evidence. Root cause verdicts are assigned here — not in hypothesis generation.',
+    steps: [
+      'Step 1: BMR/BPR Manufacturing Review — in-process results, process parameter deviations, sampling plan and fill position mapping, equipment alarms, operator/shift data, yield anomalies, hold time exceedances',
+      'Step 2: Sampling Error Investigation per site sampling error form',
+      'Step 3: Extended Lab / Hypothesis Testing per site OOS SOP (hypothesis testing section) — each hypothesis confirmed or refuted',
+      'Step 4: QA Assessment per site OOS SOP (QA assessment section)',
+      'Step 5: Root Cause Analysis — verdicts assigned using Five Whys, C&E diagram, FMEA, Fishbone; classified as Confirmed / Probable / Possible / Ruled Out',
+      'Step 6: Scope Assessment — all potentially affected batches, related products, systemic issues'
+    ]
+  },
+  'impact-assessment': {
+    title: 'Impact Assessment',
+    skill: 'Skill 4 — Part 3B', color: '#7aa4b8',
+    desc: 'All investigation paths converge here. Evaluates the full scope of the identified root cause — which batches are affected, what markets are impacted, and whether regulatory notifications are required.',
+    steps: [
+      'Scope of affected batches: same campaign, same equipment, same material lots',
+      'Related product impact (same API, same manufacturing line)',
+      'Patient safety assessment — severity of risk to end user',
+      'Market distribution status of affected batches',
+      'Regulatory notification threshold assessment (does scope trigger mandatory reporting?)',
+      'Interim controls and immediate actions consolidated from all prior phases'
+    ]
+  },
+  'risk-assessment': {
+    title: 'Risk Assessment (RPN)',
+    skill: 'Skill 4 — Part 3B', color: '#c49878',
+    desc: 'Quantitative risk scoring using Risk Priority Number methodology to prioritize response and CAPA resources.',
+    steps: [
+      'Severity scoring: patient harm potential from root cause',
+      'Occurrence scoring: likelihood of recurrence given current controls',
+      'Detectability scoring: ability to detect recurrence before reaching patient',
+      'RPN = Severity × Occurrence × Detectability',
+      'Risk level assignment: Critical / High / Medium / Low',
+      'Prioritization of CAPA actions based on RPN component scores'
+    ]
+  },
+  'regulatory': {
+    title: 'Regulatory Considerations',
+    skill: 'Skill 4 — Part 3B', color: '#c88879',
+    desc: 'Assessment of all regulatory obligations arising from the investigation, referencing specific sub-sections of applicable regulations.',
+    steps: [
+      '21 CFR 211.192 — OOS investigation requirements and documentation standards',
+      '21 CFR 211.192(a) — criteria for invalidating the original OOS result (requires confirmed assignable cause)',
+      '21 CFR 211.194(a) — laboratory records completeness requirements',
+      '21 CFR Part 11 — electronic records and audit trail requirements',
+      'Annual Product Review (APQR) flagging if required',
+      'FDA Field Alert Report / NDA/ANDA reporting obligation assessment',
+      'International market regulatory notification requirements',
+      'Recall or field safety corrective action assessment if applicable'
+    ]
+  },
+  'capa-design': {
+    title: 'CAPA Design',
+    skill: 'Skill 4 — Part 3B', color: '#8ab89a',
+    desc: 'Design of Corrective and Preventive Actions. Effectiveness of prior CAPAs from the Historical Review is cross-referenced to avoid repeating approaches that previously failed.',
+    steps: [
+      'Corrective Action: directly addresses the confirmed root cause and its immediate effects',
+      'Preventive Action: systemic changes to prevent recurrence — addresses the system that allowed the root cause to occur',
+      'Cross-reference prior CAPA history from Historical Review (Category 12: what worked, what failed for similar issues)',
+      'CAPA effectiveness monitoring plan: leading and lagging indicators defined',
+      'Timeline for each action item',
+      'Ownership assignment: accountable person for each action',
+      'Re-verification schedule: when will effectiveness be confirmed?'
+    ]
+  },
+  'batch-disposition': {
+    title: 'Batch Disposition',
+    skill: 'Skill 4 — Part 3B', color: '#8b95b8',
+    desc: 'Final disposition decision for the affected batch and any related batches identified during scope assessment. Decision must be consistent with the confirmed root cause and regulatory requirements.',
+    steps: [
+      'Reject — confirmed OOS with manufacturing root cause; product cannot be released',
+      'Release — confirmed lab error only, with documented assignable cause and 21 CFR 211.192(a) criteria fully met',
+      'Retest — specific conditions defined; limited additional testing per 21 CFR 211.192; not a blanket retry mechanism',
+      'Quarantine — hold pending additional investigation or awaiting information',
+      'Companion batch disposition: same decision logic applied to batches in scope',
+      'PPQ batch: special consideration — validated state of manufacturing process must be addressed'
+    ]
+  },
+  'report-gen': {
+    title: 'Report Generation',
+    skill: 'Skill 5 — Separate Skill', color: '#c4a775',
+    desc: 'The AI agent compiles the complete OOS investigation report from the Investigation Record, which has been built up throughout all prior skills. This is a dedicated fifth skill — separate from Skills 1–4.',
+    steps: [
+      'Complete investigation narrative documenting all phases chronologically',
+      '16-category historical search results with full search transparency log',
+      'Phase 1A assessment — all 5 categories with verification tags and confidence triads',
+      'Phase 1B assessment (if Full Path) — all 7 categories with retest data and STP extraction',
+      'BMR/BPR retrieval summary, part inventory, and search term enrichment log',
+      'Hypothesis generation outputs — ranked table with evidence basis and plausibility filter',
+      'Phase 2 investigation findings — confirmed root cause with evidence chain and RCA tool outputs',
+      'Impact and scope assessment summary',
+      'Risk Assessment (RPN) with all component scores',
+      'Regulatory considerations with specific sub-section citations',
+      'CAPA details and effectiveness monitoring plan',
+      'Batch disposition decision with rationale',
+      'Section 15: flagged incomplete items (findings where Confidence Triad could not be completed)',
+      'QA review and approval signature block',
+      'Filing per document management system requirements'
+    ]
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   FLOW GRAPH: models data flow between nodes.
+   Each key is a node id. `prereqs` = upstream (feed into it).
+   `next` = downstream (it feeds into).
+   ═══════════════════════════════════════════════════════════ */
+const GRAPH = {
+  'oos-trigger':       { prereqs: [],                   next: ['initial-setup'] },
+  'initial-setup':     { prereqs: ['oos-trigger'],      next: ['initial-impact'] },
+  'initial-impact':    { prereqs: ['initial-setup'],    next: ['historical-review'] },
+  'historical-review': { prereqs: ['initial-impact'],   next: ['phase-1a'] },
+  'phase-1a':          { prereqs: ['historical-review'],next: ['decision-1'] },
+  'decision-1':        { prereqs: ['phase-1a'],         next: ['root-cause-abbr', 'phase-1b'] },
+
+  // Abbreviated branch
+  'root-cause-abbr':   { prereqs: ['decision-1'],       next: ['abbr-outcome-a'] },
+  'abbr-outcome-a':    { prereqs: ['root-cause-abbr', 'decision-2'], next: ['impact-assessment'] },
+
+  // Full branch
+  'phase-1b':          { prereqs: ['decision-1'],       next: ['decision-2'] },
+  'decision-2':        { prereqs: ['phase-1b'],         next: ['abbr-outcome-a', 'bmr-bpr', 'hypothesis-gen'] },
+  'bmr-bpr':           { prereqs: ['decision-2'],       next: ['hypothesis-gen'] },
+  'hypothesis-gen':    { prereqs: ['decision-2', 'bmr-bpr'], next: ['phase-2'] },
+  'phase-2':           { prereqs: ['hypothesis-gen'],   next: ['impact-assessment'] },
+
+  // Convergence & post-determination
+  'impact-assessment': { prereqs: ['abbr-outcome-a', 'phase-2'], next: ['risk-assessment'] },
+  'risk-assessment':   { prereqs: ['impact-assessment'], next: ['regulatory'] },
+  'regulatory':        { prereqs: ['risk-assessment'],   next: ['capa-design'] },
+  'capa-design':       { prereqs: ['regulatory'],        next: ['batch-disposition'] },
+  'batch-disposition': { prereqs: ['capa-design'],       next: ['report-gen'] },
+  'report-gen':        { prereqs: ['batch-disposition'], next: [] }
+};
+
+/* Human-readable labels for chips in detail panel */
+const LABELS = {
+  'oos-trigger': 'OOS Event Detected',
+  'initial-setup': 'Problem Statement',
+  'initial-impact': 'Initial Impact',
+  'historical-review': 'Historical Review',
+  'phase-1a': 'Phase 1A',
+  'decision-1': 'Decision 1',
+  'root-cause-abbr': 'Root Cause (Abbr.)',
+  'abbr-outcome-a': 'Outcome A Join',
+  'phase-1b': 'Phase 1B',
+  'decision-2': 'Decision 2',
+  'bmr-bpr': 'BMR/BPR Retrieval',
+  'hypothesis-gen': 'Hypothesis Gen',
+  'phase-2': 'Phase 2',
+  'impact-assessment': 'Impact Assessment',
+  'risk-assessment': 'Risk Assessment',
+  'regulatory': 'Regulatory',
+  'capa-design': 'CAPA Design',
+  'batch-disposition': 'Batch Disposition',
+  'report-gen': 'Report Generation'
+};
+
+/* ═══════════════════════════════════════════════════════════
+   SAMPLE INVESTIGATION WALKTHROUGH
+   A scripted narrative walking through a real-world OOS case.
+   Each entry: node id + narrative context shown in the detail
+   panel during walkthrough mode. This transforms the diagram
+   from a reference doc into an interactive demo.
+   ═══════════════════════════════════════════════════════════ */
+const WALKTHROUGH = [
+  {
+    id: 'oos-trigger',
+    narrative: 'Imipenem/Cilastatin injection, batch DFF2080A. Routine release assay returned 97.8 % against a 98.0 % lower spec limit. PR#1782816 opened; sample and batch placed on "Do Not Use" hold.'
+  },
+  {
+    id: 'initial-setup',
+    narrative: 'Agent constructs the problem statement: HPLC assay, instrument HPLC-12, analyst A. Vasquez, STP-AM-045 v3.1, AR-88421. Discovery 2 h after test — no governance gap.'
+  },
+  {
+    id: 'initial-impact',
+    narrative: 'Batch DFF2080A quarantined. Companion batch DFF2081A placed on hold. HPLC-12 flagged for investigation but remains in service pending results. QA Manager notified within 20 min.'
+  },
+  {
+    id: 'historical-review',
+    narrative: '16-category KB search finds 3 similar low-assay events on Imipenem/Cilastatin in the last 24 months — all traced to reference standard degradation near expiry. Risk score: Medium → Enhanced investigation.'
+  },
+  {
+    id: 'phase-1a',
+    narrative: 'PPQ check: batch is commercial (not validation). Calculation verified. No power outages. Equipment qualified & calibrated. Sample chain-of-custody intact. No Category 1-5 assignable cause identified.'
+  },
+  {
+    id: 'decision-1',
+    narrative: 'Decision 1: evidence for a lab error is insufficient — no calculation error, no equipment failure, no documentary proof. QA investigator selects NO. Full Path proceeds.'
+  },
+  {
+    id: 'phase-1b',
+    narrative: 'Phase 1B: second analyst M. Patel retests under controlled conditions. Retest also returns OOS (97.6 %, 97.9 %). Method suitability and SST criteria met. Reference std lot RS-2184 is 28 days from expiry.'
+  },
+  {
+    id: 'decision-2',
+    narrative: 'Phase 1B Outcome B: retest confirms OOS. No assignable lab cause. Per 21 CFR 211.192 the original OOS stands. Investigation MUST proceed to manufacturing-level investigation.'
+  },
+  {
+    id: 'bmr-bpr',
+    narrative: 'BMR/BPR retrieval: all 3 parts of the executed batch record obtained by PR# search. Coverage gate PASS. Search terms enriched with equipment IDs (GMX-007, LYO-03), API lot API-IMP-22-104, operators.'
+  },
+  {
+    id: 'hypothesis-gen',
+    narrative: 'Ranked hypotheses generated: (1) reference standard degradation (high — historical precedent), (2) API lot sub-potency, (3) column aging on HPLC-12, (4) storage temperature excursion. Completeness gate PASS.'
+  },
+  {
+    id: 'phase-2',
+    narrative: 'Phase 2: reference standard RS-2184 tested against a freshly qualified standard — confirms 1.8 % degradation, fully accounting for the 0.2 % OOS magnitude. Root cause: Reference Standard near expiry. Verdict: Confirmed.'
+  },
+  {
+    id: 'impact-assessment',
+    narrative: 'Scope: 3 batches tested with RS-2184 in the preceding 14 days. Companion DFF2081A retested with fresh standard: 98.4 % — conforms. No patient-facing product affected. No regulatory notification threshold crossed.'
+  },
+  {
+    id: 'risk-assessment',
+    narrative: 'RPN scoring: Severity 3 (sub-potency antibiotic — clinical relevance), Occurrence 2 (known failure mode, controllable), Detectability 2 (caught at release). RPN = 12. Risk level: Medium.'
+  },
+  {
+    id: 'regulatory',
+    narrative: '21 CFR 211.192 investigation documentation complete. 21 CFR 211.194(a) lab records verified. APQR flagged for reference-standard management trend. No FDA Field Alert required.'
+  },
+  {
+    id: 'capa-design',
+    narrative: 'CAPA: (C) discard RS-2184, procure fresh. (P) reduce reference-standard changeover threshold from 30 days to 60 days pre-expiry; add monthly RS potency verification. Owner: QC Manager. Effectiveness review in 180 days.'
+  },
+  {
+    id: 'batch-disposition',
+    narrative: 'Batch DFF2080A: REJECT (confirmed manufacturing-accountable root cause via degraded reference contributing to invalid release test; retest with fresh standard within tolerance, but audit risk avoided by rejection). DFF2081A: RELEASE.'
+  },
+  {
+    id: 'report-gen',
+    narrative: 'Investigation report compiled from the Investigation Record built across all 5 skills. QA approval obtained, filed in DMS. Closed on Day 19 of 30. Report indexed into KB for future Historical Review cycles.'
+  }
+];
+
+/* ═══════════════════════════════════════════════════════════
+   FLOW FOCUS LOGIC: highlight related nodes on hover/focus
+   ═══════════════════════════════════════════════════════════ */
+const flowInner = document.getElementById('flowInner');
+
+/** Traverse graph to get all upstream/downstream nodes (multi-level) */
+function traceAncestors(id, visited = new Set()) {
+  if (!GRAPH[id] || visited.has(id)) return visited;
+  visited.add(id);
+  GRAPH[id].prereqs.forEach(p => traceAncestors(p, visited));
+  return visited;
+}
+function traceDescendants(id, visited = new Set()) {
+  if (!GRAPH[id] || visited.has(id)) return visited;
+  visited.add(id);
+  GRAPH[id].next.forEach(n => traceDescendants(n, visited));
+  return visited;
+}
+
+/* Maps each node id to a progress-strip step (1–5).
+   OOS trigger is considered pre-Skill-1 and not assigned; decisions
+   belong to whichever skill owns them. */
+const NODE_TO_STEP = {
+  'oos-trigger':       1,
+  'initial-setup':     1,
+  'initial-impact':    1,
+  'historical-review': 1,
+  'phase-1a':          2,
+  'decision-1':        2,
+  'phase-1b':          3,
+  'decision-2':        3,
+  'bmr-bpr':           3,
+  'hypothesis-gen':    3,
+  'root-cause-abbr':   3,   // visually adjacent to Phase 1B in the fork
+  'abbr-outcome-a':    3,
+  'phase-2':           4,
+  'impact-assessment': 4,
+  'risk-assessment':   4,
+  'regulatory':        4,
+  'capa-design':       4,
+  'batch-disposition': 4,
+  'report-gen':        5
+};
+
+function clearProgressStrip() {
+  document.querySelectorAll('.ps-step').forEach(el => {
+    el.classList.remove('is-lit', 'is-active');
+  });
+}
+function updateProgressStrip(activeNodeId, chainIds) {
+  clearProgressStrip();
+  // Light up every step that has any node on the chain
+  const stepsOnChain = new Set();
+  chainIds.forEach(id => {
+    const s = NODE_TO_STEP[id];
+    if (s) stepsOnChain.add(s);
+  });
+  stepsOnChain.forEach(s => {
+    const el = document.querySelector(`.ps-step[data-ps="${s}"]`);
+    if (el) el.classList.add('is-lit');
+  });
+  // Mark the step containing the active node
+  const activeStep = NODE_TO_STEP[activeNodeId];
+  if (activeStep) {
+    const el = document.querySelector(`.ps-step[data-ps="${activeStep}"]`);
+    if (el) el.classList.add('is-active');
+  }
+}
+
+function clearFocus() {
+  flowInner.classList.remove('has-focus');
+  flowInner.querySelectorAll('.is-active, .is-upstream, .is-downstream, .is-lit')
+    .forEach(el => el.classList.remove('is-active', 'is-upstream', 'is-downstream', 'is-lit'));
+  clearProgressStrip();
+}
+
+function applyFocus(nodeId) {
+  if (!GRAPH[nodeId]) return;
+  clearFocus();
+  flowInner.classList.add('has-focus');
+
+  // Include self, but NOT in the ancestor/descendant sets — collect them separately
+  const ancestors = traceAncestors(nodeId);
+  ancestors.delete(nodeId);
+  const descendants = traceDescendants(nodeId);
+  descendants.delete(nodeId);
+
+  // Apply active state to the focused node
+  const activeEl = flowInner.querySelector(`[data-node-id="${nodeId}"]`);
+  if (activeEl) activeEl.classList.add('is-active');
+
+  // Upstream
+  ancestors.forEach(id => {
+    const el = flowInner.querySelector(`[data-node-id="${id}"]`);
+    if (el) el.classList.add('is-upstream');
+  });
+  // Downstream
+  descendants.forEach(id => {
+    const el = flowInner.querySelector(`[data-node-id="${id}"]`);
+    if (el) el.classList.add('is-downstream');
+  });
+
+  // Light up connectors on the chain
+  const chainIds = new Set([nodeId, ...ancestors, ...descendants]);
+  // Light up straight conn's between sequential pairs
+  flowInner.querySelectorAll('[data-conn]').forEach(conn => {
+    const [from, to] = conn.getAttribute('data-conn').split('→');
+    const alt = conn.getAttribute('data-conn-alt');
+    let lit = chainIds.has(from) && chainIds.has(to);
+    if (!lit && alt) {
+      const [af, at] = alt.split('→');
+      lit = chainIds.has(af) && chainIds.has(at);
+    }
+    if (lit) conn.classList.add('is-lit');
+  });
+
+  // Light up the skill group containing any lit node
+  const litSkills = new Set();
+  chainIds.forEach(id => {
+    const el = flowInner.querySelector(`[data-node-id="${id}"]`);
+    if (el) {
+      const grp = el.closest('.skill-grp');
+      if (grp) litSkills.add(grp);
+    }
+  });
+  litSkills.forEach(g => g.classList.add('is-lit'));
+
+  // Light up the path labels
+  // "YES" path from decision-1 leads to root-cause-abbr, "NO" to phase-1b
+  if (chainIds.has('decision-1')) {
+    if (chainIds.has('root-cause-abbr') || chainIds.has('abbr-outcome-a')) {
+      const yesLbl = flowInner.querySelector('[data-path="yes"]');
+      if (yesLbl) yesLbl.classList.add('is-lit');
+    }
+    if (chainIds.has('phase-1b') || chainIds.has('decision-2') || chainIds.has('hypothesis-gen') || chainIds.has('phase-2')) {
+      const noLbl = flowInner.querySelector('[data-path="no"]');
+      if (noLbl) noLbl.classList.add('is-lit');
+    }
+  }
+
+  // Split headers
+  const abbrHeader = flowInner.querySelector('[data-path-header="abbr"]');
+  const fullHeader = flowInner.querySelector('[data-path-header="full"]');
+  if (abbrHeader && (chainIds.has('root-cause-abbr') || chainIds.has('abbr-outcome-a'))) abbrHeader.classList.add('is-lit');
+  if (fullHeader && (chainIds.has('phase-1b') || chainIds.has('decision-2') || chainIds.has('bmr-bpr') || chainIds.has('hypothesis-gen') || chainIds.has('phase-2'))) fullHeader.classList.add('is-lit');
+
+  // Convergence bar
+  const converge = flowInner.querySelector('[data-node-id="converge"]');
+  if (converge && chainIds.has('impact-assessment')) converge.classList.add('is-lit');
+
+  // Light up matching SVG paths
+  const svg = document.getElementById('flowSvg');
+  if (svg) {
+    svg.querySelectorAll('path[data-edge]').forEach(p => {
+      const edge = p.getAttribute('data-edge');
+      const [from, to] = edge.split('→');
+      if (chainIds.has(from) && chainIds.has(to)) p.classList.add('is-lit');
+    });
+  }
+
+  // Update the 5-skill progress strip
+  updateProgressStrip(nodeId, chainIds);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Hover/focus wiring — hover on any element with [data-node-id]
+   applies focus; mouseleave/focusout clears it (unless pinned).
+   ═══════════════════════════════════════════════════════════ */
+let pinnedId = null;
+function isPinned() { return pinnedId !== null; }
+
+flowInner.addEventListener('mouseover', e => {
+  const target = e.target.closest('[data-node-id]');
+  if (!target) return;
+  if (isPinned()) return;  // pinned overrides hover
+  applyFocus(target.getAttribute('data-node-id'));
+});
+flowInner.addEventListener('mouseleave', () => {
+  if (isPinned()) return;
+  clearFocus();
+});
+flowInner.addEventListener('focusin', e => {
+  const target = e.target.closest('[data-node-id]');
+  if (!target) return;
+  if (isPinned()) return;
+  applyFocus(target.getAttribute('data-node-id'));
+});
+flowInner.addEventListener('focusout', e => {
+  if (isPinned()) return;
+  // Check if focus moved within the flow — if yes, don't clear
+  setTimeout(() => {
+    const focused = document.activeElement;
+    if (!flowInner.contains(focused)) clearFocus();
+  }, 0);
+});
+
+/* Escape clears pin */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (pinnedId) unpinNode();
+    closeD();
+  }
+});
+
+function pinNode(id) {
+  pinnedId = id;
+  applyFocus(id);
+}
+function unpinNode() {
+  pinnedId = null;
+  clearFocus();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DETAIL PANEL: opening a detail panel pins the node
+   ═══════════════════════════════════════════════════════════ */
+function showD(id) {
+  const d = DATA[id];
+  if (!d) return;
+
+  // If walkthrough is active and the user clicks a node to open its
+  // detail panel, exit walkthrough first. The panel is a deliberate
+  // "drill in" action that takes the user out of the narrated tour.
+  if (walkthrough.active && !walkthrough._navigating) {
+    exitWalkthrough();
+  }
+
+  const dp     = document.getElementById('dp');
+  const stripe = document.getElementById('dp-stripe');
+  const badge  = document.getElementById('dp-badge');
+  const title  = document.getElementById('dp-title');
+  const body   = document.getElementById('dp-body');
+
+  stripe.style.background = d.color || '#7b9cb8';
+
+  badge.innerHTML = d.skill
+    ? `<span class="dp-badge" style="background:${d.color}1c;color:${d.color};border:1px solid ${d.color}3a;">${d.skill}</span>`
+    : '';
+
+  title.textContent = d.title;
+
+  let html = '';
+
+  html += `<div class="dp-sec"><div class="dp-sec-lbl">Overview</div><p class="dp-desc">${d.desc}</p></div>`;
+
+  if (d.outcomes) {
+    html += `<div class="dp-sec"><div class="dp-sec-lbl">Decision Outcomes</div><div class="oc-grid">`;
+    d.outcomes.forEach(o => {
+      html += `<div class="oc-card" style="border-left-color:${o.color}">
+        <div class="oc-lbl" style="color:${o.color}">${o.label}</div>
+        <div class="oc-desc">${o.text}</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  if (d.steps) {
+    html += `<div class="dp-sec"><div class="dp-sec-lbl">Key Activities</div><ul class="dp-list">`;
+    d.steps.forEach(s => { html += `<li>${s}</li>`; });
+    html += `</ul></div>`;
+  }
+
+  // Flow connections:
+  //   - Upstream prerequisites shown as small reference chips (compact)
+  //   - Downstream next step(s) shown as a prominent "Next →" CTA
+  //     (single button for linear flow, multiple for fork/decisions)
+  if (GRAPH[id]) {
+    const ups = GRAPH[id].prereqs.filter(p => LABELS[p]);
+    const downs = GRAPH[id].next.filter(p => LABELS[p]);
+
+    if (ups.length) {
+      html += `<div class="dp-sec"><div class="dp-sec-lbl">Feeds in from</div><div class="dp-related">`;
+      ups.forEach(u => {
+        html += `<button class="dp-rel-chip" data-dir="up" onclick="showD('${u}')" type="button"><span class="dp-rel-dir">↑ from</span>${LABELS[u]}</button>`;
+      });
+      html += `</div></div>`;
+    }
+
+    if (downs.length === 0) {
+      html += `<div class="dp-next"><div class="dp-next-lbl">Flow Complete</div>
+        <div class="dp-next-end">Investigation workflow ends here — Report filed per document management system.</div></div>`;
+    } else if (downs.length === 1) {
+      const n = downs[0];
+      html += `<div class="dp-next"><div class="dp-next-lbl">Next Step</div>
+        <button class="dp-next-btn" onclick="showD('${n}')" type="button">
+          <div class="dp-next-btn-body">
+            <div class="dp-next-btn-eyebrow">Continue to</div>
+            <div class="dp-next-btn-title">${LABELS[n]}</div>
+          </div>
+          <div class="dp-next-btn-arrow">→</div>
+        </button></div>`;
+    } else {
+      // Fork: 2+ branches (typically a decision point)
+      html += `<div class="dp-next"><div class="dp-next-lbl">Branches To</div>`;
+      downs.forEach(n => {
+        html += `<button class="dp-next-btn compact" onclick="showD('${n}')" type="button">
+          <div class="dp-next-btn-body">
+            <div class="dp-next-btn-title">${LABELS[n]}</div>
+          </div>
+          <div class="dp-next-btn-arrow">→</div>
+        </button>`;
+      });
+      html += `</div>`;
+    }
+  }
+
+  body.innerHTML = html;
+  body.scrollTop = 0;
+  dp.classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+
+  // Pin the focused node so the chain stays visible while the panel is open
+  pinNode(id);
+}
+
+function closeD() {
+  document.getElementById('dp').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+  unpinNode();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WALKTHROUGH CONTROLLER
+   Sequentially walks through the WALKTHROUGH array, pinning
+   each node, opening its detail panel with narrative context,
+   and updating the floating control bar.
+   ═══════════════════════════════════════════════════════════ */
+const walkthrough = {
+  active: false,
+  index: 0,
+  steps: WALKTHROUGH
+};
+
+function startWalkthrough() {
+  if (walkthrough.active) return;
+  walkthrough.active = true;
+  walkthrough.index = 0;
+  document.getElementById('walkthroughBar').classList.add('is-open');
+  document.getElementById('walkthroughBar').setAttribute('aria-hidden', 'false');
+  document.getElementById('wtStepTotal').textContent = walkthrough.steps.length;
+  // If a detail panel is open from a previous interaction, close it
+  // — walkthrough now narrates in-diagram, not via the panel.
+  const dp = document.getElementById('dp');
+  if (dp.classList.contains('open')) {
+    dp.classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+  }
+  gotoWalkthroughStep(0);
+}
+
+function exitWalkthrough() {
+  if (!walkthrough.active) return;
+  walkthrough.active = false;
+  // Remove spotlight
+  document.querySelectorAll('.wt-active-node').forEach(el => el.classList.remove('wt-active-node'));
+  // Hide the bar
+  document.getElementById('walkthroughBar').classList.remove('is-open');
+  document.getElementById('walkthroughBar').setAttribute('aria-hidden', 'true');
+  // Clean up the focus chain & pin
+  unpinNode();
+}
+
+/**
+ * Advance walkthrough to step i. Highlights the step's node IN THE
+ * DIAGRAM (chain-highlight + spotlight + scroll-into-view) and updates
+ * the narrative text in the floating bar. Does NOT open the detail
+ * panel — the user can click the node themselves to drill in (which
+ * will exit walkthrough).
+ */
+function gotoWalkthroughStep(i) {
+  if (i < 0 || i >= walkthrough.steps.length) return;
+  walkthrough.index = i;
+  const step = walkthrough.steps[i];
+  const nodeLabel = LABELS[step.id] || step.id;
+
+  // Update control bar counters & buttons
+  document.getElementById('wtStepNum').textContent = (i + 1);
+  const pct = ((i + 1) / walkthrough.steps.length) * 100;
+  document.getElementById('wtProgressFill').style.width = `${pct}%`;
+  document.getElementById('wtBack').disabled = (i === 0);
+  const nextBtn = document.getElementById('wtNext');
+  nextBtn.textContent = (i === walkthrough.steps.length - 1) ? 'Finish ✓' : 'Next Step →';
+
+  // Update narrative with a brief fade-swap so text changes feel
+  // intentional rather than jarring. The stage badge shows which
+  // diagram node is being narrated.
+  const narrativeEl = document.getElementById('wtNarrative');
+  const badgeEl = document.getElementById('wtStageBadge');
+  narrativeEl.classList.add('is-swapping');
+  badgeEl.classList.add('is-swapping');
+  setTimeout(() => {
+    narrativeEl.textContent = step.narrative;
+    badgeEl.textContent = nodeLabel;
+    narrativeEl.classList.remove('is-swapping');
+    badgeEl.classList.remove('is-swapping');
+  }, 150);
+
+  // Remove any previous spotlight
+  document.querySelectorAll('.wt-active-node').forEach(el => el.classList.remove('wt-active-node'));
+
+  // Apply chain-highlighting IN THE DIAGRAM (same logic as hover).
+  // Pin the node so later hovers don't override.
+  walkthrough._navigating = true;
+  pinNode(step.id);
+  walkthrough._navigating = false;
+
+  // Apply the walkthrough spotlight — a stronger glow than the
+  // regular pin state, distinctive for walkthrough mode.
+  const nodeEl = document.querySelector(`[data-node-id="${step.id}"]`);
+  if (nodeEl) {
+    nodeEl.classList.add('wt-active-node');
+    // Smooth-scroll the node into view if it's off-screen, accounting
+    // for the walkthrough bar at the bottom (~180px including padding).
+    requestAnimationFrame(() => {
+      const rect = nodeEl.getBoundingClientRect();
+      const viewH = window.innerHeight;
+      if (rect.top < 80 || rect.bottom > viewH - 200) {
+        nodeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  }
+}
+
+function nextWalkthroughStep() {
+  if (walkthrough.index >= walkthrough.steps.length - 1) {
+    exitWalkthrough();
+    return;
+  }
+  gotoWalkthroughStep(walkthrough.index + 1);
+}
+
+function prevWalkthroughStep() {
+  if (walkthrough.index <= 0) return;
+  gotoWalkthroughStep(walkthrough.index - 1);
+}
+
+// Wire up the header play button and bar controls
+document.getElementById('playWalkthroughBtn').addEventListener('click', startWalkthrough);
+document.getElementById('wtNext').addEventListener('click', nextWalkthroughStep);
+document.getElementById('wtBack').addEventListener('click', prevWalkthroughStep);
+document.getElementById('wtExit').addEventListener('click', exitWalkthrough);
+
+// Keyboard shortcuts during walkthrough
+document.addEventListener('keydown', (e) => {
+  if (!walkthrough.active) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    nextWalkthroughStep();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    prevWalkthroughStep();
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   ORTHOGONAL PATH RENDERER
+   Routes arrows through empty gutters between nodes so they
+   never overlap node text. All bends are rounded (8px radius).
+   ═══════════════════════════════════════════════════════════ */
+function renderFlowPaths() {
+  const section = document.getElementById('flowSection');
+  const svg = document.getElementById('flowSvg');
+  if (!section || !svg) return;
+
+  const sRect = section.getBoundingClientRect();
+  const W = sRect.width, H = sRect.height;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+
+  function pos(id) {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return {
+      x: r.left - sRect.left, y: r.top - sRect.top,
+      w: r.width, h: r.height,
+      cx: r.left - sRect.left + r.width / 2,
+      cy: r.top - sRect.top + r.height / 2,
+      left: r.left - sRect.left, right: r.left - sRect.left + r.width,
+      top: r.top - sRect.top, bottom: r.top - sRect.top + r.height,
+    };
+  }
+
+  const d1   = pos('anchor-decision1');
+  const rc   = pos('anchor-rootcause');
+  const p1b  = pos('anchor-phase1b');
+  const d2   = pos('anchor-decision2');
+  const oa   = pos('anchor-outcomeA');
+  const p2   = pos('anchor-phase2');
+  const conv = pos('anchor-converge');
+  if (!d1 || !rc || !p1b || !d2 || !oa || !p2 || !conv) return;
+
+  /**
+   * Build an orthogonal (right-angle) path with rounded corners.
+   * Accepts an array of waypoints [[x,y], [x,y], ...] where each
+   * consecutive pair MUST share exactly one coordinate (pure vertical
+   * or pure horizontal segment). Rounds each internal corner.
+   * Radius auto-clamps to half the shorter adjacent segment so corners
+   * don't overshoot on tight layouts.
+   */
+  function orthoPath(points, maxRadius = 10) {
+    if (points.length < 2) return '';
+    let d = `M ${points[0][0]} ${points[0][1]}`;
+    for (let i = 1; i < points.length - 1; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const next = points[i + 1];
+      const inDx = Math.sign(curr[0] - prev[0]);
+      const inDy = Math.sign(curr[1] - prev[1]);
+      const outDx = Math.sign(next[0] - curr[0]);
+      const outDy = Math.sign(next[1] - curr[1]);
+      const inLen = Math.hypot(curr[0] - prev[0], curr[1] - prev[1]);
+      const outLen = Math.hypot(next[0] - curr[0], next[1] - curr[1]);
+      // Clamp radius: max 10, but no more than half of the shorter segment
+      const r = Math.max(2, Math.min(maxRadius, inLen / 2, outLen / 2));
+      const preX = curr[0] - inDx * r;
+      const preY = curr[1] - inDy * r;
+      d += ` L ${preX} ${preY}`;
+      const postX = curr[0] + outDx * r;
+      const postY = curr[1] + outDy * r;
+      d += ` Q ${curr[0]} ${curr[1]}, ${postX} ${postY}`;
+    }
+    const last = points[points.length - 1];
+    d += ` L ${last[0]} ${last[1]}`;
+    return d;
+  }
+
+  const paths = [];
+
+  // ═══════════════════════════════════════════════════════
+  // PATH 1 & 2: Decision 1 → Root Cause (YES) / Phase 1B (NO)
+  // Clean single-bend routing: exit the diamond bottom slightly
+  // offset left/right, drop into a shared horizontal routing
+  // channel just below the diamond, bend outward at the target
+  // column's center, drop straight down into the target's top.
+  // One turn per arrow. Split-headers have been removed so the
+  // column centers are clear routing channels.
+  // ═══════════════════════════════════════════════════════
+  const d1_exitY = d1.bottom + 6;
+  const channel1_Y = d1.bottom + 28;
+  const rc_entryY = rc.top - 10;
+  const p1b_entryY = p1b.top - 10;
+
+  const d1_xLeft = d1.cx - 12;
+  const d1_xRight = d1.cx + 12;
+
+  paths.push({
+    cls: 'path-yes', edge: 'decision-1→root-cause-abbr',
+    d: orthoPath([
+      [d1_xLeft, d1_exitY],
+      [d1_xLeft, channel1_Y],
+      [rc.cx, channel1_Y],
+      [rc.cx, rc_entryY]
+    ], 10),
+    marker: 'ah-green'
+  });
+
+  paths.push({
+    cls: 'path-no', edge: 'decision-1→phase-1b',
+    d: orthoPath([
+      [d1_xRight, d1_exitY],
+      [d1_xRight, channel1_Y],
+      [p1b.cx, channel1_Y],
+      [p1b.cx, p1b_entryY]
+    ], 10),
+    marker: 'ah-violet'
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // PATH 3: Abbreviated path — Root Cause → Outcome A
+  // Pure vertical drop through left column gutter.
+  // ═══════════════════════════════════════════════════════
+  paths.push({
+    cls: 'path-abbr', edge: 'root-cause-abbr→abbr-outcome-a',
+    d: `M ${rc.cx} ${rc.bottom + 4} L ${rc.cx} ${oa.top - 6}`,
+    marker: 'ah-green'
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // PATH 4: Decision 2 → Outcome A (crossover)
+  // This is the tricky one. Decision 2 is in the RIGHT column,
+  // Outcome A is in the LEFT column and BELOW Decision 2 vertically.
+  // Route: exit Decision 2 from its LEFT tip, travel left through
+  // the split-divider gutter, drop down in that gutter, then
+  // bend left into Outcome A's right side.
+  // ═══════════════════════════════════════════════════════
+  const d2_exitX = d2.left + 4;
+  // Gutter between left column and right column — use widest nodes in each
+  // column to find a reliably-empty vertical channel.
+  const leftColRight = Math.max(rc.right, oa.right);
+  const rightColLeft = Math.min(p1b.left, p2.left, d2.left);
+  const gutterX = (leftColRight + rightColLeft) / 2;
+  const oa_entryX = oa.right + 6;
+
+  paths.push({
+    cls: 'path-outcomeA', edge: 'decision-2→abbr-outcome-a',
+    d: orthoPath([
+      [d2_exitX, d2.cy],
+      [gutterX, d2.cy],
+      [gutterX, oa.cy],
+      [oa_entryX, oa.cy]
+    ], 10),
+    marker: 'ah-green'
+  });
+
+  // ═══════════════════════════════════════════════════════
+  // PATH 5 & 6: Convergence
+  // Each column drops vertically within its own column, then
+  // bends toward converge bar center from above.
+  // ═══════════════════════════════════════════════════════
+  const convEntryY = conv.top - 6;
+  const channel2_Y = conv.top - 26;    // routing band just above converge
+
+  // Green (left): Outcome A → Converge
+  paths.push({
+    cls: 'path-conv-green', edge: 'abbr-outcome-a→impact-assessment',
+    d: orthoPath([
+      [oa.cx, oa.bottom + 4],
+      [oa.cx, channel2_Y],
+      [conv.cx - 60, channel2_Y],
+      [conv.cx - 60, convEntryY]
+    ], 10),
+    marker: 'ah-green'
+  });
+
+  // Violet (right): Phase 2 → Converge
+  paths.push({
+    cls: 'path-conv-violet', edge: 'phase-2→impact-assessment',
+    d: orthoPath([
+      [p2.cx, p2.bottom + 4],
+      [p2.cx, channel2_Y],
+      [conv.cx + 60, channel2_Y],
+      [conv.cx + 60, convEntryY]
+    ], 10),
+    marker: 'ah-violet'
+  });
+
+  // Clear existing injected paths
+  svg.querySelectorAll('path').forEach(p => {
+    if (!p.closest('defs')) p.remove();
+  });
+
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // Render each path TWICE — first a dark "stroke halo" behind it
+  // (wider, dark color) then the colored line on top. This guarantees
+  // arrows read as a separate layer even if they pass close to text.
+  // Halo shares the data-edge attribute so lighting logic toggles both.
+  paths.forEach(p => {
+    // Halo (underneath)
+    const halo = document.createElementNS(NS, 'path');
+    halo.setAttribute('class', 'path-halo');
+    halo.setAttribute('d', p.d);
+    if (p.edge) halo.setAttribute('data-edge', p.edge);
+    svg.appendChild(halo);
+    // Colored line on top
+    const el = document.createElementNS(NS, 'path');
+    el.setAttribute('class', p.cls);
+    el.setAttribute('d', p.d);
+    if (p.edge) el.setAttribute('data-edge', p.edge);
+    if (p.marker) el.setAttribute('marker-end', `url(#${p.marker})`);
+    svg.appendChild(el);
+  });
+
+  // Re-apply lit state if focus was active
+  if (flowInner.classList.contains('has-focus')) {
+    const active = flowInner.querySelector('.is-active');
+    if (active) applyFocus(active.getAttribute('data-node-id'));
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   STAGGERED REVEAL: assign per-element animation delays so the
+   flow fills in from top to bottom on first paint. 55ms per step.
+   The is-revealing class gates the animation — if JS fails to run,
+   the page still renders normally (no permanent invisible nodes).
+   ═══════════════════════════════════════════════════════════ */
+let revealApplied = false;
+function applyStaggerDelays() {
+  if (revealApplied) return;
+  const selector = '.flow-inner .node, .flow-inner .pill-node, ' +
+                   '.flow-inner .diamond, .flow-inner .outcome-a-join, ' +
+                   '.flow-inner .conn, .flow-inner .converge, ' +
+                   '.flow-inner .skill-grp, .flow-inner .path-lbl, ' +
+                   '.flow-inner .split-header';
+  const els = Array.from(document.querySelectorAll(selector));
+  els.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+  const stepMs = 55;
+  els.forEach((el, i) => {
+    el.style.setProperty('--reveal-delay', `${i * stepMs}ms`);
+  });
+  const svgDelay = Math.min(els.length * stepMs + 200, 1400);
+  document.documentElement.style.setProperty('--svg-reveal-delay', `${svgDelay}ms`);
+  // Kick off the animation
+  flowInner.classList.add('is-revealing');
+  revealApplied = true;
+  // Remove the class once the full cascade is complete, so hover
+  // dimming and other interactions aren't fighting with animations.
+  const totalMs = svgDelay + 500;
+  setTimeout(() => {
+    flowInner.classList.remove('is-revealing');
+  }, totalMs);
+}
+
+window.addEventListener('load', () => {
+  applyStaggerDelays();
+  renderFlowPaths();
+});
+window.addEventListener('resize', renderFlowPaths);
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => {
+    applyStaggerDelays();
+    renderFlowPaths();
+  });
+}
+setTimeout(renderFlowPaths, 100);
+setTimeout(renderFlowPaths, 500);
+</script>
+</body>
+</html>
